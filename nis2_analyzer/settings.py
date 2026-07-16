@@ -18,6 +18,10 @@ ALLOWED_HOSTS = config(
     default="localhost,127.0.0.1",
     cast=lambda v: [s.strip() for s in v.split(",")],
 )
+# Railway sets RAILWAY_PUBLIC_DOMAIN automatically — add it to ALLOWED_HOSTS
+_railway_domain = config("RAILWAY_PUBLIC_DOMAIN", default="")
+if _railway_domain and _railway_domain not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(_railway_domain)
 
 # Application definition
 INSTALLED_APPS = [
