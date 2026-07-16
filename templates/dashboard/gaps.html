@@ -1,0 +1,152 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Gap Analyse — NIS2{% endblock %}
+{% block page_title %}Gap Analyse Browser{% endblock %}
+
+{% block content %}
+
+{# ── KPI Bar ──────────────────────────────────────────────────── #}
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+    <div class="kpi-card" style="border-left-color:#EF4444;">
+        <div class="kpi-value">{{ total_gaps }}</div>
+        <div class="kpi-label">Totale Gaps</div>
+    </div>
+    <div class="kpi-card" style="border-left-color:#EF4444;">
+        <div class="kpi-value text-red-600">{{ critical_open }}</div>
+        <div class="kpi-label">Kritiek & Open</div>
+    </div>
+    <div class="kpi-card" style="border-left-color:#F97316;">
+        <div class="kpi-value">{{ avg_risk }}</div>
+        <div class="kpi-label">Gem. Risico / 10</div>
+    </div>
+    <div class="kpi-card" style="border-left-color:#3B82F6;">
+        <div class="kpi-value">{{ total_effort }}u</div>
+        <div class="kpi-label">Totale Hersteltijd</div>
+    </div>
+</div>
+
+{# ── Treemap ───────────────────────────────────────────────────── #}
+<div class="card mb-5">
+    <div class="card-title">Gaps per Categorie (treemap)</div>
+    <div class="treemap mt-2">
+        {% for cat in treemap_data %}
+        <div class="treemap-cell" style="flex-basis: {% widthratio cat.n treemap_max 30 %}%; min-width: 80px;
+                background: rgba(37,99,235,{{ cat.avg_risk|floatformat:0 }}0%);"
+            hx-get="{% url 'dashboard:htmx_gap_rows' %}?category={{ cat.category }}" hx-target="#gap-tbody"
+            hx-swap="innerHTML">
+            <div class="cat-count">{{ cat.n }}</div>
+            <div class="cat-name">{{ cat.category|truncatechars:14 }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{# ── Gap Table ─────────────────────────────────────────────────── #}
+<div class="card p-0 overflow-hidden" x-data="{ severity: '', category: '', addressed: '' }">
+    <div class="flex flex-wrap gap-3 p-4" style="border-bottom:1px solid var(--border);">
+        <div class="pill-filter">
+            <span @click="severity = ''" :class="{ active: severity === '' }" class="pill cursor-pointer">Alle
+                ernst</span>
+            <span @click="severity = 'CRITICAL'" :class="{ active: severity === 'CRITICAL' }"
+                class="pill cursor-pointer">🔴 Kritiek</span>
+            <span @click="severity = 'HIGH'" :class="{ active: severity === 'HIGH' }" class="pill cursor-pointer">🟠
+                Hoog</span>
+            <span @click="severity = 'MEDIUM'" :class="{ active: severity === 'MEDIUM' }" class="pill cursor-pointer">🟡
+                Medium</span>
+            <span @click="severity = 'LOW'" :class="{ active: severity === 'LOW' }" class="pill cursor-pointer">⚪
+                Laag</span>
+        </div>
+        <select class="form-select text-sm w-44" x-model="category">
+            <option value="">Alle categorieën</option>
+            {% for val, label in category_choices %}
+            <option value="{{ val }}">{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select class="form-select text-sm w-36" x-model="addressed">
+            <option value="">Alle statussen</option>
+            <option value="open">Open</option>
+            <option value="resolved">Opgelost</option>
+        </select>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Ernst</th>
+                <th>Klant</th>
+                <th>Titel</th>
+                <th>NIS2</th>
+                <th>Categorie</th>
+                <th>Risico</th>
+                <th>Uren</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="gap-tbody">
+            {% for gap in gaps %}
+            <tr x-show="(severity===''||severity==='{{ gap.severity }}')&&(category===''||category==='{{ gap.category }}')&&(addressed===''||(addressed==='open'&&!{{ gap.addressed|lower }})||(addressed==='resolved'&&{{ gap.addressed|lower }}))"
+                x-data="{ expanded: false }">
+                <td @click="expanded=!expanded"><span class="badge badge-{{ gap.severity|lower }}">{{
+                        gap.get_severity_display }}</span></td>
+                <td @click="expanded=!expanded">
+                    <a href="{% url 'dashboard:client_detail' gap.audit.client.pk %}"
+                        class="text-sm font-medium hover:underline" style="color:var(--accent-blue);">{{ gap.audit.client.company_name
+                        }}</a>
+                    <div class="text-xs" style="color:var(--text-muted);">
+                        <a href="{% url 'dashboard:audit_detail' gap.audit.pk %}" class="hover:underline">Audit →</a>
+                    </div>
+                </td>
+                <td @click="expanded=!expanded"><span class="text-sm">{{ gap.title|truncatechars:40 }}</span></td>
+                <td @click="expanded=!expanded"><span class="mono text-xs px-2 py-0.5 rounded" style="background:var(--secondary);color:var(--muted-foreground);">{{
+                        gap.nis2_article }}</span></td>
+                <td @click="expanded=!expanded"><span class="text-xs" style="color:var(--muted-foreground);">{{ gap.get_category_display
+                        }}</span></td>
+                <td @click="expanded=!expanded">
+                    <div class="flex items-center gap-1">
+                        <div
+                            class="w-2 h-2 rounded-full {% if gap.risk_score >= 8 %}bg-red-500{% elif gap.risk_score >= 5 %}bg-yellow-400{% else %}bg-green-400{% endif %}">
+                        </div>
+                        <span class="text-sm">{{ gap.risk_score }}/10</span>
+                    </div>
+                </td>
+                <td @click="expanded=!expanded"><span class="text-sm">{{ gap.estimated_effort_hours }}u</span></td>
+                <td>
+                    {% if gap.addressed %}<span class="text-green-600 text-sm font-medium">✓ Opgelost</span>
+                    {% else %}<span class="text-red-500 text-sm">● Open</span>{% endif %}
+                </td>
+            </tr>
+            <tr x-show="expanded" style="background:var(--secondary);">
+                <td colspan="8" class="p-0">
+                    <div class="gap-detail">
+                        <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+                            <div>
+                                <dt>Huidige Situatie</dt>
+                                <dd>{{ gap.current_state }}</dd>
+                            </div>
+                            <div>
+                                <dt>Aanbeveling</dt>
+                                <dd>{{ gap.recommendation }}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8">
+                    <div class="empty-state py-16">
+                        <div class="empty-state-icon">🔍</div>
+                        <div class="empty-state-text">Nog geen gaps gevonden</div>
+                        <p class="text-sm mt-2 mb-4" style="color:var(--text-muted);">
+                            Maak eerst een audit aan, upload beleidsdocumenten en start de AI-analyse.
+                        </p>
+                        <a href="{% url 'dashboard:audit_new' %}" class="btn btn-primary btn-sm" style="display:inline-flex;">
+                            + Nieuwe Audit Starten
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,247 @@
+{% extends "dashboard/base.html" %}
+{% block title %}{{ client.company_name }} — NIS2{% endblock %}
+{% block page_title %}{{ client.company_name }}{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+    {# ── Left: Client Info + Audits ─────────────────────────────── #}
+    <div class="lg:col-span-2 space-y-5">
+
+        {# Client Info Card — Task 3: Full edit form #}
+        <div class="card" x-data="{ editing: false }">
+            <div class="flex items-start justify-between mb-4">
+                <div>
+                    <h2 class="text-xl font-bold" style="color:var(--foreground);">{{ client.company_name }}</h2>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        <span class="mono text-xs px-2 py-0.5 rounded" style="background:var(--secondary);color:var(--muted-foreground);">KVK {{ client.kvk_number }}</span>
+                        <span class="badge" style="background:#EFF6FF;color:#1E40AF;">{{ client.get_sector_display }}</span>
+                        <span class="badge" style="background:#F1F5F9;color:#475569;">
+                            {% if client.company_size == 'SMALL' %}Klein (10–49){% elif client.company_size == 'MEDIUM' %}Middel (50–249){% else %}Groot (250+){% endif %}
+                        </span>
+                        {# Task 1: Display country #}
+                        <span class="badge" style="background:#F0FDF4;color:#166534;">🌍 {{ client.get_country_display }}</span>
+                    </div>
+                </div>
+                <button @click="editing = !editing" class="btn btn-secondary btn-sm">
+                    <span x-show="!editing">Bewerken</span>
+                    <span x-show="editing">Annuleren</span>
+                </button>
+            </div>
+
+            {# Display mode #}
+            <div x-show="!editing" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                <div>
+                    <span class="text-xs uppercase font-medium" style="color:var(--muted-foreground);">Adres</span>
+                    <p class="mt-0.5" style="color:var(--foreground);">{{ client.address }}<br>{{ client.postal_code }} {{ client.city }}</p>
+                </div>
+                <div>
+                    <span class="text-xs uppercase font-medium" style="color:var(--muted-foreground);">Contactpersoon</span>
+                    <p class="mt-0.5" style="color:var(--foreground);">{{ client.contact_person }}</p>
+                    <p style="color:var(--accent-blue);">{{ client.email }}</p>
+                    {% if client.phone %}<p style="color:var(--muted-foreground);">{{ client.phone }}</p>{% endif %}
+                </div>
+                <div>
+                    <span class="text-xs uppercase font-medium" style="color:var(--muted-foreground);">Land</span>
+                    <p class="mt-0.5" style="color:var(--foreground);">{{ client.get_country_display }}</p>
+                </div>
+                <div>
+                    <span class="text-xs uppercase font-medium" style="color:var(--muted-foreground);">Accountmanager</span>
+                    <p class="mt-0.5" style="color:var(--foreground);">{{ client.account_manager.get_full_name|default:"—" }}</p>
+                </div>
+                <div>
+                    <span class="text-xs uppercase font-medium" style="color:var(--muted-foreground);">Klant sinds</span>
+                    <p class="mt-0.5" style="color:var(--foreground);">{{ client.created_at|date:"d-m-Y" }}</p>
+                </div>
+                <div>
+                    <span class="text-xs uppercase font-medium" style="color:var(--muted-foreground);">KVK-nummer</span>
+                    <p class="mt-0.5 mono" style="color:var(--muted-foreground);">{{ client.kvk_number }}</p>
+                </div>
+            </div>
+
+            {# Task 3: Edit form — only shown when editing=true #}
+            <div x-show="editing" x-transition>
+                <form method="post" action="{% url 'dashboard:client_update' client.pk %}">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                        <div class="sm:col-span-2">
+                            <label class="form-label">Bedrijfsnaam *</label>
+                            <input type="text" name="company_name" class="form-input" required
+                                value="{{ client.company_name }}">
+                        </div>
+
+                        <div>
+                            <label class="form-label">KVK-nummer</label>
+                            <input type="text" class="form-input" value="{{ client.kvk_number }}" disabled
+                                style="opacity:0.6; cursor:not-allowed;">
+                            <p class="form-hint">KVK-nummer kan niet worden gewijzigd.</p>
+                        </div>
+
+                        <div>
+                            <label class="form-label">Sector *</label>
+                            <select name="sector" class="form-select" required>
+                                {% for val, label in sectors %}
+                                <option value="{{ val }}" {% if client.sector == val %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="form-label">Bedrijfsgrootte *</label>
+                            <select name="company_size" class="form-select" required>
+                                {% for val, label in sizes %}
+                                <option value="{{ val }}" {% if client.company_size == val %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        {# Task 1: Country in edit form #}
+                        <div>
+                            <label class="form-label">Land *</label>
+                            <select name="country" class="form-select" required>
+                                {% for val, label in country_choices %}
+                                <option value="{{ val }}" {% if client.country == val %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="form-label">Contactpersoon *</label>
+                            <input type="text" name="contact_person" class="form-input" required
+                                value="{{ client.contact_person }}">
+                        </div>
+
+                        <div>
+                            <label class="form-label">E-mailadres *</label>
+                            <input type="email" name="email" class="form-input" required
+                                value="{{ client.email }}">
+                        </div>
+
+                    </div>
+
+                    <div class="flex gap-3 mt-4" style="border-top:1px solid var(--border); padding-top:1rem;">
+                        <button type="submit" class="btn btn-primary">Opslaan</button>
+                        <button type="button" @click="editing = false" class="btn btn-secondary">Annuleren</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {# Audit History #}
+        <div class="card p-0 overflow-hidden">
+            <div class="flex items-center justify-between px-6 py-4" style="border-bottom:1px solid var(--border);">
+                <span class="text-sm font-semibold uppercase tracking-wide" style="color:var(--muted-foreground);">Audit Geschiedenis</span>
+                {# Task 2: Wire button to audit_new URL with client pre-selected #}
+                <a href="{% url 'dashboard:audit_new' %}?client_id={{ client.pk }}" class="btn btn-primary btn-sm">+ Nieuwe Audit Starten</a>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Datum</th>
+                        <th>Tier</th>
+                        <th>Status</th>
+                        <th>Score</th>
+                        <th>Gaps</th>
+                        <th>Doorlooptijd</th>
+                        <th>Betaald</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for audit in audits %}
+                    <tr>
+                        <td class="text-sm">{{ audit.created_at|date:"d-m-Y" }}</td>
+                        <td><span class="badge badge-{{ audit.tier|lower }}">{{ audit.tier }}</span></td>
+                        <td><span class="badge badge-{{ audit.status|lower }}">{{ audit.get_status_display }}</span></td>
+                        <td>
+                            {% if audit.compliance_score %}
+                            <div class="flex items-center gap-2">
+                                <div class="score-bar w-12">
+                                    <div class="score-bar-fill {% if audit.compliance_score >= 70 %}bg-green-500{% elif audit.compliance_score >= 40 %}bg-yellow-400{% else %}bg-red-500{% endif %}"
+                                        style="width:{{ audit.compliance_score }}%;"></div>
+                                </div>
+                                <span class="text-sm font-semibold">{{ audit.compliance_score }}%</span>
+                            </div>
+                            {% else %}<span style="color:var(--text-muted);">—</span>{% endif %}
+                        </td>
+                        <td><span class="text-sm">{{ audit.gaps_identified }}</span></td>
+                        <td><span class="text-sm">{% if audit.duration_days is not None %}{{ audit.duration_days }} d{% else %}—{% endif %}</span></td>
+                        <td>{% if audit.paid %}<span class="text-green-600">✓</span>{% else %}<span style="color:var(--muted-foreground);">Nee</span>{% endif %}</td>
+                        <td>
+                            <div class="flex gap-1">
+                                <a href="{% url 'dashboard:audit_detail' audit.pk %}" class="btn btn-sm btn-secondary">Bekijken</a>
+                                {% if audit.gaps.count > 0 %}
+                                <a href="{% url 'report_generator:gap_report_download' audit.pk %}" class="btn btn-sm btn-ghost">↓</a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📋</div>
+                                <div class="empty-state-text">Nog geen audits voor deze klant</div>
+                                <a href="{% url 'dashboard:audit_new' %}?client_id={{ client.pk }}" class="btn btn-primary btn-sm mt-3">+ Eerste Audit Starten</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {# ── Right: Stats + Trend + Quick Actions ────────────────────── #}
+    <div class="space-y-5">
+
+        {# Compliance Trend #}
+        {% if trend_scores|length >= 2 %}
+        <div class="card">
+            <div class="card-title">Compliance Trend</div>
+            <div class="flex items-end gap-1 h-24 mt-2">
+                {% for score in trend_scores %}
+                <div class="flex-1 flex flex-col items-center gap-1">
+                    <div class="w-full rounded-t"
+                        style="height: {{ score|floatformat:0 }}px; max-height: 80px; background: {% if score >= 70 %}#22C55E{% elif score >= 40 %}#EAB308{% else %}#EF4444{% endif %}; opacity: 0.85;">
+                    </div>
+                    <span class="text-xs" style="color:var(--text-muted);">{{ score|floatformat:0 }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {# Sector Benchmark #}
+        <div class="card">
+            <div class="card-title">Sector Benchmark</div>
+            <div class="text-sm" style="color:var(--muted-foreground);">
+                Gemiddelde compliance voor <strong>{{ client.get_sector_display }}</strong>:
+            </div>
+            <div class="text-3xl font-bold mt-2 {% if sector_avg >= 70 %}text-green-600{% elif sector_avg >= 40 %}text-yellow-500{% else %}text-red-500{% endif %}">
+                {{ sector_avg }}%
+            </div>
+        </div>
+
+        {# Quick Actions #}
+        <div class="card">
+            <div class="card-title">Snelle Acties</div>
+            <div class="space-y-2">
+                {# Task 2: Wire button to audit_new #}
+                <a href="{% url 'dashboard:audit_new' %}?client_id={{ client.pk }}"
+                    class="btn btn-primary w-full justify-center">
+                    ＋ Nieuwe Audit Starten
+                </a>
+                {% if latest_audit and latest_audit.gaps.count > 0 %}
+                <a href="{% url 'report_generator:gap_report_download' latest_audit.pk %}"
+                    class="btn btn-secondary w-full justify-center">
+                    ↓ Laatste Rapport Downloaden
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

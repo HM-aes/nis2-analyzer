@@ -1,0 +1,83 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Audits — NIS2{% endblock %}
+{% block page_title %}Audits{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-5">
+    <div class="mb-0">
+        <div class="flex flex-wrap items-center gap-3">
+            <div class="pill-filter">
+                <a href="{% url 'dashboard:audits' %}" class="pill {% if not current_status %}active{% endif %}"
+                    hx-get="{% url 'dashboard:htmx_audit_rows' %}" hx-target="#audit-tbody" hx-push-url="true">Alle</a>
+                {% for val, label in status_choices %}
+                <a href="{% url 'dashboard:audits' %}?status={{ val }}"
+                    class="pill {% if current_status == val %}active{% endif %}"
+                    hx-get="{% url 'dashboard:htmx_audit_rows' %}?status={{ val }}&tier={{ current_tier }}"
+                    hx-target="#audit-tbody">{{ label }}</a>
+                {% endfor %}
+            </div>
+            <div class="border-l border-slate-200 pl-3">
+                <div class="pill-filter">
+                    <a class="pill {% if not current_tier %}active{% endif %}"
+                        hx-get="{% url 'dashboard:htmx_audit_rows' %}?status={{ current_status }}"
+                        hx-target="#audit-tbody">Alle tiers</a>
+                    {% for val, label in tier_choices %}
+                    <a class="pill {% if current_tier == val %}active{% endif %}"
+                        hx-get="{% url 'dashboard:htmx_audit_rows' %}?status={{ current_status }}&tier={{ val }}"
+                        hx-target="#audit-tbody">{{ val }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="{% url 'dashboard:audit_new' %}" class="btn btn-primary">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        Nieuwe Audit
+    </a>
+</div>
+
+{% if total_audits == 0 %}
+<div class="card" style="text-align:center; padding:4rem 2rem;">
+    <div style="font-size:4rem; margin-bottom:1rem;">📋</div>
+    <h3 style="font-size:1.25rem; font-weight:700; color:var(--foreground); margin-bottom:0.5rem;">
+        Nog geen audits
+    </h3>
+    <p style="color:var(--muted-foreground); margin-bottom:1.5rem; max-width:400px; margin-left:auto; margin-right:auto;">
+        Maak uw eerste NIS2 compliance audit aan. Selecteer een klant,
+        kies het tier en upload de beleidsdocumenten om de AI-analyse te starten.
+    </p>
+    <div style="display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap;">
+        <a href="{% url 'dashboard:audit_new' %}" class="btn btn-primary" style="display:inline-flex;">
+            + Eerste Audit Aanmaken
+        </a>
+        <a href="{% url 'dashboard:clients' %}" class="btn btn-secondary" style="display:inline-flex;">
+            Naar Klanten
+        </a>
+    </div>
+</div>
+{% else %}
+<div class="card p-0 overflow-hidden">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Klant</th>
+                <th>Tier</th>
+                <th>Status</th>
+                <th>Score</th>
+                <th>Gaps</th>
+                <th>Docs</th>
+                <th>Aangemaakt</th>
+                <th>Doorlooptijd</th>
+                <th>Betaald</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="audit-tbody">
+            {% include "dashboard/partials/audit_rows.html" %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

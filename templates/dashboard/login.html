@@ -1,0 +1,688 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inloggen — NIS2 Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:       #09090b;
+      --card:     #18181b;
+      --fg:       #fafafa;
+      --muted:    #a1a1aa;
+      --dim:      #71717a;
+      --dimmer:   #52525b;
+      --border:   #27272a;
+      --surface:  #27272a;
+      --surface2: #3f3f46;
+      --primary:  #fafafa;
+      --primary-fg: #09090b;
+      --ring:     #a1a1aa;
+      --radius:   0.5rem;
+      --blue:   #6366f1; --blue-dim:   rgba(99,102,241,.15);  --blue-border:   rgba(99,102,241,.3);
+      --purple: #8b5cf6; --purple-dim: rgba(139,92,246,.15);  --purple-border: rgba(139,92,246,.3);
+      --green:  #22c55e; --green-dim:  rgba(34,197,94,.12);   --green-border:  rgba(34,197,94,.25);
+      --amber:  #f59e0b; --amber-dim:  rgba(245,158,11,.12);  --amber-border:  rgba(245,158,11,.25);
+      --red:    #ef4444; --red-dim:    rgba(239,68,68,.12);   --red-border:    rgba(239,68,68,.25);
+      --cyan:   #06b6d4; --cyan-dim:   rgba(6,182,212,.12);   --cyan-border:   rgba(6,182,212,.25);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: var(--bg); }
+    body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; color: var(--fg); }
+
+    /* ── Shell ── */
+    .shell { display: flex; width: 100%; height: 100vh; overflow: hidden; }
+
+    /* ════════════════════════════════════════════
+       LEFT PANEL
+    ════════════════════════════════════════════ */
+    .lp {
+      display: none; flex: 1; min-width: 0;
+      background: var(--bg);
+      -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 60px), transparent 100%);
+      mask-image:         linear-gradient(to bottom, black calc(100% - 60px), transparent 100%);
+    }
+    @media (min-width: 1024px) { .lp { display: flex; flex-direction: column; } }
+
+    .lp-inner {
+      width: 100%; height: 100%;
+      padding: 2.5rem 3rem 5rem;
+      overflow-y: scroll;
+      scrollbar-width: thin;
+      scrollbar-color: #3f3f46 transparent;
+    }
+    .lp-inner::-webkit-scrollbar { width: 4px; }
+    .lp-inner::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 99px; }
+    .lp-inner::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
+    /* ── Brand ── */
+    .lp-brand { display: flex; align-items: center; gap: .625rem; margin-bottom: 2.25rem; animation: fade-up .55s .05s ease both; }
+    .lp-brand a { display: flex; align-items: center; gap: .625rem; text-decoration: none; }
+    .brand-ic {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: var(--fg); display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: transform .3s ease;
+    }
+    .brand-ic svg { width: 18px; height: 18px; color: var(--bg); stroke-width: 2.5; }
+    .lp-brand:hover .brand-ic { transform: rotate(-8deg) scale(1.08); }
+    .brand-name { font-size: .9375rem; font-weight: 600; color: var(--fg); letter-spacing: -.015em; }
+
+    /* ── Badge ── */
+    .lp-badge {
+      display: inline-flex; align-items: center; gap: .375rem;
+      padding: .28rem .75rem; border: 1px solid rgba(255,255,255,.12);
+      background: var(--card); border-radius: 999px;
+      font-size: .7rem; font-weight: 500; color: var(--muted);
+      letter-spacing: .06em; text-transform: uppercase;
+      margin-bottom: 1.125rem; width: fit-content;
+      animation: fade-up .55s .18s ease both;
+    }
+    .badge-dot {
+      width: 5px; height: 5px; border-radius: 50%; background: var(--green);
+      box-shadow: 0 0 0 0 rgba(34,197,94,.5);
+      animation: dot-pulse 2.2s ease-in-out infinite;
+    }
+    @keyframes dot-pulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,.45); }
+      50%      { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+    }
+
+    /* ── Headline ── */
+    .lp-h {
+      font-size: 1.625rem; font-weight: 800; line-height: 1.2;
+      letter-spacing: -.035em; color: var(--fg); margin-bottom: .75rem;
+      animation: fade-up .55s .30s ease both;
+    }
+    .lp-h em {
+      font-style: normal;
+      background: linear-gradient(90deg, var(--muted) 0%, var(--fg) 40%, var(--muted) 80%);
+      background-size: 220% auto;
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      animation: shimmer 4s linear infinite;
+    }
+    @keyframes shimmer { from { background-position: -220% center; } to { background-position: 220% center; } }
+
+    .lp-sub {
+      font-size: .8125rem; line-height: 1.65; color: var(--muted);
+      margin-bottom: 1.25rem; max-width: 400px;
+      animation: fade-up .55s .42s ease both;
+    }
+
+    /* ── Stats row ── */
+    .stat-row { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 2rem; animation: fade-up .55s .54s ease both; }
+    .stat-pill {
+      padding: .5rem .875rem; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.10); background: var(--card);
+      transition: transform .22s, border-color .22s, box-shadow .22s; cursor: default;
+    }
+    .stat-pill:hover { transform: translateY(-4px); border-color: rgba(255,255,255,.25); box-shadow: 0 8px 20px rgba(0,0,0,.35); }
+    .stat-n { font-size: 1.125rem; font-weight: 800; color: var(--fg); letter-spacing: -.03em; line-height: 1; }
+    .stat-l { font-size: .68rem; color: var(--muted); margin-top: .125rem; white-space: nowrap; }
+
+    /* ── Section divider ── */
+    .sec-div {
+      display: flex; align-items: center; gap: .75rem;
+      margin: 1.75rem 0 1.25rem;
+    }
+    .sec-div-line { flex: 1; height: 1px; background: rgba(255,255,255,.06); }
+    .sec-div-label {
+      font-size: .6rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--dimmer); white-space: nowrap;
+    }
+
+    /* ════════════════════════════════════════════
+       NIS2 EXPLAINER
+    ════════════════════════════════════════════ */
+    .nis2-section { animation: fade-up .55s .60s ease both; }
+
+    .nis2-intro {
+      font-size: .8rem; line-height: 1.7; color: var(--dim);
+      margin-bottom: 1.125rem; max-width: 430px;
+    }
+    .nis2-intro strong { color: var(--muted); font-weight: 600; }
+
+    .tier-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .625rem; margin-bottom: 1rem; }
+    .tier-card { border-radius: 10px; padding: .875rem 1rem; border: 1px solid; }
+    .tier-t1 { background: rgba(239,68,68,.05); border-color: rgba(239,68,68,.2); }
+    .tier-t2 { background: rgba(245,158,11,.05); border-color: rgba(245,158,11,.2); }
+
+    .tier-label {
+      display: flex; align-items: center; gap: .4rem;
+      font-size: .675rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; margin-bottom: .5rem;
+    }
+    .tier-t1 .tier-label { color: #f87171; }
+    .tier-t2 .tier-label { color: #fbbf24; }
+    .tier-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .tier-t1 .tier-dot { background: var(--red); }
+    .tier-t2 .tier-dot { background: var(--amber); }
+
+    .tier-sectors { font-size: .72rem; color: var(--dim); line-height: 1.55; margin-bottom: .5rem; }
+    .tier-fine { font-size: .68rem; font-weight: 600; display: flex; align-items: center; gap: .3rem; }
+    .tier-t1 .tier-fine { color: #f87171; }
+    .tier-t2 .tier-fine { color: #fbbf24; }
+    .tier-fine svg { width: 10px; height: 10px; flex-shrink: 0; }
+
+    .applies-banner {
+      display: flex; align-items: flex-start; gap: .75rem;
+      padding: .75rem 1rem;
+      background: rgba(99,102,241,.06); border: 1px solid rgba(99,102,241,.2);
+      border-radius: 10px; margin-bottom: .25rem;
+    }
+    .applies-ic {
+      width: 28px; height: 28px; flex-shrink: 0; border-radius: 6px;
+      background: rgba(99,102,241,.12); border: 1px solid rgba(99,102,241,.25);
+      display: flex; align-items: center; justify-content: center; font-size: .85rem;
+    }
+    .applies-txt { font-size: .75rem; color: var(--dim); line-height: 1.6; }
+    .applies-txt strong { color: var(--muted); font-weight: 600; }
+
+    /* ════════════════════════════════════════════
+       ARCHITECTURE DIAGRAM CARD
+    ════════════════════════════════════════════ */
+    .arch-section { animation: fade-up .55s .68s ease both; }
+
+    .arch-card {
+      background: var(--card); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px; padding: 1.25rem;
+    }
+    .arch-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+    .arch-title { font-size: .6875rem; font-weight: 600; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; }
+    .arch-tag {
+      font-size: .6rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+      padding: .15rem .5rem; border-radius: 4px;
+      background: rgba(99,102,241,.12); color: #818cf8; border: 1px solid rgba(99,102,241,.2);
+    }
+
+    /* flow rows */
+    .arch-row { display: flex; align-items: center; gap: .5rem; }
+    .arch-node {
+      flex: 1; background: var(--bg);
+      border: 1px solid rgba(255,255,255,.08); border-radius: 8px;
+      padding: .6rem .625rem; text-align: center;
+      transition: border-color .2s, box-shadow .2s; cursor: default;
+    }
+    .arch-node:hover { border-color: rgba(255,255,255,.16); box-shadow: 0 4px 12px rgba(0,0,0,.3); }
+    .arch-node-ic {
+      width: 26px; height: 26px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto .35rem;
+    }
+    .arch-node-ic svg { width: 13px; height: 13px; }
+    .arch-node-name { font-size: .68rem; font-weight: 600; color: var(--fg); line-height: 1.2; margin-bottom: .1rem; }
+    .arch-node-sub  { font-size: .58rem; color: var(--dimmer); line-height: 1.3; }
+
+    .n-blue   .arch-node-ic { background: var(--blue-dim);   border: 1px solid var(--blue-border);   color: #818cf8; }
+    .n-red    .arch-node-ic { background: var(--red-dim);    border: 1px solid var(--red-border);    color: #f87171; }
+    .n-purple .arch-node-ic { background: var(--purple-dim); border: 1px solid var(--purple-border); color: #c4b5fd; }
+    .n-green  .arch-node-ic { background: var(--green-dim);  border: 1px solid var(--green-border);  color: #4ade80; }
+    .n-amber  .arch-node-ic { background: var(--amber-dim);  border: 1px solid var(--amber-border);  color: #fbbf24; }
+    .n-cyan   .arch-node-ic { background: var(--cyan-dim);   border: 1px solid var(--cyan-border);   color: #22d3ee; }
+
+    .arch-arrow { color: #3f3f46; flex-shrink: 0; }
+    .arch-arrow svg { width: 11px; height: 11px; }
+
+    /* connector between rows — drops from right end of row 1 to right end of row 2 */
+    .arch-connector-wrap {
+      display: flex; justify-content: flex-end;
+      padding-right: 0; margin: .25rem 0;
+    }
+    .arch-connector-line {
+      width: 1px; height: 20px;
+      background: linear-gradient(to bottom, rgba(255,255,255,.14), rgba(255,255,255,.03));
+    }
+
+    /* tech stack grid */
+    .tech-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem;
+      border-top: 1px solid rgba(255,255,255,.06); padding-top: 1rem; margin-top: 1.125rem;
+    }
+    .tech-tile {
+      text-align: center; padding: .55rem .375rem;
+      border-radius: 8px; background: rgba(255,255,255,.02);
+      border: 1px solid rgba(255,255,255,.05);
+      transition: background .15s, border-color .15s; cursor: default;
+    }
+    .tech-tile:hover { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.1); }
+    .tech-logo {
+      width: 26px; height: 26px; border-radius: 6px;
+      margin: 0 auto .35rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .65rem; font-weight: 800; letter-spacing: -.01em;
+    }
+    .tech-name { font-size: .6rem; font-weight: 600; color: var(--muted); margin-bottom: .1rem; }
+    .tech-desc { font-size: .55rem; color: var(--dimmer); line-height: 1.3; }
+
+    .tl-django  { background: rgba(34,197,94,.15); border: 1px solid rgba(34,197,94,.3);   color: #4ade80; }
+    .tl-qdrant  { background: rgba(99,102,241,.15); border: 1px solid rgba(99,102,241,.3); color: #818cf8; }
+    .tl-claude  { background: rgba(245,158,11,.15); border: 1px solid rgba(245,158,11,.3); color: #fbbf24; }
+    .tl-report  { background: rgba(239,68,68,.12);  border: 1px solid rgba(239,68,68,.25); color: #f87171; }
+
+    /* ════════════════════════════════════════════
+       SAMPLE REPORT PREVIEW
+    ════════════════════════════════════════════ */
+    .rp-card {
+      background: var(--card); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px; padding: 1.125rem 1.25rem;
+      animation: fade-up .55s .76s ease both;
+    }
+    .rp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .rp-title { font-size: .6875rem; font-weight: 600; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; }
+    .rp-label { font-size: .6rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: .15rem .45rem; border-radius: 4px; background: rgba(34,197,94,.12); color: #4ade80; }
+
+    .score-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+    .score-ring { position: relative; flex-shrink: 0; width: 56px; height: 56px; }
+    .score-ring svg { width: 56px; height: 56px; transform: rotate(-90deg); }
+    .ring-bg { fill: none; stroke: rgba(255,255,255,.06); stroke-width: 5; }
+    .ring-fg { fill: none; stroke: #4ade80; stroke-width: 5; stroke-linecap: round; stroke-dasharray: 138; stroke-dashoffset: 46; }
+    .score-val { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: .9375rem; font-weight: 800; color: var(--fg); }
+    .score-pct { font-size: 1.375rem; font-weight: 800; color: var(--fg); letter-spacing: -.03em; line-height: 1; }
+    .score-lbl { font-size: .7rem; color: var(--muted); margin-top: .1rem; }
+    .score-trend { display: flex; align-items: center; gap: .25rem; font-size: .7rem; font-weight: 600; color: #4ade80; margin-top: .3rem; }
+    .score-trend svg { width: 10px; height: 10px; stroke-width: 2.5; }
+
+    .sev-row { display: flex; gap: .5rem; margin-bottom: 1rem; }
+    .sev-pill { flex: 1; padding: .35rem .5rem; border-radius: 6px; text-align: center; }
+    .sp-c { background: rgba(239,68,68,.12); } .sp-c .sev-n { color: #f87171; }
+    .sp-h { background: rgba(249,115,22,.10); } .sp-h .sev-n { color: #fb923c; }
+    .sp-m { background: rgba(234,179,8,.10); }  .sp-m .sev-n { color: #facc15; }
+    .sp-l { background: rgba(34,197,94,.10); }  .sp-l .sev-n { color: #4ade80; }
+    .sev-n { font-size: .9375rem; font-weight: 800; line-height: 1; }
+    .sev-l { font-size: .58rem; color: var(--dim); margin-top: .1rem; text-transform: uppercase; letter-spacing: .04em; }
+
+    .mini-bars { display: flex; flex-direction: column; gap: .45rem; }
+    .mb-row { display: flex; align-items: center; gap: .625rem; }
+    .mb-name { font-size: .68rem; color: var(--muted); width: 76px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mb-track { flex: 1; height: 5px; background: rgba(255,255,255,.06); border-radius: 99px; overflow: hidden; }
+    .mb-fill { height: 100%; border-radius: 99px; }
+    .mb-c { background: #f87171; } .mb-h { background: #fb923c; } .mb-m { background: #facc15; } .mb-l { background: #4ade80; }
+    .mb-pct { font-size: .65rem; color: var(--dim); width: 26px; text-align: right; flex-shrink: 0; }
+
+    /* ════════════════════════════════════════════
+       RIGHT PANEL — login form
+    ════════════════════════════════════════════ */
+    .rp-panel {
+      width: 100%; display: flex; align-items: center; justify-content: center;
+      padding: 2rem 1.5rem; background: var(--card);
+      overflow-y: auto; overscroll-behavior: contain;
+    }
+    @media (min-width: 1024px) {
+      .rp-panel { width: 540px; flex-shrink: 0; height: 100vh; border-left: 1px solid var(--border); padding: 3rem 3.5rem; }
+    }
+
+    .form-box {
+      width: 100%; max-width: 400px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 2.5rem 2.25rem;
+      box-shadow: 0 0 0 1px var(--border), 0 8px 32px rgba(0,0,0,.2);
+      animation: card-in .5s .1s ease both;
+    }
+    @keyframes card-in { from { opacity: 0; transform: translateY(20px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes fade-up  { from { opacity: 0; transform: translateY(16px); }          to { opacity: 1; transform: translateY(0); } }
+
+    .mob-brand { display: flex; align-items: center; justify-content: center; gap: .625rem; margin-bottom: 2rem; }
+    @media (min-width: 1024px) { .mob-brand { display: none; } }
+    .mob-ic { width: 34px; height: 34px; border-radius: 8px; background: var(--fg); display: flex; align-items: center; justify-content: center; }
+    .mob-ic svg { width: 18px; height: 18px; color: var(--bg); stroke-width: 2.5; }
+    .mob-name { font-size: .9375rem; font-weight: 600; color: var(--fg); }
+
+    .card-logo { display: flex; align-items: center; justify-content: center; gap: .5rem; margin-bottom: 1.75rem; }
+    .card-logo-ic { width: 38px; height: 38px; border-radius: 10px; background: var(--fg); display: flex; align-items: center; justify-content: center; }
+    .card-logo-ic svg { width: 20px; height: 20px; color: var(--bg); stroke-width: 2.5; }
+    .card-logo-name { font-size: 1rem; font-weight: 700; color: var(--fg); letter-spacing: -.02em; }
+
+    .f-title { font-size: 1.5rem; font-weight: 800; letter-spacing: -.035em; color: var(--fg); margin-bottom: .25rem; line-height: 1.2; text-align: center; }
+    .f-sub   { font-size: .8375rem; color: var(--muted); margin-bottom: 1.75rem; text-align: center; }
+
+    .err { display: flex; align-items: center; gap: .5rem; padding: .7rem .875rem; border-radius: var(--radius); border: 1px solid rgba(239,68,68,.25); background: rgba(239,68,68,.06); color: #f87171; font-size: .8rem; margin-bottom: 1.25rem; }
+    .err svg { width: 14px; height: 14px; flex-shrink: 0; stroke-width: 2; }
+
+    .field { margin-bottom: .875rem; }
+    .f-label { display: block; font-size: .8125rem; font-weight: 600; color: var(--fg); margin-bottom: .375rem; }
+    .f-input { display: block; width: 100%; height: 42px; padding: 0 .875rem; border: 1px solid var(--surface); border-radius: var(--radius); background: var(--surface); color: var(--fg); font-size: .875rem; font-family: inherit; outline: none; transition: border-color .15s, box-shadow .15s; }
+    .f-input::placeholder { color: var(--muted); }
+    .f-input:focus { border-color: var(--fg); box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--ring); }
+
+    .btn-go { display: flex; align-items: center; justify-content: center; gap: .5rem; width: 100%; height: 42px; margin-top: 1.25rem; border: none; border-radius: var(--radius); background: var(--primary); color: var(--primary-fg); font-size: .875rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: opacity .15s, transform .1s; }
+    .btn-go:hover { opacity: .88; transform: translateY(-1px); }
+    .btn-go svg { width: 14px; height: 14px; stroke-width: 2.5; }
+
+    .div-row { display: flex; align-items: center; gap: .75rem; margin: 1.5rem 0 1.125rem; }
+    .div-line { flex: 1; height: 1px; background: var(--border); }
+    .div-txt  { font-size: .72rem; color: var(--muted); white-space: nowrap; font-weight: 500; }
+
+    .sso-btn { display: flex; align-items: center; justify-content: center; gap: .625rem; width: 100%; height: 42px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--fg); font-size: .875rem; font-weight: 500; font-family: inherit; cursor: pointer; transition: all .15s; margin-bottom: .5rem; }
+    .sso-btn:hover { border-color: var(--surface2); background: var(--surface2); transform: translateY(-1px); }
+
+    .trust-row { display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+    .trust-b   { display: flex; align-items: center; gap: .3rem; font-size: .69rem; color: var(--muted); }
+    .trust-b svg { width: 11px; height: 11px; stroke-width: 2; opacity: .6; }
+
+    .f-foot { text-align: center; font-size: .7rem; color: var(--muted); margin-top: 1.5rem; }
+  </style>
+</head>
+
+<body>
+<div class="shell">
+
+  <!-- ════════ LEFT PANEL ════════ -->
+  <div class="lp">
+    <div class="lp-inner">
+
+      <!-- Brand -->
+      <div class="lp-brand">
+        <a href="{% url 'home' %}">
+          <div class="brand-ic">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+          </div>
+          <span class="brand-name">NIS2 Analyzer</span>
+        </a>
+      </div>
+
+      <!-- Badge + headline -->
+      <div class="lp-badge"><span class="badge-dot"></span>NIS2 Compliance Platform</div>
+      <h2 class="lp-h">NIS2 <em>gap analysis</em><br>voor Nederlandse IT</h2>
+      <p class="lp-sub">Upload uw beleidsdocumenten. Ons RAG-systeem haalt elk relevant NIS2-artikel op en Claude AI brengt elke gap in kaart — boardklaar PDF-rapport in minuten.</p>
+
+      <!-- Stats -->
+      <div class="stat-row">
+        <div class="stat-pill"><div class="stat-n">46</div><div class="stat-l">NIS2 Artikelen</div></div>
+        <div class="stat-pill"><div class="stat-n">4×</div><div class="stat-l">Snellere Audit</div></div>
+        <div class="stat-pill"><div class="stat-n">18</div><div class="stat-l">Sectoren</div></div>
+        <div class="stat-pill"><div class="stat-n">99%</div><div class="stat-l">Dekking</div></div>
+      </div>
+
+      <!-- ═══ NIS2 EXPLAINER ═══ -->
+      <div class="sec-div"><div class="sec-div-line"></div><span class="sec-div-label">Wat is NIS2?</span><div class="sec-div-line"></div></div>
+      <div class="nis2-section">
+        <p class="nis2-intro">
+          De <strong>NIS2-richtlijn</strong> (Network &amp; Information Security Directive 2) is EU-wetgeving die
+          per <strong>oktober 2024</strong> van kracht is als de Nederlandse <strong>Cyberbeveiligingswet</strong>.
+          Zij verplicht organisaties in kritieke sectoren tot aantoonbare cybersecuritymaatregelen —
+          met zware sancties bij non-compliance.
+        </p>
+
+        <div class="tier-grid">
+          <div class="tier-card tier-t1">
+            <div class="tier-label">
+              <span class="tier-dot"></span>Tier 1 — Essentieel
+            </div>
+            <div class="tier-sectors">Energie · Transport · Bankwezen · Zorg · Drinkwater · Digitale infra · Ruimtevaart</div>
+            <div class="tier-fine">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+              Max €10M of 2% wereldwijde omzet
+            </div>
+          </div>
+          <div class="tier-card tier-t2">
+            <div class="tier-label">
+              <span class="tier-dot"></span>Tier 2 — Belangrijk
+            </div>
+            <div class="tier-sectors">Post · Afval · Chemie · Levensmiddelen · ICT-diensten · Onderzoek · Productie</div>
+            <div class="tier-fine">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+              Max €7M of 1,4% wereldwijde omzet
+            </div>
+          </div>
+        </div>
+
+        <div class="applies-banner">
+          <div class="applies-ic">⚡</div>
+          <div class="applies-txt">
+            <strong>Geldt voor uw organisatie</strong> als u actief bent in een kritieke sector én
+            minimaal <strong>50 medewerkers</strong> heeft of een jaaromzet van <strong>€10M+</strong> draait.
+            Kleine aanbieders die als essentieel worden aangemerkt vallen er ook onder.
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ ARCHITECTURE DIAGRAM ═══ -->
+      <div class="sec-div" style="margin-top:1.75rem"><div class="sec-div-line"></div><span class="sec-div-label">Hoe werkt het</span><div class="sec-div-line"></div></div>
+      <div class="arch-section">
+        <div class="arch-card">
+          <div class="arch-head">
+            <span class="arch-title">AI Data Pipeline</span>
+            <span class="arch-tag">6-staps verwerking</span>
+          </div>
+
+          <!-- Row 1: Upload → Security → Extract -->
+          <div class="arch-row">
+            <div class="arch-node n-blue">
+              <div class="arch-node-ic">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                </svg>
+              </div>
+              <div class="arch-node-name">Document Upload</div>
+              <div class="arch-node-sub">PDF · DOCX · TXT</div>
+            </div>
+            <div class="arch-arrow"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></div>
+            <div class="arch-node n-red">
+              <div class="arch-node-ic">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+              </div>
+              <div class="arch-node-name">Security Gate</div>
+              <div class="arch-node-sub">PII · Virus · Django</div>
+            </div>
+            <div class="arch-arrow"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></div>
+            <div class="arch-node n-purple">
+              <div class="arch-node-ic">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                </svg>
+              </div>
+              <div class="arch-node-name">Tekst Extract</div>
+              <div class="arch-node-sub">docling · pdfplumber</div>
+            </div>
+          </div>
+
+          <!-- Connector: right side ↓ -->
+          <div class="arch-connector-wrap">
+            <div class="arch-connector-line"></div>
+          </div>
+
+          <!-- Row 2 (right-to-left flow): Qdrant ← Claude ← Report -->
+          <div class="arch-row">
+            <div class="arch-node n-cyan">
+              <div class="arch-node-ic">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v1a3 3 0 006 0v-1M9 7V6a3 3 0 016 0v1M9 7h6M9 17h6M5 7h.01M5 17h.01M19 7h.01M19 17h.01"/>
+                </svg>
+              </div>
+              <div class="arch-node-name">PDF Rapport</div>
+              <div class="arch-node-sub">ReportLab · Plotly</div>
+            </div>
+            <div class="arch-arrow"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></div>
+            <div class="arch-node n-amber">
+              <div class="arch-node-ic">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2"/>
+                </svg>
+              </div>
+              <div class="arch-node-name">Claude AI</div>
+              <div class="arch-node-sub">Sonnet 4 · Pydantic AI</div>
+            </div>
+            <div class="arch-arrow"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></div>
+            <div class="arch-node n-green">
+              <div class="arch-node-ic">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+                </svg>
+              </div>
+              <div class="arch-node-name">Qdrant Search</div>
+              <div class="arch-node-sub">384-dim · COSINE</div>
+            </div>
+          </div>
+
+          <!-- Tech stack tiles -->
+          <div class="tech-grid">
+            <div class="tech-tile">
+              <div class="tech-logo tl-django">DJ</div>
+              <div class="tech-name">Django 6.0</div>
+              <div class="tech-desc">REST API<br>Security</div>
+            </div>
+            <div class="tech-tile">
+              <div class="tech-logo tl-qdrant">QD</div>
+              <div class="tech-name">Qdrant</div>
+              <div class="tech-desc">Vector DB<br>RAG engine</div>
+            </div>
+            <div class="tech-tile">
+              <div class="tech-logo tl-claude">AI</div>
+              <div class="tech-name">Claude AI</div>
+              <div class="tech-desc">Gap analyse<br>Sonnet 4</div>
+            </div>
+            <div class="tech-tile">
+              <div class="tech-logo tl-report">RL</div>
+              <div class="tech-name">ReportLab</div>
+              <div class="tech-desc">PDF output<br>Plotly charts</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SAMPLE REPORT PREVIEW ═══ -->
+      <div class="sec-div" style="margin-top:1.75rem"><div class="sec-div-line"></div><span class="sec-div-label">Voorbeeld rapport</span><div class="sec-div-line"></div></div>
+      <div class="rp-card">
+        <div class="rp-head">
+          <span class="rp-title">Sample Report Output</span>
+          <span class="rp-label">Live Preview</span>
+        </div>
+        <div class="score-row">
+          <div class="score-ring">
+            <svg viewBox="0 0 56 56"><circle class="ring-bg" cx="28" cy="28" r="22"/><circle class="ring-fg" cx="28" cy="28" r="22"/></svg>
+            <div class="score-val">67%</div>
+          </div>
+          <div>
+            <div class="score-pct">67%</div>
+            <div class="score-lbl">NIS2 Compliance Score</div>
+            <div class="score-trend">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+              +12% vs vorige audit
+            </div>
+          </div>
+        </div>
+        <div class="sev-row">
+          <div class="sev-pill sp-c"><div class="sev-n">3</div><div class="sev-l">Critical</div></div>
+          <div class="sev-pill sp-h"><div class="sev-n">7</div><div class="sev-l">High</div></div>
+          <div class="sev-pill sp-m"><div class="sev-n">12</div><div class="sev-l">Medium</div></div>
+          <div class="sev-pill sp-l"><div class="sev-n">8</div><div class="sev-l">Low</div></div>
+        </div>
+        <div class="mini-bars">
+          <div class="mb-row"><span class="mb-name">Risk Mgmt</span><div class="mb-track"><div class="mb-fill mb-c" style="width:82%"></div></div><span class="mb-pct">82%</span></div>
+          <div class="mb-row"><span class="mb-name">Incident Resp</span><div class="mb-track"><div class="mb-fill mb-h" style="width:61%"></div></div><span class="mb-pct">61%</span></div>
+          <div class="mb-row"><span class="mb-name">Supply Chain</span><div class="mb-track"><div class="mb-fill mb-m" style="width:45%"></div></div><span class="mb-pct">45%</span></div>
+          <div class="mb-row"><span class="mb-name">Cryptography</span><div class="mb-track"><div class="mb-fill mb-l" style="width:78%"></div></div><span class="mb-pct">78%</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /lp -->
+
+  <!-- ════════ RIGHT PANEL — Login form ════════ -->
+  <div class="rp-panel">
+    <div class="form-box">
+
+      <div class="card-logo">
+        <div class="card-logo-ic">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <span class="card-logo-name">NIS2 Analyzer</span>
+      </div>
+
+      <div class="mob-brand">
+        <div class="mob-ic">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <span class="mob-name">NIS2 Analyzer</span>
+      </div>
+
+      <h1 class="f-title">Welkom terug</h1>
+      <p class="f-sub">Inloggen bij uw compliance dashboard</p>
+
+      {% if error %}
+      <div class="err">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        {{ error }}
+      </div>
+      {% endif %}
+
+      <form method="post" action="{% url 'dashboard:login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">
+        {% csrf_token %}
+        <div class="field">
+          <label class="f-label" for="uid">Gebruikersnaam</label>
+          <input id="uid" type="text" name="username" class="f-input" placeholder="uw gebruikersnaam" required autofocus autocomplete="username">
+        </div>
+        <div class="field">
+          <label class="f-label" for="upw">Wachtwoord</label>
+          <input id="upw" type="password" name="password" class="f-input" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-go">
+          Inloggen
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+          </svg>
+        </button>
+      </form>
+
+      <div class="div-row"><div class="div-line"></div><span class="div-txt">of verder met</span><div class="div-line"></div></div>
+
+      <button class="sso-btn" onclick="alert('Google SSO — binnenkort beschikbaar.')">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+          <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+          <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+          <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+        </svg>
+        Doorgaan met Google
+      </button>
+      <button class="sso-btn" onclick="alert('GitHub SSO — binnenkort beschikbaar.')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color:#a1a1aa">
+          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+        </svg>
+        Doorgaan met GitHub
+      </button>
+
+      <div class="div-row" style="margin-top:1.5rem;margin-bottom:1rem"><div class="div-line"></div><span class="div-txt">veilig platform</span><div class="div-line"></div></div>
+
+      <div class="trust-row">
+        <div class="trust-b">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          TLS versleuteld
+        </div>
+        <div class="trust-b">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          AVG-conform
+        </div>
+        <div class="trust-b">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+          NL hosting
+        </div>
+      </div>
+
+      <p class="f-foot">NIS2 Compliance Platform &copy; 2026</p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

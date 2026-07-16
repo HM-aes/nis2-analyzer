@@ -1,0 +1,634 @@
+{% extends "dashboard/base.html" %}
+{% block title %}{{ audit.client.company_name }} Audit — NIS2{% endblock %}
+{% block page_title %}{{ audit.client.company_name }}{% endblock %}
+
+{% block content %}
+
+{# ── Audit Header ───────────────────────────────────────────── #}
+<div class="card mb-5">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+        <div class="flex items-start gap-4">
+            {# Compliance Gauge #}
+            <div class="gauge-wrap" style="width:110px;height:110px;">
+                {% if audit.compliance_score %}
+                {% with score=audit.compliance_score|floatformat:0 %}
+                <svg class="gauge-svg" width="110" height="110" viewBox="0 0 110 110">
+                    <circle class="gauge-track" cx="55" cy="55" r="42" stroke-width="10" stroke-dasharray="263.89" stroke-dashoffset="65.97" />
+                    {% if audit.compliance_score >= 70 %}
+                    <circle class="gauge-fill" cx="55" cy="55" r="42" stroke-width="10" stroke="#22C55E" stroke-dasharray="263.89" stroke-dashoffset="{{ 263.89|add:"-65.97" }}"/>
+                    {% elif audit.compliance_score >= 40 %}
+                    <circle class="gauge-fill" cx="55" cy="55" r="42" stroke-width="10" stroke="#EAB308" stroke-dasharray="263.89" stroke-dashoffset="{{ 263.89|add:"-65.97" }}"/>
+                    {% else %}
+                    <circle class="gauge-fill" cx="55" cy="55" r="42" stroke-width="10" stroke="#EF4444" stroke-dasharray="263.89" stroke-dashoffset="{{ 263.89|add:"-65.97" }}"/>
+                    {% endif %}
+                </svg>
+                <div class="gauge-label">{{ score }}%</div>
+                {% endwith %}
+                {% else %}
+                <svg class="gauge-svg" width="110" height="110" viewBox="0 0 110 110">
+                    <circle class="gauge-track" cx="55" cy="55" r="42" stroke-width="10" stroke-dasharray="263.89"
+                        stroke-dashoffset="65.97" />
+                </svg>
+                <div class="gauge-label text-2xl" style="color:var(--muted-foreground);">—</div>
+                {% endif %}
+                <div class="gauge-sub">Compliance Score</div>
+            </div>
+
+            <div>
+                <div class="flex flex-wrap gap-2 items-center mb-2">
+                    <span class="badge badge-{{ audit.tier|lower }}">{{ audit.tier }}</span>
+                    <span class="badge badge-{{ audit.status|lower }}">
+                        {% if audit.status == 'PROCESSING' or audit.status == 'ANALYSIS' %}
+                        <span class="spinner mr-1" style="width:10px;height:10px;border-width:1.5px;"></span>
+                        {% endif %}
+                        {{ audit.get_status_display }}
+                    </span>
+                    {% if audit.client.company_size == 'SMALL' %}<span class="badge" style="background:var(--secondary);color:var(--muted-foreground);border-color:var(--border);">Klein</span>
+                    {% elif audit.client.company_size == 'MEDIUM' %}<span class="badge" style="background:var(--secondary);color:var(--muted-foreground);border-color:var(--border);">Middel</span>
+                    {% else %}<span class="badge" style="background:var(--secondary);color:var(--muted-foreground);border-color:var(--border);">Groot</span>{% endif %}
+                    <span class="text-xs mono" style="color:var(--muted-foreground);">{{ audit.client.sector }}</span>
+                </div>
+                <div class="text-xs space-y-0.5" style="color:var(--muted-foreground);">
+                    <div>Aangemaakt: {{ audit.created_at|date:"d-m-Y H:i" }}</div>
+                    {% if audit.started_at %}<div>Gestart: {{ audit.started_at|date:"d-m-Y H:i" }}</div>{% endif %}
+                    {% if audit.completed_at %}<div>Voltooid: {{ audit.completed_at|date:"d-m-Y H:i" }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="flex gap-2 flex-wrap items-start">
+            {# Task 15: AI Analyse button with loading state #}
+            {% if audit.status == 'INTAKE' and documents %}
+            <div x-data="{ running: false, error: null }">
+                <form method="post" action="{% url 'dashboard:audit_run' audit.pk %}"
+                    @submit="running = true">
+                    {% csrf_token %}
+                    <button type="submit" id="run-audit-btn"
+                        :disabled="running"
+                        :class="running ? 'opacity-50 cursor-not-allowed' : ''"
+                        class="btn btn-primary flex items-center gap-2">
+                        <span x-show="!running">🚀 AI Analyse Starten</span>
+                        <span x-show="running" class="flex items-center gap-2">
+                            <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                            Analyseren...
+                        </span>
+                    </button>
+                </form>
+                <p x-show="error" x-text="error" class="text-red-500 text-sm mt-2"></p>
+            </div>
+            {% elif audit.status == 'INTAKE' %}
+            <button class="btn btn-primary opacity-50 cursor-not-allowed" disabled title="Upload eerst een document">
+                📂 Upload eerst een document
+            </button>
+            {% endif %}
+
+            {# Task 17: Report download — show when gaps exist (no gate on report_generated) #}
+            {% if gaps.count > 0 %}
+            <a href="{% url 'report_generator:gap_report_download' audit.pk %}" class="btn btn-secondary flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Rapport Downloaden
+            </a>
+            {% elif audit.status == 'COMPLETE' %}
+            <p class="text-sm" style="color:var(--muted-foreground);">Rapport wordt gegenereerd...</p>
+            {% endif %}
+
+            <a href="{% url 'dashboard:client_detail' client.pk %}" class="btn btn-ghost">← {{ client.company_name }}</a>
+        </div>
+    </div>
+
+    {# Task 4: Status transition buttons #}
+    {% if audit.status == 'REVIEW' %}
+    <div class="mt-4 pt-4 flex flex-wrap gap-3" style="border-top:1px solid var(--border);"
+        x-data="{ confirmStatus: '', confirmText: '' }">
+        <span class="text-sm font-medium self-center" style="color:var(--muted-foreground);">Acties:</span>
+
+        <button @click="confirmStatus='COMPLETE'; confirmText='Weet u zeker dat u de analyse wilt goedkeuren?'"
+            class="btn btn-sm" style="background:#22c55e;color:white;border-color:#22c55e;">
+            ✅ Analyse Goedkeuren
+        </button>
+        <button @click="confirmStatus='INTAKE'; confirmText='Weet u zeker dat u de audit wilt resetten naar INTAKE?'"
+            class="btn btn-sm" style="background:#ef4444;color:white;border-color:#ef4444;">
+            🔄 Opnieuw Starten
+        </button>
+
+        {# Confirmation modal #}
+        <div x-show="confirmStatus !== ''" x-transition
+            class="fixed inset-0 flex items-center justify-center z-50"
+            style="background:rgba(0,0,0,0.5);">
+            <div class="card max-w-sm w-full mx-4">
+                <h3 class="text-lg font-semibold mb-2" style="color:var(--foreground);">Bevestigen</h3>
+                <p class="text-sm mb-4" style="color:var(--muted-foreground);" x-text="confirmText"></p>
+                <div class="flex gap-3">
+                    <form method="post" action="{% url 'dashboard:audit_transition' audit.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="status" :value="confirmStatus">
+                        <button type="submit" class="btn btn-primary btn-sm">Bevestigen</button>
+                    </form>
+                    <button @click="confirmStatus=''" class="btn btn-secondary btn-sm">Annuleren</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% elif audit.status == 'COMPLETE' %}
+    <div class="mt-4 pt-4 flex flex-wrap gap-3" style="border-top:1px solid var(--border);"
+        x-data="{ confirmStatus: '', confirmText: '' }">
+        <span class="text-sm font-medium self-center" style="color:var(--muted-foreground);">Acties:</span>
+        <button @click="confirmStatus='DELIVERED'; confirmText='Weet u zeker dat u het rapport als geleverd wilt markeren?'"
+            class="btn btn-sm" style="background:#1d4ed8;color:white;border-color:#1d4ed8;">
+            🚀 Rapport Geleverd
+        </button>
+        <button @click="confirmStatus='INTAKE'; confirmText='Weet u zeker dat u de audit wilt resetten naar INTAKE?'"
+            class="btn btn-sm" style="background:#ef4444;color:white;border-color:#ef4444;">
+            🔄 Opnieuw Starten
+        </button>
+        <div x-show="confirmStatus !== ''" x-transition
+            class="fixed inset-0 flex items-center justify-center z-50"
+            style="background:rgba(0,0,0,0.5);">
+            <div class="card max-w-sm w-full mx-4">
+                <h3 class="text-lg font-semibold mb-2" style="color:var(--foreground);">Bevestigen</h3>
+                <p class="text-sm mb-4" style="color:var(--muted-foreground);" x-text="confirmText"></p>
+                <div class="flex gap-3">
+                    <form method="post" action="{% url 'dashboard:audit_transition' audit.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="status" :value="confirmStatus">
+                        <button type="submit" class="btn btn-primary btn-sm">Bevestigen</button>
+                    </form>
+                    <button @click="confirmStatus=''" class="btn btn-secondary btn-sm">Annuleren</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% elif audit.status == 'ERROR' or audit.status == 'PROCESSING' %}
+    <div class="mt-4 pt-4 flex flex-wrap gap-3" style="border-top:1px solid var(--border);"
+        x-data="{ confirmStatus: '', confirmText: '' }">
+        <button @click="confirmStatus='INTAKE'; confirmText='Weet u zeker dat u de audit wilt resetten naar INTAKE?'"
+            class="btn btn-sm" style="background:#ef4444;color:white;border-color:#ef4444;">
+            🔄 Reset naar Intake
+        </button>
+        <div x-show="confirmStatus !== ''" x-transition
+            class="fixed inset-0 flex items-center justify-center z-50"
+            style="background:rgba(0,0,0,0.5);">
+            <div class="card max-w-sm w-full mx-4">
+                <h3 class="text-lg font-semibold mb-2" style="color:var(--foreground);">Bevestigen</h3>
+                <p class="text-sm mb-4" style="color:var(--muted-foreground);" x-text="confirmText"></p>
+                <div class="flex gap-3">
+                    <form method="post" action="{% url 'dashboard:audit_transition' audit.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="status" :value="confirmStatus">
+                        <button type="submit" class="btn btn-primary btn-sm">Bevestigen</button>
+                    </form>
+                    <button @click="confirmStatus=''" class="btn btn-secondary btn-sm">Annuleren</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Live processing status #}
+    {% if audit.status == 'PROCESSING' or audit.status == 'ANALYSIS' %}
+    <div id="audit-status-block" class="mt-4" hx-get="{% url 'dashboard:htmx_audit_status' audit.pk %}"
+        hx-trigger="every 3s" hx-swap="outerHTML">
+        {% include "dashboard/partials/audit_status.html" %}
+    </div>
+    {% else %}
+    <div id="audit-status-block"></div>
+    {% endif %}
+</div>
+
+{# ── Tab Navigation (Alpine.js) ─────────────────────────────── #}
+<div x-data="{ tab: '{{ tab }}' }">
+    <div class="tab-nav">
+        <a @click.prevent="tab = 'overview'" :class="{ active: tab === 'overview' }" class="tab-btn" href="#">Overzicht</a>
+        <a @click.prevent="tab = 'gaps'" :class="{ active: tab === 'gaps' }" class="tab-btn" href="#">
+            Gap Analyse
+            {% if critical_gaps > 0 %}<span class="badge badge-critical ml-1">{{ critical_gaps }}</span>{% endif %}
+        </a>
+        <a @click.prevent="tab = 'documents'" :class="{ active: tab === 'documents' }" class="tab-btn" href="#">
+            Documenten
+            {% with doc_count=documents.count %}
+            {% if doc_count > 0 %}<span class="badge ml-1" style="background:var(--secondary);color:var(--muted-foreground);">{{ doc_count }}</span>{% endif %}
+            {% endwith %}
+        </a>
+        <a @click.prevent="tab = 'timeline'" :class="{ active: tab === 'timeline' }" class="tab-btn" href="#">Timeline</a>
+    </div>
+
+    {# ── Tab 1: Overview ─────────────────────────────────────── #}
+    <div x-show="tab === 'overview'" x-transition>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+            {# Gap severity breakdown #}
+            <div class="card">
+                <div class="card-title">Gap Verdeling</div>
+                <div class="grid grid-cols-2 gap-3 mt-1">
+                    <div class="rounded-lg p-3 text-center cursor-pointer hover:opacity-80"
+                        style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.18);"
+                        x-data @click="tab='gaps'">
+                        <div class="text-2xl font-bold" style="color:var(--accent-red);">{{ critical_gaps }}</div>
+                        <div class="text-xs font-medium" style="color:var(--accent-red);">KRITIEK</div>
+                    </div>
+                    <div class="rounded-lg p-3 text-center"
+                        style="background:rgba(251,146,60,0.08); border:1px solid rgba(251,146,60,0.18);">
+                        <div class="text-2xl font-bold" style="color:#fb923c;">{{ high_gaps }}</div>
+                        <div class="text-xs font-medium" style="color:#fb923c;">HOOG</div>
+                    </div>
+                    <div class="rounded-lg p-3 text-center"
+                        style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.18);">
+                        <div class="text-2xl font-bold" style="color:var(--accent-amber);">{{ medium_gaps }}</div>
+                        <div class="text-xs font-medium" style="color:var(--accent-amber);">MEDIUM</div>
+                    </div>
+                    <div class="rounded-lg p-3 text-center"
+                        style="background:var(--secondary); border:1px solid var(--border);">
+                        <div class="text-2xl font-bold" style="color:var(--muted-foreground);">{{ low_gaps }}</div>
+                        <div class="text-xs font-medium" style="color:var(--text-muted);">LAAG</div>
+                    </div>
+                </div>
+            </div>
+
+            {# Category heatmap #}
+            <div class="card lg:col-span-2">
+                <div class="card-title">Gaps per Categorie</div>
+                <div class="heatmap mt-2">
+                    {% for cat, count in gap_by_category.items %}
+                    {% with intensity=count|floatformat:0 %}
+                    <div class="heatmap-cell"
+                        style="background: rgba(37,99,235,{% if max_cat_count > 0 %}{{ count }}{% else %}0{% endif %}00);"
+                        x-data @click="tab='gaps'">
+                        <div class="cat-count">{{ count }}</div>
+                        <div class="cat-name">{{ cat|truncatechars:12 }}</div>
+                    </div>
+                    {% endwith %}
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+
+        {# Remediation effort #}
+        {% if total_effort or total_cost %}
+        <div class="card mt-5">
+            <div class="card-title">Herstelschatting</div>
+            <div class="flex gap-8">
+                <div>
+                    <div class="text-2xl font-bold" style="color:var(--foreground);">{{ total_effort }} uur</div>
+                    <div class="text-xs" style="color:var(--muted-foreground);">Geschatte implementatietijd</div>
+                </div>
+                {% if total_cost %}
+                <div>
+                    <div class="text-2xl font-bold" style="color:var(--foreground);">€{{ total_cost|floatformat:0 }}</div>
+                    <div class="text-xs" style="color:var(--muted-foreground);">Geschatte kosten</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {# ── Tab 2: Gap Analysis ─────────────────────────────────── #}
+    <div x-show="tab === 'gaps'" x-transition x-data="{ severity: '', category: '', addressed: '' }">
+        <div class="flex flex-wrap gap-3 mb-4 items-center">
+            <div class="pill-filter">
+                <span @click="severity = ''" :class="{ active: severity === '' }" class="pill cursor-pointer">Alle</span>
+                <span @click="severity = 'CRITICAL'" :class="{ active: severity === 'CRITICAL' }" class="pill cursor-pointer">🔴 Kritiek</span>
+                <span @click="severity = 'HIGH'" :class="{ active: severity === 'HIGH' }" class="pill cursor-pointer">🟠 Hoog</span>
+                <span @click="severity = 'MEDIUM'" :class="{ active: severity === 'MEDIUM' }" class="pill cursor-pointer">🟡 Medium</span>
+                <span @click="severity = 'LOW'" :class="{ active: severity === 'LOW' }" class="pill cursor-pointer">⚪ Laag</span>
+            </div>
+            <select class="form-select text-sm w-44" x-model="category">
+                <option value="">Alle categorieën</option>
+                {% for gap in gaps %}
+                <option value="{{ gap.category }}">{{ gap.get_category_display }}</option>
+                {% endfor %}
+            </select>
+            <select class="form-select text-sm w-36" x-model="addressed">
+                <option value="">Alle statussen</option>
+                <option value="open">Open</option>
+                <option value="resolved">Opgelost</option>
+            </select>
+        </div>
+
+        {% if not gaps %}
+        <div class="card">
+            <div class="empty-state py-16">
+                <div class="empty-state-icon">✅</div>
+                <div class="empty-state-text">Geen gaps gevonden — voer eerst een AI analyse uit</div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card p-0 overflow-hidden">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Ernst</th>
+                        <th>Titel</th>
+                        <th>NIS2 Artikel</th>
+                        <th>Categorie</th>
+                        <th>Risico</th>
+                        <th>Uren</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for gap in gaps %}
+                    <tr x-show="(severity === '' || severity === '{{ gap.severity }}') && (category === '' || category === '{{ gap.category }}') && (addressed === '' || (addressed === 'open' && !{{ gap.addressed|lower }}) || (addressed === 'resolved' && {{ gap.addressed|lower }}))"
+                        x-data="{ expanded: false }" class="cursor-pointer">
+                        <td @click="expanded = !expanded"><span class="badge badge-{{ gap.severity|lower }}">{{ gap.get_severity_display }}</span></td>
+                        <td @click="expanded = !expanded">
+                            <div class="font-medium text-sm" style="color:var(--foreground);">{{ gap.title|truncatechars:50 }}</div>
+                        </td>
+                        <td @click="expanded = !expanded"><span class="mono text-xs px-2 py-0.5 rounded" style="background:var(--secondary);color:var(--muted-foreground);">{{ gap.nis2_article }}</span></td>
+                        <td @click="expanded = !expanded"><span class="text-xs" style="color:var(--muted-foreground);">{{ gap.get_category_display }}</span></td>
+                        <td @click="expanded = !expanded">
+                            <div class="flex items-center gap-1">
+                                <div class="w-2 h-2 rounded-full {% if gap.risk_score >= 8 %}bg-red-500{% elif gap.risk_score >= 5 %}bg-yellow-400{% else %}bg-green-400{% endif %}"></div>
+                                <span class="text-sm">{{ gap.risk_score }}/10</span>
+                            </div>
+                        </td>
+                        <td @click="expanded = !expanded"><span class="text-sm">{{ gap.estimated_effort_hours }}u</span></td>
+                        <td @click="expanded = !expanded">
+                            {% if gap.addressed %}
+                            <span class="flex items-center gap-1 text-green-600 text-sm"><span>✓</span> Opgelost</span>
+                            {% else %}
+                            <span class="flex items-center gap-1 text-red-500 text-sm"><span class="w-2 h-2 rounded-full bg-red-500 inline-block"></span> Open</span>
+                            {% endif %}
+                        </td>
+                        <td></td>
+                    </tr>
+                    {# Expanded row — Task 5: Mark-as-addressed panel #}
+                    <tr x-show="expanded" style="background:var(--secondary);">
+                        <td colspan="8" class="p-0">
+                            <div class="gap-detail">
+                                <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+                                    <div>
+                                        <dt>Huidige Situatie</dt>
+                                        <dd>{{ gap.current_state }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Vereiste Situatie</dt>
+                                        <dd>{{ gap.required_state }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Aanbeveling</dt>
+                                        <dd>{{ gap.recommendation }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Bedrijfsimpact</dt>
+                                        <dd>{{ gap.business_impact|default:"—" }}</dd>
+                                    </div>
+                                </dl>
+
+                                {# Task 5: Mark-as-addressed form #}
+                                {% if not gap.addressed %}
+                                <div class="mt-4 pt-4" style="border-top:1px solid var(--border);">
+                                    <p class="text-xs font-semibold uppercase tracking-wide mb-2" style="color:var(--muted-foreground);">Gap Markeren als Opgelost</p>
+                                    <form hx-post="{% url 'dashboard:gap_address' gap.pk %}"
+                                          hx-target="closest tr"
+                                          hx-swap="outerHTML"
+                                          class="flex flex-col gap-2"
+                                          x-data="{ submitting: false }"
+                                          @submit="submitting = true">
+                                        {% csrf_token %}
+                                        <textarea name="implementation_notes" rows="2"
+                                            class="form-input text-sm"
+                                            placeholder="Beschrijf de uitgevoerde maatregelen..."></textarea>
+                                        <button type="submit"
+                                            :disabled="submitting"
+                                            :class="submitting ? 'opacity-50 cursor-not-allowed' : ''"
+                                            class="btn btn-sm self-start flex items-center gap-2"
+                                            style="background:#22c55e;color:white;border-color:#22c55e;">
+                                            <span x-show="!submitting">✅ Markeer als Opgelost</span>
+                                            <span x-show="submitting">Opslaan...</span>
+                                        </button>
+                                    </form>
+                                </div>
+                                {% else %}
+                                <div class="mt-4 pt-4" style="border-top:1px solid var(--border);">
+                                    <p class="text-green-600 font-medium text-sm">✅ Opgelost op {{ gap.addressed_date|date:"d-m-Y" }}</p>
+                                    {% if gap.implementation_notes %}
+                                    <p class="text-sm mt-1" style="color:var(--muted-foreground);">{{ gap.implementation_notes }}</p>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">✅</div>
+                                <div class="empty-state-text">Geen gaps gevonden</div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+
+    {# ── Tab 3: Documents (Task 6 — full rebuild) ─────────────── #}
+    <div x-show="tab === 'documents'" x-transition>
+        {# Upload zone #}
+        <div class="card mb-4" x-data="{ dragging: false, uploading: false }" @dragover.prevent="dragging = true"
+            @dragleave="dragging = false" @drop.prevent="dragging = false">
+            <div class="card-title">Document Uploaden</div>
+            <form method="post" action="{% url 'dashboard:audit_upload' audit.pk %}"
+                enctype="multipart/form-data"
+                @submit="uploading = true">
+                {% csrf_token %}
+                <div class="upload-zone" :class="{ dragover: dragging }" @click="$refs.fileInput.click()">
+                    <div class="text-3xl mb-2">📄</div>
+                    <p class="text-sm font-medium" style="color:var(--muted-foreground);">Sleep bestanden hierheen of klik om te bladeren</p>
+                    <p class="text-xs mt-1" style="color:var(--text-muted);">PDF, DOCX of TXT — max. 50MB</p>
+                    <input type="file" x-ref="fileInput" name="file" class="hidden" accept=".pdf,.docx,.txt"
+                        @change="$el.closest('form').submit()">
+                </div>
+                <div class="mt-3 flex gap-3 items-center">
+                    <select name="document_type" class="form-select text-sm w-52" required>
+                        <option value="">Documenttype kiezen…</option>
+                        <option value="POLICY">Beveiligingsbeleid</option>
+                        <option value="PROCEDURE">Beveiligingsprocedure</option>
+                        <option value="NETWORK_DIAGRAM">Netwerkdiagram</option>
+                        <option value="INCIDENT_PLAN">Incidentresponsplan</option>
+                        <option value="BCP">Bedrijfscontinuïteitsplan</option>
+                        <option value="RISK_ASSESSMENT">Risicoanalyse</option>
+                        <option value="AUDIT_REPORT">Vorig Auditrapport</option>
+                        <option value="CERTIFICATE">Beveiligingscertificaat</option>
+                        <option value="OTHER">Overig</option>
+                    </select>
+                    <button type="submit" class="btn btn-secondary btn-sm flex items-center gap-2"
+                        :disabled="uploading"
+                        :class="uploading ? 'opacity-50 cursor-not-allowed' : ''">
+                        <span x-show="!uploading">📤 Uploaden</span>
+                        <span x-show="uploading" class="flex items-center gap-2">
+                            <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                            Uploaden...
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {# Document table — Task 6: Full document list with security flags, delete, reprocess #}
+        <div class="card p-0 overflow-hidden">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Bestand</th>
+                        <th>Type</th>
+                        <th>Grootte</th>
+                        <th>Beveiliging</th>
+                        <th>Geüpload</th>
+                        <th>Status</th>
+                        <th>Acties</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in documents %}
+                    <tr>
+                        <td>
+                            <div class="flex items-center gap-2">
+                                {% if doc.original_filename|lower|slice:"-3:" == "pdf" %}<span>📕</span>
+                                {% elif doc.original_filename|lower|slice:"-4:" == "docx" %}<span>📘</span>
+                                {% else %}<span>📄</span>{% endif %}
+                                <span class="text-sm font-medium truncate max-w-xs" style="color:var(--foreground);">{{ doc.original_filename }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge" style="background:var(--secondary);color:var(--muted-foreground);">{{ doc.get_document_type_display }}</span>
+                        </td>
+                        <td>
+                            <span class="text-sm" style="color:var(--muted-foreground);">{{ doc.file_size_bytes|filesizeformat }}</span>
+                        </td>
+                        <td>
+                            <div class="flex gap-1.5 flex-wrap">
+                                {# Virus scan status #}
+                                {% if not doc.virus_scanned %}
+                                <span class="badge" style="background:#F1F5F9;color:#64748B;" title="Nog niet gescand">⚠️ Niet gescand</span>
+                                {% elif doc.virus_found %}
+                                <span class="badge badge-critical" title="Virus gevonden">🚨 Dreiging!</span>
+                                {% else %}
+                                <span class="badge badge-complete" title="Schoon">✅ Schoon</span>
+                                {% endif %}
+                                {# PII status #}
+                                {% if doc.pii_detected %}
+                                <span class="badge badge-review" title="PII gevonden">⚠️ PII Gevonden</span>
+                                {% else %}
+                                <span class="badge badge-complete" title="Geen PII">✅ Geen PII</span>
+                                {% endif %}
+                                {# Language #}
+                                {% if doc.language_detected %}
+                                <span class="badge" style="background:#EFF6FF;color:#1E40AF;">🌐 {{ doc.language_detected|upper }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-sm" style="color:var(--foreground);">{{ doc.uploaded_at|date:"d-m-Y" }}</div>
+                            <div class="text-xs" style="color:var(--text-muted);">{{ doc.uploaded_at|timesince }} geleden</div>
+                        </td>
+                        <td>
+                            {% if doc.processed %}
+                            <span class="badge badge-complete">✅ Verwerkt</span>
+                            {% elif doc.processing_error %}
+                            <span class="badge badge-critical">❌ Fout</span>
+                            {% else %}
+                            <span class="badge" style="background:#F1F5F9;color:#64748B;">⏳ Wachten</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="flex gap-1">
+                                {# Delete button #}
+                                {% if audit.status != 'PROCESSING' %}
+                                <form method="post" action="{% url 'dashboard:document_delete' doc.pk %}"
+                                    x-data="{ confirm: false }">
+                                    {% csrf_token %}
+                                    <button type="button" @click="confirm = true"
+                                        class="btn btn-sm" style="background:#fee2e2;color:#dc2626;border-color:#fca5a5;"
+                                        title="Document verwijderen">
+                                        🗑️
+                                    </button>
+                                    {# Confirm delete dialog #}
+                                    <div x-show="confirm" x-transition
+                                        class="fixed inset-0 flex items-center justify-center z-50"
+                                        style="background:rgba(0,0,0,0.5);">
+                                        <div class="card max-w-xs w-full mx-4">
+                                            <p class="text-sm mb-3" style="color:var(--foreground);">Weet u zeker dat u <strong>{{ doc.original_filename }}</strong> wilt verwijderen?</p>
+                                            <div class="flex gap-2">
+                                                <button type="submit" class="btn btn-sm" style="background:#ef4444;color:white;">Verwijderen</button>
+                                                <button type="button" @click="confirm = false" class="btn btn-sm btn-secondary">Annuleren</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                                {% endif %}
+                                {# Reprocess button — only shown if failed #}
+                                {% if doc.processing_error %}
+                                <form method="post" action="{% url 'dashboard:document_reprocess' doc.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-secondary" title="Opnieuw verwerken">
+                                        🔄 Herverwerken
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state py-12">
+                                <div class="empty-state-icon">📂</div>
+                                <div class="empty-state-text">Nog geen documenten geüpload</div>
+                                <p class="text-sm mt-2" style="color:var(--text-muted);">Upload beleidsdocumenten, procedures of certificaten om de analyse te starten.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {# ── Tab 4: Timeline (Task 7) ──────────────────────────────── #}
+    <div x-show="tab === 'timeline'" x-transition>
+        <div class="card max-w-2xl">
+            <div class="card-title">Audit Tijdlijn</div>
+            {% if timeline_events %}
+            <div class="timeline mt-3">
+                {% for event in timeline_events %}
+                <div class="timeline-item">
+                    <div class="timeline-dot {% if event.type == 'created' or event.type == 'completed' or event.type == 'delivered' %}done{% elif event.type == 'processing' %}active{% else %}done{% endif %}">
+                        {{ event.icon }}
+                    </div>
+                    <div style="min-width:0;">
+                        <div class="timeline-title">{{ event.title }}</div>
+                        {% if event.detail %}
+                        <div class="timeline-desc">{{ event.detail }}</div>
+                        {% endif %}
+                        <div class="timeline-time">{{ event.timestamp|date:"d-m-Y H:i" }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state py-12">
+                <div class="empty-state-icon">📋</div>
+                <div class="empty-state-text">Nog geen tijdlijn gebeurtenissen</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

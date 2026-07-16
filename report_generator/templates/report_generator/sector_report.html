@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gratis NIS2 Sector Rapport — AES AI Solutions</title>
+    <meta name="description" content="Ontvang een gratis NIS2 compliance vereisten rapport voor uw sector. AI-aangedreven analyse van uw NIS2-verplichtingen, boetes en aanbevelingen.">
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --dark: #0f172a;
+            --mid: #1e293b;
+            --blue: #1d4ed8;
+            --blue-light: #3b82f6;
+            --blue-glow: rgba(59,130,246,0.15);
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --border: rgba(148,163,184,0.2);
+            --card: rgba(255,255,255,0.04);
+            --card-hover: rgba(255,255,255,0.07);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated background gradient */
+        .bg-gradient {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 50% at 50% -20%,
+                rgba(29,78,216,0.4) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 80%,
+                rgba(59,130,246,0.15) 0%, transparent 60%),
+                var(--dark);
+            z-index: -1;
+        }
+
+        /* Nav */
+        nav {
+            padding: 1.25rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+            background: rgba(15,23,42,0.8);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+        .nav-logo {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--blue), var(--blue-light));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        .nav-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .nav-subtitle {
+            font-size: 0.7rem;
+            color: var(--muted);
+            letter-spacing: 0.05em;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 5rem 2rem 3rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            background: rgba(59,130,246,0.12);
+            border: 1px solid rgba(59,130,246,0.3);
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            color: var(--blue-light);
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #f8fafc 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.25rem;
+        }
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--muted);
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Feature badges */
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+        .feature-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        /* Form card */
+        .form-card {
+            max-width: 680px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+        }
+        .form-card h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            color: var(--text);
+        }
+        .form-card .subtitle {
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-bottom: 2rem;
+        }
+
+        /* Form elements */
+        .field {
+            margin-bottom: 1.25rem;
+        }
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+        }
+        input[type="text"],
+        input[type="email"],
+        select {
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            color: var(--text);
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        input:focus, select:focus {
+            border-color: var(--blue-light);
+            box-shadow: 0 0 0 3px var(--blue-glow);
+        }
+        select option {
+            background: var(--mid);
+            color: var(--text);
+        }
+
+        /* Entity type cards */
+        .entity-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        .entity-card {
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .entity-card:hover {
+            border-color: var(--blue-light);
+            background: var(--blue-glow);
+        }
+        .entity-card.selected {
+            border-color: var(--blue-light);
+            background: rgba(59,130,246,0.12);
+        }
+        .entity-card h4 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+        .entity-card p {
+            font-size: 0.75rem;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+        .entity-card .fine {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        /* Grid layout */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Submit button */
+        .btn-generate {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--blue), var(--blue-light));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+        .btn-generate:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 30px rgba(29,78,216,0.4);
+        }
+        .btn-generate:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-generate .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Error banner */
+        .error-banner {
+            background: rgba(220,38,38,0.1);
+            border: 1px solid rgba(220,38,38,0.3);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            color: #fca5a5;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Trust badges below form */
+        .trust-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+            margin: 2.5rem auto;
+            max-width: 680px;
+        }
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+        .trust-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        /* What's inside section */
+        .inside-section {
+            max-width: 800px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+        .inside-section h2 {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+        .inside-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+        .inside-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.25rem;
+            transition: all 0.2s;
+        }
+        .inside-card:hover {
+            border-color: rgba(59,130,246,0.4);
+            background: var(--card-hover);
+        }
+        .inside-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .inside-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+        }
+        .inside-desc {
+            font-size: 0.75rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .form-card { padding: 1.5rem; }
+            .grid-2 { grid-template-columns: 1fr; }
+            .entity-cards { grid-template-columns: 1fr; }
+            nav { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="bg-gradient"></div>
+
+<!-- Navigation -->
+<nav>
+    <a href="/" class="nav-brand">
+        <div class="nav-logo">🛡️</div>
+        <div>
+            <div class="nav-title">AES AI Solutions</div>
+            <div class="nav-subtitle">NIS2 Compliance Platform</div>
+        </div>
+    </a>
+    <div style="display:flex; gap:1rem; align-items:center;">
+        <a href="/dashboard/" style="color:var(--muted); font-size:0.85rem; text-decoration:none;">Dashboard →</a>
+    </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+    <div class="hero-badge">
+        <span>🤖</span>
+        AI-aangedreven NIS2 Analyse
+    </div>
+    <h1>Gratis NIS2 Sector Vereistenrapport</h1>
+    <p>Ontvang direct een professioneel PDF-rapport met alle NIS2-verplichtingen voor uw sector, maximale boetes en geprioriteerde actieplannen.</p>
+
+    <div class="features">
+        <div class="feature-badge">📄 Professioneel PDF rapport</div>
+        <div class="feature-badge">🤖 Aangedreven door Claude AI</div>
+        <div class="feature-badge">⚡ Direct gegenereerd</div>
+        <div class="feature-badge">🏛️ NIS2 Richtlijn 2022/2555</div>
+        <div class="feature-badge">💶 Boeteberekening</div>
+    </div>
+</div>
+
+<!-- Form -->
+<div class="form-card" x-data="{ entityType: 'IMPORTANT', generating: false }">
+    <h2>Genereer Uw Rapport</h2>
+    <p class="subtitle">Vul uw gegevens in — uw rapport wordt direct gegenereerd en gedownload.</p>
+
+    {% if error %}
+    <div class="error-banner">⚠️ {{ error }}</div>
+    {% endif %}
+
+    <form method="post" @submit="generating = true">
+        {% csrf_token %}
+
+        <div class="field">
+            <label for="company_name">Bedrijfsnaam *</label>
+            <input type="text" id="company_name" name="company_name"
+                placeholder="bijv. TechBedrijf BV"
+                value="{{ data.company_name|default:'' }}" required>
+        </div>
+
+        <div class="grid-2">
+            <div class="field">
+                <label for="sector">Sector *</label>
+                <select id="sector" name="sector" required>
+                    {% for val, label in sector_choices %}
+                    <option value="{{ val }}" {% if data.sector == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label for="country">Land *</label>
+                <select id="country" name="country" required>
+                    {% for val, label in country_choices %}
+                    <option value="{{ val }}" {% if data.country == val or val == 'NL' and not data.country %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="company_size">Bedrijfsgrootte *</label>
+            <select id="company_size" name="company_size" required>
+                <option value="SMALL" {% if data.company_size == 'SMALL' %}selected{% endif %}>Klein — 10 tot 49 medewerkers</option>
+                <option value="MEDIUM" {% if data.company_size == 'MEDIUM' or not data.company_size %}selected{% endif %}>Middel — 50 tot 249 medewerkers</option>
+                <option value="LARGE" {% if data.company_size == 'LARGE' %}selected{% endif %}>Groot — 250 of meer medewerkers</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label>Entiteitstype *</label>
+            <div class="entity-cards">
+                <div class="entity-card"
+                    :class="entityType === 'ESSENTIAL' ? 'selected' : ''"
+                    @click="entityType = 'ESSENTIAL'">
+                    <input type="radio" name="entity_type" value="ESSENTIAL"
+                        :checked="entityType === 'ESSENTIAL'" class="sr-only">
+                    <h4>🔴 Essentiële Entiteit</h4>
+                    <p>Grote organisaties in kritieke sectoren. Hogere eisen, strikter toezicht.</p>
+                    <span class="fine" style="background:rgba(220,38,38,0.15); color:#fca5a5;">Max. €10M of 2% omzet</span>
+                </div>
+                <div class="entity-card"
+                    :class="entityType === 'IMPORTANT' ? 'selected' : ''"
+                    @click="entityType = 'IMPORTANT'">
+                    <input type="radio" name="entity_type" value="IMPORTANT"
+                        :checked="entityType === 'IMPORTANT'" class="sr-only">
+                    <h4>🟡 Belangrijke Entiteit</h4>
+                    <p>Middelgrote organisaties. Ex-post toezicht met zelfrapportage.</p>
+                    <span class="fine" style="background:rgba(202,138,4,0.15); color:#fcd34d;">Max. €7M of 1.4% omzet</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="email">E-mailadres (optioneel)</label>
+            <input type="email" id="email" name="email"
+                placeholder="voor een gratis consultatie"
+                value="{{ data.email|default:'' }}">
+        </div>
+
+        <button type="submit" class="btn-generate"
+            :disabled="generating">
+            <template x-if="!generating">
+                <span>🚀 Rapport Genereren &amp; Downloaden</span>
+            </template>
+            <template x-if="generating">
+                <span class="flex items-center gap-2">
+                    <span class="spinner"></span>
+                    Claude AI is aan het analyseren…
+                </span>
+            </template>
+        </button>
+    </form>
+</div>
+
+<!-- Trust badges -->
+<div class="trust-row">
+    <div class="trust-item">
+        <div class="trust-icon">🔒</div>
+        <span>Uw gegevens worden niet opgeslagen</span>
+    </div>
+    <div class="trust-item">
+        <div class="trust-icon">🤖</div>
+        <span>Claude Sonnet AI analyse</span>
+    </div>
+    <div class="trust-item">
+        <div class="trust-icon">📋</div>
+        <span>Gebaseerd op officiële NIS2 (EU) 2022/2555</span>
+    </div>
+    <div class="trust-item">
+        <div class="trust-icon">⚡</div>
+        <span>Rapport in 30-60 seconden gereed</span>
+    </div>
+</div>
+
+<!-- What's inside -->
+<div class="inside-section">
+    <h2>Wat staat er in uw rapport?</h2>
+    <div class="inside-grid">
+        <div class="inside-card">
+            <div class="inside-icon">🏛️</div>
+            <div class="inside-title">Entiteitsclassificatie</div>
+            <div class="inside-desc">Bepaal of u een Essentiële of Belangrijke Entiteit bent onder Artikel 3.</div>
+        </div>
+        <div class="inside-card">
+            <div class="inside-icon">📋</div>
+            <div class="inside-title">10 Verplichte Maatregelen</div>
+            <div class="inside-desc">Alle beveiligingseisen van Artikel 21 uitgelegd per sector.</div>
+        </div>
+        <div class="inside-card">
+            <div class="inside-icon">🚨</div>
+            <div class="inside-title">Incidentmeldingsvereisten</div>
+            <div class="inside-desc">24u-vroege waarschuwing, 72u-melding en maandrapportage.</div>
+        </div>
+        <div class="inside-card">
+            <div class="inside-icon">💰</div>
+            <div class="inside-title">Boeteberekening</div>
+            <div class="inside-desc">Maximale boetes voor uw entiteitstype en persoonlijke aansprakelijkheid.</div>
+        </div>
+        <div class="inside-card">
+            <div class="inside-icon">🔗</div>
+            <div class="inside-title">Supply Chain Vereisten</div>
+            <div class="inside-desc">Leveranciersbeveiligingsvereisten specifiek voor uw sector.</div>
+        </div>
+        <div class="inside-card">
+            <div class="inside-icon">📍</div>
+            <div class="inside-title">Actieplan</div>
+            <div class="inside-desc">Geprioriteerde aanbevelingen voor directe compliance-verbeteringen.</div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>© 2026 AES AI Solutions — NIS2 Compliance Platform</p>
+    <p style="margin-top:0.4rem;">Dit rapport is informatief en vervangt geen juridisch advies. Gebaseerd op NIS2 Richtlijn (EU) 2022/2555.</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,64 @@
+{% for audit in audits %}
+<tr class="{% if audit.status == 'PROCESSING' %}processing-row{% elif audit.status == 'REVIEW' %}review-row{% endif %}">
+    <td>
+        <a href="{% url 'dashboard:audit_detail' audit.pk %}" class="font-medium text-slate-800 hover:text-blue-600">
+            {{ audit.client.company_name }}
+        </a>
+        <div class="text-xs text-slate-400">{{ audit.client.get_sector_display }}</div>
+    </td>
+    <td>
+        <span class="badge badge-{{ audit.tier|lower }}">{{ audit.tier }}</span>
+    </td>
+    <td>
+        <span class="badge badge-{{ audit.status|lower }}">
+            {% if audit.status == 'PROCESSING' %}<span class="spinner mr-1"
+                style="width:10px;height:10px;border-width:1.5px;"></span>{% endif %}
+            {{ audit.get_status_display }}
+        </span>
+    </td>
+    <td>
+        {% if audit.compliance_score %}
+        <div class="flex items-center gap-2">
+            <div class="score-bar w-12">
+                <div class="score-bar-fill {% if audit.compliance_score >= 70 %}bg-green-500{% elif audit.compliance_score >= 40 %}bg-yellow-400{% else %}bg-red-500{% endif %}"
+                    style="width: {{ audit.compliance_score }}%;"></div>
+            </div>
+            <span class="text-sm font-semibold">{{ audit.compliance_score }}%</span>
+        </div>
+        {% else %}<span class="text-slate-400">—</span>{% endif %}
+    </td>
+    <td>
+        <span class="text-sm">{{ audit.gaps_identified }}</span>
+        {% with critical=audit.gaps.filter %}
+        {% endwith %}
+    </td>
+    <td><span class="text-sm text-slate-600">{{ audit.documents_uploaded }}</span></td>
+    <td>
+        <div class="text-sm">{{ audit.created_at|date:"d-m-Y" }}</div>
+        <div class="text-xs text-slate-400">{{ audit.created_at|timesince }} geleden</div>
+    </td>
+    <td>
+        {% if audit.duration_days is not None %}<span class="text-sm">{{ audit.duration_days }} d</span>
+        {% elif audit.started_at %}<span class="text-sm text-amber-600">Bezig…</span>
+        {% else %}<span class="text-slate-400">—</span>
+        {% endif %}
+    </td>
+    <td>
+        {% if audit.paid %}<span class="text-green-600 font-medium text-sm">✓</span>
+        {% else %}<span class="text-slate-400 text-sm">Nee</span>
+        {% endif %}
+    </td>
+    <td>
+        <a href="{% url 'dashboard:audit_detail' audit.pk %}" class="btn btn-sm btn-secondary">Bekijken</a>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="10">
+        <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <div class="empty-state-text">Geen audits gevonden</div>
+        </div>
+    </td>
+</tr>
+{% endfor %}

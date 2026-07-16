@@ -1,0 +1,63 @@
+# ══════════════════════════════════════════════════════════════
+# NIS2 Compliance Analyzer - Requirements
+# Django + Qdrant + Pydantic AI + Gemini
+# ══════════════════════════════════════════════════════════════
+
+# Django Framework
+Django
+gunicorn
+whitenoise
+
+# Django REST Framework
+djangorestframework
+django-cors-headers
+
+# Vector Database + Embeddings
+qdrant-client[fastembed]
+
+# Pydantic AI + Google Gemini
+pydantic-ai
+google-generativeai
+
+# Anthropic (Claude — used for PDF report generation)
+anthropic
+
+# Document Processing
+pdfplumber
+python-docx
+pypdf
+docling
+
+# Security & PII Detection
+presidio-analyzer
+presidio-anonymizer
+
+# PDF Generation
+reportlab
+
+# Data Visualization
+plotly
+kaleido
+matplotlib
+pandas
+
+# Database
+psycopg2-binary
+dj-database-url
+
+# Environment & Security
+python-decouple
+cryptography
+
+# HTTP Client
+httpx
+
+# Embeddings
+fastembed
+
+# Utilities
+python-dateutil
+pytz
+
+# Development
+django-debug-toolbar

@@ -1,0 +1,125 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Nieuwe Audit — NIS2{% endblock %}
+{% block page_title %}Nieuwe Audit Starten{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl" x-data="{
+    tierPrices: { 'T1': 950, 'T2': 2500, 'T3': 5000 },
+    selectedTier: '',
+    quotedPrice: '',
+    running: false,
+    selectTier(tier) {
+        this.selectedTier = tier;
+        this.quotedPrice = this.tierPrices[tier];
+    }
+}">
+    <div class="card">
+        <div class="mb-5" style="border-bottom:1px solid var(--border); padding-bottom:1rem;">
+            <h2 class="text-lg font-semibold" style="color:var(--foreground);">Nieuwe Audit Aanmaken</h2>
+            <p class="text-sm mt-1" style="color:var(--muted-foreground);">Selecteer de klant, kies het tier en bevestig de offerte.</p>
+        </div>
+
+        <form method="post" action="{% url 'dashboard:audit_new' %}" @submit="running = true">
+            {% csrf_token %}
+
+            {# Client dropdown #}
+            <div class="mb-5">
+                <label class="form-label">Klant *</label>
+                <select name="client" class="form-select" required>
+                    <option value="">Kies een klant…</option>
+                    {% for client in clients %}
+                    <option value="{{ client.pk }}"
+                        {% if selected_client_id == client.pk|stringformat:"s" %}selected{% endif %}>
+                        {{ client.company_name }}
+                        {% if client.sector %} — {{ client.sector }}{% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            {# Tier selection #}
+            <div class="mb-5">
+                <label class="form-label">Tier *</label>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
+
+                    <label class="cursor-pointer" @click="selectTier('T1')">
+                        <input type="radio" name="tier" value="T1" class="sr-only" required>
+                        <div class="rounded-xl p-4 transition-all border-2"
+                            :class="selectedTier === 'T1'
+                                ? 'border-blue-500 bg-blue-50'
+                                : 'border-gray-200 hover:border-blue-300'"
+                            style="background: selectedTier === 'T1' ? '' : 'var(--secondary)'; border-color: selectedTier === 'T1' ? '#3b82f6' : 'var(--border)';">
+                            <div class="text-center">
+                                <div class="text-2xl mb-1">🔍</div>
+                                <div class="font-bold text-sm" style="color:var(--foreground);">Tier 1</div>
+                                <div class="text-xs mt-1" style="color:var(--muted-foreground);">Gap Analyse</div>
+                                <div class="text-lg font-bold mt-2" style="color:var(--accent-blue);">€950</div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="cursor-pointer" @click="selectTier('T2')">
+                        <input type="radio" name="tier" value="T2" class="sr-only">
+                        <div class="rounded-xl p-4 transition-all border-2"
+                            :class="selectedTier === 'T2'
+                                ? 'border-blue-500'
+                                : 'hover:border-blue-300'"
+                            style="border-color: var(--border);">
+                            <div class="text-center">
+                                <div class="text-2xl mb-1">📄</div>
+                                <div class="font-bold text-sm" style="color:var(--foreground);">Tier 2</div>
+                                <div class="text-xs mt-1" style="color:var(--muted-foreground);">Implementatiedocumenten</div>
+                                <div class="text-lg font-bold mt-2" style="color:var(--accent-blue);">€2.500</div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="cursor-pointer" @click="selectTier('T3')">
+                        <input type="radio" name="tier" value="T3" class="sr-only">
+                        <div class="rounded-xl p-4 transition-all border-2"
+                            :class="selectedTier === 'T3'
+                                ? 'border-blue-500'
+                                : 'hover:border-blue-300'"
+                            style="border-color: var(--border);">
+                            <div class="text-center">
+                                <div class="text-2xl mb-1">🏆</div>
+                                <div class="font-bold text-sm" style="color:var(--foreground);">Tier 3</div>
+                                <div class="text-xs mt-1" style="color:var(--muted-foreground);">Volledig Pakket</div>
+                                <div class="text-lg font-bold mt-2" style="color:var(--accent-blue);">€5.000</div>
+                            </div>
+                        </div>
+                    </label>
+
+                </div>
+            </div>
+
+            {# Quoted price — auto-filled, editable #}
+            <div class="mb-6">
+                <label class="form-label">Offertebedrag (€) *</label>
+                <input type="number" name="quoted_price" class="form-input"
+                    :value="quotedPrice"
+                    @input="quotedPrice = $event.target.value"
+                    placeholder="Wordt automatisch ingevuld bij tier selectie"
+                    step="0.01" min="0" required>
+                <p class="form-hint">Wordt automatisch ingevuld op basis van tier, maar kan worden aangepast.</p>
+            </div>
+
+            <div class="flex gap-3" style="border-top:1px solid var(--border); padding-top:1rem;">
+                <button type="submit" class="btn btn-primary flex items-center gap-2"
+                    :disabled="running"
+                    :class="running ? 'opacity-50 cursor-not-allowed' : ''">
+                    <span x-show="!running">✅ Audit Aanmaken</span>
+                    <span x-show="running" class="flex items-center gap-2">
+                        <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                        Aanmaken...
+                    </span>
+                </button>
+                <a href="{% url 'dashboard:audits' %}" class="btn btn-secondary">Annuleren</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

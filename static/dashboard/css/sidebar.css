@@ -1,0 +1,172 @@
+/* ================================================================
+   NIS2 Dashboard — Sidebar Component Styles
+   Separated per industry standard for component isolation.
+   All sidebar overrides (including light-mode dark sidebar)
+   live here; dashboard.css handles the rest of the shell.
+   ================================================================ */
+
+/* ── Base Sidebar ─────────────────────────────────────────────── */
+.sidebar {
+    width: 240px;
+    min-height: 100vh;
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ── Brand ────────────────────────────────────────────────────── */
+.sidebar-brand {
+    padding: 1.125rem 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.sidebar-brand .brand-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.sidebar-brand .brand-text .brand-name {
+    color: var(--foreground);
+    font-weight: 600;
+    font-size: 0.875rem;
+    letter-spacing: -0.01em;
+}
+
+.sidebar-brand .brand-text .brand-sub {
+    color: var(--muted-foreground);
+    font-size: 0.6875rem;
+    margin-top: 1px;
+}
+
+/* ── Navigation ───────────────────────────────────────────────── */
+.sidebar-nav {
+    padding: 0.5rem;
+    flex: 1;
+}
+
+.sidebar-section-label {
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 0.75rem 0.75rem 0.25rem;
+}
+
+.sidebar-nav a,
+.sidebar-nav button {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--muted-foreground);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    margin-bottom: 1px;
+}
+
+.sidebar-nav a::before {
+    display: none;
+}
+
+.sidebar-nav a:hover {
+    color: var(--foreground);
+    background: var(--secondary);
+}
+
+.sidebar-nav a.active {
+    color: var(--primary-foreground);
+    background: var(--primary);
+    border-color: transparent;
+}
+
+.sidebar-nav a.active .nav-icon,
+.sidebar-nav a.active svg {
+    filter: none;
+}
+
+.sidebar-nav a .nav-icon {
+    width: 18px;
+    text-align: center;
+    flex-shrink: 0;
+    font-size: 0.9rem;
+}
+
+.sidebar-nav a svg,
+.sidebar-nav button svg,
+.sidebar-logout-btn svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+}
+
+/* ── Logout Button ────────────────────────────────────────────── */
+.sidebar-logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    background: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-bottom: 1px;
+}
+
+.sidebar-logout-btn:hover {
+    color: var(--foreground);
+    background: var(--secondary);
+}
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 60px;
+    }
+
+    .sidebar-nav a span:not(.nav-icon) {
+        display: none;
+    }
+
+    .sidebar-brand .brand-text {
+        display: none;
+    }
+
+    .sidebar-section-label {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        min-height: auto;
+        height: auto;
+        flex-direction: row;
+        position: relative;
+    }
+}
+
+

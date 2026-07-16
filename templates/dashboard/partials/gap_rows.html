@@ -1,0 +1,55 @@
+{# HTMX partial: gap rows for server-side filtering via HtmxGapRows. Replaces #gap-tbody content. #}
+{% load i18n %}
+{% for gap in gaps %}
+<tr x-data="{ expanded: false }">
+    <td @click="expanded=!expanded"><span class="badge badge-{{ gap.severity|lower }}">{{ gap.get_severity_display }}</span></td>
+    {% if show_client %}
+    <td @click="expanded=!expanded">
+        <a href="{% url 'dashboard:client_detail' gap.audit.client.pk %}"
+            class="text-sm font-medium hover:underline" style="color:var(--accent-blue);">{{ gap.audit.client.company_name }}</a>
+        <div class="text-xs" style="color:var(--text-muted);">
+            <a href="{% url 'dashboard:audit_detail' gap.audit.pk %}" class="hover:underline">Audit →</a>
+        </div>
+    </td>
+    {% endif %}
+    <td @click="expanded=!expanded"><span class="text-sm">{{ gap.title|truncatechars:40 }}</span></td>
+    <td @click="expanded=!expanded"><span class="mono text-xs px-2 py-0.5 rounded" style="background:var(--secondary);color:var(--muted-foreground);">{{ gap.nis2_article }}</span></td>
+    <td @click="expanded=!expanded"><span class="text-xs" style="color:var(--muted-foreground);">{{ gap.get_category_display }}</span></td>
+    <td @click="expanded=!expanded">
+        <div class="flex items-center gap-1">
+            <div class="w-2 h-2 rounded-full {% if gap.risk_score >= 8 %}bg-red-500{% elif gap.risk_score >= 5 %}bg-yellow-400{% else %}bg-green-400{% endif %}"></div>
+            <span class="text-sm">{{ gap.risk_score }}/10</span>
+        </div>
+    </td>
+    <td @click="expanded=!expanded"><span class="text-sm">{{ gap.estimated_effort_hours }}u</span></td>
+    <td>
+        {% if gap.addressed %}<span class="text-green-600 text-sm font-medium">✓ Opgelost</span>
+        {% else %}<span class="text-red-500 text-sm">● Open</span>{% endif %}
+    </td>
+</tr>
+<tr x-show="expanded" style="background:var(--secondary);">
+    <td colspan="8" class="p-0">
+        <div class="gap-detail">
+            <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+                <div>
+                    <dt>Huidige Situatie</dt>
+                    <dd>{{ gap.current_state }}</dd>
+                </div>
+                <div>
+                    <dt>Aanbeveling</dt>
+                    <dd>{{ gap.recommendation }}</dd>
+                </div>
+            </dl>
+        </div>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="8">
+        <div class="empty-state py-16">
+            <div class="empty-state-icon">🔍</div>
+            <div class="empty-state-text">Geen gaps gevonden voor deze filters</div>
+        </div>
+    </td>
+</tr>
+{% endfor %}

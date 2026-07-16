@@ -1,0 +1,124 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Nieuwe Klant — NIS2{% endblock %}
+{% block page_title %}Nieuwe Klant Toevoegen{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+    <div class="card">
+        <form method="post" action="{% url 'dashboard:client_new' %}" x-data="{ kvkOk: true }">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <div class="sm:col-span-2">
+                    <label class="form-label">Bedrijfsnaam *</label>
+                    <input type="text" name="company_name" class="form-input" required maxlength="200"
+                        value="{{ data.company_name|default:'' }}">
+                    {% if errors.company_name %}<p class="form-error">{{ errors.company_name }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label class="form-label">KVK-nummer *</label>
+                    <input type="text" name="kvk_number" class="form-input" required maxlength="8"
+                        value="{{ data.kvk_number|default:'' }}" placeholder="12345678"
+                        @input="kvkOk = /^\d{8}$/.test($el.value)" :class="{ 'border-red-400': !kvkOk }">
+                    <p class="form-hint">Precies 8 cijfers</p>
+                    {% if errors.kvk_number %}<p class="form-error">{{ errors.kvk_number }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label class="form-label">Sector *</label>
+                    <select name="sector" class="form-select" required>
+                        <option value="">Kies sector…</option>
+                        {% for val, label in sectors %}
+                        <option value="{{ val }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if errors.sector %}<p class="form-error">{{ errors.sector }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label class="form-label">Bedrijfsgrootte *</label>
+                    <div class="flex gap-4 mt-1">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="company_size" value="SMALL" required> <span class="text-sm">Klein
+                                (10–49)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="company_size" value="MEDIUM"> <span class="text-sm">Middel
+                                (50–249)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="company_size" value="LARGE"> <span class="text-sm">Groot
+                                (250+)</span>
+                        </label>
+                    </div>
+                    {% if errors.company_size %}<p class="form-error">{{ errors.company_size }}</p>{% endif %}
+                </div>
+
+                {# Task 1: Country dropdown #}
+                <div>
+                    <label class="form-label">Land *</label>
+                    <select name="country" class="form-select" required>
+                        {% for val, label in country_choices %}
+                        <option value="{{ val }}" {% if data.country == val %}selected{% elif val == 'NL' and not data.country %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="pt-4 sm:col-span-2" style="border-top:1px solid var(--border);">
+                    <p class="text-xs font-semibold uppercase tracking-wide mb-3" style="color:var(--muted-foreground);">Contactgegevens</p>
+                </div>
+
+
+                <div>
+                    <label class="form-label">Contactpersoon *</label>
+                    <input type="text" name="contact_person" class="form-input" required
+                        value="{{ data.contact_person|default:'' }}">
+                    {% if errors.contact_person %}<p class="form-error">{{ errors.contact_person }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label class="form-label">E-mailadres *</label>
+                    <input type="email" name="email" class="form-input" required value="{{ data.email|default:'' }}">
+                    {% if errors.email %}<p class="form-error">{{ errors.email }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label class="form-label">Telefoonnummer</label>
+                    <input type="text" name="phone" class="form-input" placeholder="+31 20 123 4567"
+                        value="{{ data.phone|default:'' }}">
+                </div>
+
+                <div class="pt-4 sm:col-span-2" style="border-top:1px solid var(--border);">
+                    <p class="text-xs font-semibold uppercase tracking-wide mb-3" style="color:var(--muted-foreground);">Adres</p>
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="form-label">Straat en huisnummer *</label>
+                    <input type="text" name="address" class="form-input" required value="{{ data.address|default:'' }}">
+                    {% if errors.address %}<p class="form-error">{{ errors.address }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label class="form-label">Postcode *</label>
+                    <input type="text" name="postal_code" class="form-input" required placeholder="1234 AB"
+                        value="{{ data.postal_code|default:'' }}">
+                    {% if errors.postal_code %}<p class="form-error">{{ errors.postal_code }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label class="form-label">Stad *</label>
+                    <input type="text" name="city" class="form-input" required value="{{ data.city|default:'' }}">
+                    {% if errors.city %}<p class="form-error">{{ errors.city }}</p>{% endif %}
+                </div>
+
+            </div>
+
+            <div class="flex gap-3 mt-6 pt-4" style="border-top:1px solid var(--border);">
+                <button type="submit" class="btn btn-primary">Klant Opslaan</button>
+                <a href="{% url 'dashboard:clients' %}" class="btn btn-secondary">Annuleren</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
