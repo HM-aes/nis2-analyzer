@@ -141,10 +141,11 @@ REST_FRAMEWORK = {
 # Qdrant Configuration
 QDRANT_HOST = config("QDRANT_HOST", default="localhost")
 QDRANT_PORT = config("QDRANT_PORT", default=6333, cast=int)
+QDRANT_API_KEY = config("QDRANT_API_KEY", default="")
 QDRANT_COLLECTION_NAME = "nis2_knowledge_base"
 QDRANT_VECTOR_SIZE = 384  # sentence-transformers/all-MiniLM-L6-v2
-# Local on-disk mode — no server required (set to None to use host/port instead)
-QDRANT_LOCAL_PATH = BASE_DIR / "qdrant_local"
+# Local on-disk mode for dev; None in production (uses QDRANT_HOST/PORT instead)
+QDRANT_LOCAL_PATH = None if _database_url else BASE_DIR / "qdrant_local"
 
 # AI API Keys
 GOOGLE_API_KEY = config("GOOGLE_API_KEY", default="")

@@ -27,9 +27,12 @@ class NIS2QdrantClient:
         if local_path:
             self.client = QdrantClient(path=str(local_path))
         else:
+            api_key = getattr(settings, 'QDRANT_API_KEY', '') or None
             self.client = QdrantClient(
                 host=settings.QDRANT_HOST,
-                port=settings.QDRANT_PORT
+                port=settings.QDRANT_PORT,
+                api_key=api_key,
+                https=bool(api_key),  # Qdrant Cloud requires HTTPS
             )
         self.collection_name = settings.QDRANT_COLLECTION_NAME
         self.vector_size = settings.QDRANT_VECTOR_SIZE
