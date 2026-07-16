@@ -3,6 +3,7 @@ Django settings for NIS2 Compliance Analyzer
 """
 
 import os
+# pyrefly: ignore [missing-import]
 import dj_database_url
 from pathlib import Path
 from decouple import config
@@ -13,15 +14,59 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Security
 SECRET_KEY = config("SECRET_KEY", default="django-insecure-CHANGE-THIS-IN-PRODUCTION")
 DEBUG = config("DEBUG", default=True, cast=bool)
+def _parse_csv_hosts(value: str) -> list[str]:
+    """Parse comma-separated hosts; tolerate common Railway dashboard mistakes."""
+    value = value.strip().strip('"').strip("'")
+    if value.upper().startswith("ALLOWED_HOSTS="):
+        value = value.split("=", 1)[1].strip()
+    hosts = []
+    for part in value.split(","):
+        host = part.strip().strip('"').strip("'")
+        if host:
+            hosts.append(host)
+    return hosts
+
+
+_database_url = config("DATABASE_URL", default="")
 ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS",
     default="localhost,127.0.0.1",
-    cast=lambda v: [s.strip() for s in v.split(",")],
+    cast=_parse_csv_hosts,
 )
-# Railway sets RAILWAY_PUBLIC_DOMAIN automatically — add it to ALLOWED_HOSTS
-_railway_domain = config("RAILWAY_PUBLIC_DOMAIN", default="")
+# Railway — accept the service public domain and any *.up.railway.app host
+_railway_domain = (
+    os.environ.get("RAILWAY_PUBLIC_DOMAIN", "")
+    or config("RAILWAY_PUBLIC_DOMAIN", default="")
+).strip().strip('"').strip("'")
 if _railway_domain and _railway_domain not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(_railway_domain)
+_on_railway = any(
+    os.environ.get(key)
+    for key in (
+        "RAILWAY_ENVIRONMENT",
+        "RAILWAY_PUBLIC_DOMAIN",
+        "RAILWAY_SERVICE_ID",
+        "RAILWAY_PROJECT_ID",
+    )
+) or bool(_database_url)
+if _on_railway and ".up.railway.app" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(".up.railway.app")
+
+# HTTPS / CSRF — required for Railway (TLS terminates at the edge proxy)
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    default="",
+    cast=lambda v: [s.strip() for s in v.split(",") if s.strip()],
+)
+if _railway_domain:
+    _railway_origin = f"https://{_railway_domain}"
+    if _railway_origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(_railway_origin)
+elif _on_railway and "https://*.up.railway.app" not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append("https://*.up.railway.app")
+
+if _database_url:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Application definition
 INSTALLED_APPS = [
@@ -75,7 +120,6 @@ TEMPLATES = [
 WSGI_APPLICATION = "nis2_analyzer.wsgi.application"
 
 # Database — PostgreSQL on Railway (DATABASE_URL), SQLite locally
-_database_url = config("DATABASE_URL", default="")
 if _database_url:
     DATABASES = {"default": dj_database_url.parse(_database_url, conn_max_age=600)}
 else:
