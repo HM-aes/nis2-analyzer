@@ -1,0 +1,7 @@
+/* ============ LOGOS / TRUST STRIP ============ */
+.trust{border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);
+  padding:26px 0;margin-top:20px}
+.trust .wrap{display:flex;align-items:center;gap:34px;flex-wrap:wrap;justify-content:center}
+.trust .lbl{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2)}
+.trust .item{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--ink-2)}
+.trust .item svg{color:var(--green)}

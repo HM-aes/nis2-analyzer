@@ -1,0 +1,12 @@
+/* ---- CTA band ---- */
+.cta-band{background:linear-gradient(180deg,var(--panel),var(--panel-2));
+  border:1px solid var(--line);border-radius:20px;padding:56px 40px;text-align:center;position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;
+  background-image:linear-gradient(90deg,var(--line-soft) 1px,transparent 1px);background-size:44px 44px;
+  mask-image:radial-gradient(ellipse 60% 80% at 50% 100%,#000,transparent 70%);
+  -webkit-mask-image:radial-gradient(ellipse 60% 80% at 50% 100%,#000,transparent 70%);opacity:.5}
+.cta-band>*{position:relative;z-index:1}
+.cta-band h2{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(28px,4vw,42px);
+  letter-spacing:-.015em;margin-bottom:14px;color:#F4F7FB}
+.cta-band p{font-size:17px;color:var(--ink-2);max-width:48ch;margin:0 auto 30px}
+.cta-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}

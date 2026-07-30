@@ -1,0 +1,111 @@
+<section id="product" style="padding-top:20px">
+  <div class="wrap">
+    <div class="sec-head reveal" style="max-width:64ch">
+      <div class="sec-eyebrow">04 — Inside the platform</div>
+      <h2 class="sec-title serif">One surface for your whole compliance posture.</h2>
+      <p class="sec-lead">Every assessment, document and open task in a single live view — so you always know your exposure at a glance, and can prove it when asked.</p>
+    </div>
+
+    <!-- ==== the mock ==== -->
+    <div class="dash reveal" x-data="dashMock()" x-init="init($el)">
+      <!-- browser chrome -->
+      <div class="dash-bar">
+        <span class="tl"><i></i><i></i><i></i></span>
+        <span class="url mono">app.nis2analyzer.eu/dashboard</span>
+        <span class="chip amber" style="font-size:11px;padding:3px 9px"><span class="dot amber pulse"></span>Live</span>
+      </div>
+
+      <!-- app body -->
+      <div class="dash-body">
+        <!-- mini sidebar -->
+        <aside class="dash-side">
+          <div class="ds-brand"><span class="glyph"></span></div>
+          <nav class="ds-nav">
+            <span class="ds-link active" title="Overview">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+            </span>
+            <span class="ds-link" title="Assessments">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </span>
+            <span class="ds-link" title="Documents">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+            </span>
+            <span class="ds-link" title="Incidents">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </span>
+          </nav>
+        </aside>
+
+        <!-- main -->
+        <div class="dash-main">
+          <div class="dm-head">
+            <div>
+              <h3>Compliance Overview</h3>
+              <p class="mono">Real-time posture across your NIS2 obligations</p>
+            </div>
+            <span class="chip green" style="font-size:11px"><span class="dot green"></span>Audit-ready</span>
+          </div>
+
+          <!-- stat row -->
+          <div class="dm-stats">
+            <template x-for="s in stats" :key="s.k">
+              <div class="dm-card">
+                <div class="dm-card-top">
+                  <span class="dm-ico" :class="s.live?'live':''" x-html="s.ico"></span>
+                  <span class="dm-delta" :style="`color:${s.dc}`" x-text="s.d"></span>
+                </div>
+                <div class="dm-num" :class="s.live?'live':''"
+                     x-text="s.disp"></div>
+                <div class="dm-lbl mono" x-text="s.k"></div>
+              </div>
+            </template>
+          </div>
+
+          <!-- lower: feed + processing -->
+          <div class="dm-lower">
+            <div class="dm-panel">
+              <div class="dm-panel-h">
+                <span class="mono">Recent activity</span>
+                <span class="dm-view">View all</span>
+              </div>
+              <div class="dm-feed">
+                <template x-for="(r,i) in feed" :key="r.id">
+                  <div class="dm-row" :style="`animation-delay:${.25+i*.12}s`" x-show="feedIn">
+                    <span class="dm-av" x-text="r.i"></span>
+                    <div class="dm-rowmain">
+                      <span class="dm-name" x-text="r.n"></span>
+                      <span class="dm-q" x-text="r.q"></span>
+                    </div>
+                    <span class="dm-time mono" x-text="r.t"></span>
+                    <span class="dm-fb" :style="`color:${r.c}`">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"/></svg>
+                    </span>
+                  </div>
+                </template>
+              </div>
+            </div>
+
+            <div class="dm-panel">
+              <div class="dm-panel-h">
+                <span class="mono">Processing</span>
+                <span class="dot amber pulse"></span>
+              </div>
+              <div class="dm-proc">
+                <template x-for="p in proc" :key="p.id">
+                  <div class="dm-procitem">
+                    <div class="dm-procrow">
+                      <span class="dm-procname" x-text="p.n"></span>
+                      <span class="dm-procpct mono" x-text="p.p+'%'"></span>
+                    </div>
+                    <div class="dm-track"><span class="dm-fill" :style="`width:${feedIn?p.p+'%':'0'}`"></span></div>
+                    <span class="dm-procmeta mono" x-text="p.m"></span>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

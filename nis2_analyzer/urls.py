@@ -6,14 +6,15 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from dashboard.views import DashboardLoginView
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("compliance_engine.urls")),
     path("dashboard/", include("dashboard.urls", namespace="dashboard")),
     path("reports/", include("report_generator.urls", namespace="report_generator")),
-    path("", DashboardLoginView.as_view(), name="home"),
+    path("", include("marketing.urls", namespace="marketing")),
+    path("", TemplateView.as_view(template_name="marketing/landing.html"), name="home"),
 ]
 
 # Serve media files in development

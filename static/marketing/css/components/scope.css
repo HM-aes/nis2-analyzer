@@ -1,0 +1,17 @@
+/* ---- scope section: essential vs important ---- */
+.entity-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:800px){.entity-grid{grid-template-columns:1fr}}
+.entity{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:28px;position:relative;overflow:hidden}
+.entity .tag{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;
+  font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:6px;
+  margin-bottom:18px}
+.entity.ess .tag{color:var(--amber);background:var(--amber-soft)}
+.entity.imp .tag{color:var(--ink-2);background:rgba(255,255,255,.04)}
+.entity h3{font-size:20px;margin-bottom:6px;color:var(--ink)}
+.entity .desc{font-size:14px;color:var(--muted);margin-bottom:20px}
+.entity ul{list-style:none;display:grid;gap:11px}
+.entity li{display:flex;gap:11px;font-size:14px;color:var(--ink-2)}
+.entity li svg{flex:none;margin-top:3px;color:var(--muted)}
+.entity .super{position:absolute;top:22px;right:24px;font-family:'JetBrains Mono',monospace;
+  font-size:11px;color:var(--muted-2)}

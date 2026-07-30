@@ -10,7 +10,6 @@ whitenoise
 
 # Django REST Framework
 djangorestframework
-django-cors-headers
 
 # Vector Database + Embeddings
 qdrant-client[fastembed]

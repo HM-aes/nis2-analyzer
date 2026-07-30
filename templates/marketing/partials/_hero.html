@@ -1,0 +1,63 @@
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <!-- left: message -->
+      <div class="reveal">
+        <span class="eyebrow"><span class="dot amber pulse"></span>NIS2 · Directive (EU) 2022/2555</span>
+        <h1 class="hero-title serif">Know exactly where you stand on <em>NIS2</em>.</h1>
+        <p class="hero-sub">Find out if you're in scope, where your gaps are, and what to fix — before your national authority asks.</p>
+        <p class="hero-fact mono">The obligations have been binding since 18 October 2024 — regardless of whether your member state has finished transposing. Late national law is not a grace period.</p>
+        <div class="hero-cta">
+          <a href="#start" class="btn btn-primary btn-lg">Start free assessment</a>
+          <span class="note">No account · takes 2 minutes</span>
+        </div>
+      </div>
+
+      <!-- right: interactive scope card (the signature) -->
+      <div class="reveal" style="transition-delay:.12s"
+           x-data="scopeCheck()">
+        <div class="scope-card">
+          <div class="scope-head">
+            <span class="t">Scope pre-check</span>
+            <span class="chip amber"><span class="dot amber"></span>Live</span>
+          </div>
+
+          <!-- question state -->
+          <div class="scope-body" x-show="!done">
+            <p class="scope-q" x-text="questions[step].q"></p>
+            <div class="scope-opts">
+              <template x-for="(opt,i) in questions[step].opts" :key="i">
+                <button class="opt" :class="{sel:answers[step]===i}"
+                        @click="choose(i)">
+                  <span class="idx" x-text="String.fromCharCode(65+i)"></span>
+                  <span x-text="opt"></span>
+                </button>
+              </template>
+            </div>
+          </div>
+
+          <!-- result state -->
+          <div class="scope-result" :class="{show:done}">
+            <div class="verdict">
+              <span class="mark" x-text="verdict.mark"></span>
+              <div>
+                <h4 x-text="verdict.title"></h4>
+                <p x-text="verdict.note"></p>
+              </div>
+            </div>
+            <a href="#start" class="btn btn-primary" style="width:100%;justify-content:center">
+              Get your full breakdown →
+            </a>
+          </div>
+
+          <div class="scope-foot">
+            <span class="step" x-show="!done" x-text="'Step ' + (step+1) + ' / ' + questions.length"></span>
+            <span class="step" x-show="done">Pre-check complete</span>
+            <button class="btn btn-ghost" style="padding:7px 12px;font-size:12px"
+                    @click="reset()" x-show="done || step>0">Restart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

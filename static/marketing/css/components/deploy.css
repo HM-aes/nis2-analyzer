@@ -1,0 +1,15 @@
+/* ---- deployment: SaaS vs air-gapped ---- */
+.deploy-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:800px){.deploy-grid{grid-template-columns:1fr}}
+.deploy{border:1px solid var(--line);border-radius:var(--radius);padding:30px;position:relative}
+.deploy.air{background:linear-gradient(180deg,rgba(224,168,46,.05),transparent 60%),var(--panel);
+  border-color:rgba(224,168,46,.3)}
+.deploy.saas{background:var(--panel)}
+.deploy .badge{position:absolute;top:-1px;right:24px;font-family:'JetBrains Mono',monospace;
+  font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;
+  background:var(--amber);color:#1a1405;border-radius:0 0 7px 7px}
+.deploy h3{font-size:22px;margin-bottom:6px;font-family:'Fraunces',serif;font-weight:500}
+.deploy .sub{font-size:14px;color:var(--muted);margin-bottom:22px}
+.deploy ul{list-style:none;display:grid;gap:13px;margin-bottom:24px}
+.deploy li{display:flex;gap:11px;font-size:14px;color:var(--ink-2)}
+.deploy li svg{flex:none;margin-top:3px;color:var(--green)}

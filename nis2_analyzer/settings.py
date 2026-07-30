@@ -3,19 +3,18 @@ Django settings for NIS2 Compliance Analyzer
 """
 
 import os
-# pyrefly: ignore [missing-import]
-import dj_database_url
 from pathlib import Path
+from typing import Any
+
+import dj_database_url
 from decouple import config
 
 # Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Security
-SECRET_KEY = config("SECRET_KEY", default="django-insecure-CHANGE-THIS-IN-PRODUCTION")
-DEBUG = config("DEBUG", default=True, cast=bool)
+
 def _parse_csv_hosts(value: str) -> list[str]:
-    """Parse comma-separated hosts; tolerate common Railway dashboard mistakes."""
+    """Parse comma-separated hosts; tolerate Railway env var mistakes."""
     value = value.strip().strip('"').strip("'")
     if value.upper().startswith("ALLOWED_HOSTS="):
         value = value.split("=", 1)[1].strip()
@@ -27,16 +26,25 @@ def _parse_csv_hosts(value: str) -> list[str]:
     return hosts
 
 
-_database_url = config("DATABASE_URL", default="")
-ALLOWED_HOSTS = config(
-    "ALLOWED_HOSTS",
-    default="localhost,127.0.0.1",
-    cast=_parse_csv_hosts,
+def _parse_csv_origins(value: str) -> list[str]:
+    return [s.strip() for s in value.split(",") if s.strip()]
+
+
+# Security
+SECRET_KEY = config(
+    "SECRET_KEY",
+    default="django-insecure-CHANGE-THIS-IN-PRODUCTION",
+)
+DEBUG = config("DEBUG", default=True, cast=bool)
+
+_database_url: str = str(config("DATABASE_URL", default=""))
+ALLOWED_HOSTS: list[str] = _parse_csv_hosts(
+    str(config("ALLOWED_HOSTS", default="localhost,127.0.0.1")),
 )
 # Railway — accept the service public domain and any *.up.railway.app host
-_railway_domain = (
+_railway_domain: str = (
     os.environ.get("RAILWAY_PUBLIC_DOMAIN", "")
-    or config("RAILWAY_PUBLIC_DOMAIN", default="")
+    or str(config("RAILWAY_PUBLIC_DOMAIN", default=""))
 ).strip().strip('"').strip("'")
 if _railway_domain and _railway_domain not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(_railway_domain)
@@ -53,10 +61,8 @@ if _on_railway and ".up.railway.app" not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(".up.railway.app")
 
 # HTTPS / CSRF — required for Railway (TLS terminates at the edge proxy)
-CSRF_TRUSTED_ORIGINS = config(
-    "CSRF_TRUSTED_ORIGINS",
-    default="",
-    cast=lambda v: [s.strip() for s in v.split(",") if s.strip()],
+CSRF_TRUSTED_ORIGINS: list[str] = _parse_csv_origins(
+    str(config("CSRF_TRUSTED_ORIGINS", default="")),
 )
 if _railway_domain:
     _railway_origin = f"https://{_railway_domain}"
@@ -78,19 +84,18 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Third party
     "rest_framework",
-    "corsheaders",
     # NIS2 Apps
     "compliance_engine",
     "nis2_agents",
     "rag_engine",
     "dashboard",
     "report_generator",
+    "marketing",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -119,9 +124,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "nis2_analyzer.wsgi.application"
 
-# Database — PostgreSQL on Railway (DATABASE_URL), SQLite locally
+# Database — PostgreSQL on Railway (DATABASE_URL),
+# SQLite locally
 if _database_url:
-    DATABASES = {"default": dj_database_url.parse(_database_url, conn_max_age=600)}
+    DATABASES = {
+        "default": dj_database_url.parse(
+            _database_url,
+            conn_max_age=600,
+        ),
+    }
 else:
     DATABASES = {
         "default": {
@@ -133,11 +144,29 @@ else:
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "UserAttributeSimilarityValidator"
+        ),
     },
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+    {
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "MinimumLengthValidator"
+        ),
+    },
+    {
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "CommonPasswordValidator"
+        ),
+    },
+    {
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "NumericPasswordValidator"
+        ),
+    },
 ]
 
 # Internationalization
@@ -150,7 +179,9 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = (
+    "whitenoise.storage.CompressedManifestStaticFilesStorage"
+)
 
 # Media files
 MEDIA_URL = "media/"
@@ -162,17 +193,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Auth
 LOGIN_URL = "/dashboard/login/"
 
-# CORS Settings
-CORS_ALLOWED_ORIGINS = config(
-    "CORS_ORIGINS",
-    default="http://localhost:3000,http://localhost:5173",
-    cast=lambda v: [s.strip() for s in v.split(",")],
-)
-CORS_ALLOW_CREDENTIALS = True
-
 # REST Framework
 REST_FRAMEWORK = {
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_PAGINATION_CLASS": (
+        "rest_framework.pagination.PageNumberPagination"
+    ),
     "PAGE_SIZE": 20,
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
@@ -192,13 +217,14 @@ QDRANT_PORT = config("QDRANT_PORT", default=6333, cast=int)
 QDRANT_API_KEY = config("QDRANT_API_KEY", default="")
 QDRANT_COLLECTION_NAME = "nis2_knowledge_base"
 QDRANT_VECTOR_SIZE = 384  # sentence-transformers/all-MiniLM-L6-v2
-# Local on-disk mode for dev; None in production (uses QDRANT_HOST/PORT instead)
+# Local on-disk mode for dev; None in production
+# (uses QDRANT_HOST/PORT instead)
 QDRANT_LOCAL_PATH = None if _database_url else BASE_DIR / "qdrant_local"
 
 # AI API Keys
 GOOGLE_API_KEY = config("GOOGLE_API_KEY", default="")
 
-# Embedding Model (fastembed — BAAI/bge-small-en-v1.5 is 384-dim, same as all-MiniLM-L6-v2)
+# Embedding Model (fastembed — BAAI/bge-small-en-v1.5, 384-dim)
 EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 
 # Document Processing
@@ -211,8 +237,8 @@ REPORT_OUTPUT_DIR = MEDIA_ROOT / "reports"
 REPORT_LOGO_PATH = STATIC_ROOT / "images" / "logo.png"
 
 # Logging — console only on Railway, file logging locally
-_log_handlers = ["console"]
-_log_handler_config = {
+_log_handlers: list[str] = ["console"]
+_log_handler_config: dict[str, dict[str, Any]] = {
     "console": {
         "class": "logging.StreamHandler",
         "formatter": "verbose",
@@ -225,7 +251,7 @@ if DEBUG and not _database_url:
     _log_handlers.append("file")
     _log_handler_config["file"] = {
         "class": "logging.handlers.RotatingFileHandler",
-        "filename": BASE_DIR / "logs" / "nis2_analyzer.log",
+        "filename": str(BASE_DIR / "logs" / "nis2_analyzer.log"),
         "maxBytes": 1024 * 1024 * 10,
         "backupCount": 5,
         "formatter": "verbose",
@@ -236,7 +262,10 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "verbose": {
-            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "format": (
+                "{levelname} {asctime} {module} "
+                "{process:d} {thread:d} {message}"
+            ),
             "style": "{",
         },
     },
