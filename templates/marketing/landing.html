@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="{% static 'marketing/css/base.css' %}">
 
 <!-- header -->
-<link rel="stylesheet" href="{% static 'marketing/header/navbar.css' %}">
+<link rel="stylesheet" href="{% static 'marketing/header/navbar/navbar.css' %}">
 <link rel="stylesheet" href="{% static 'marketing/header/hero.css' %}">
 
 <!-- sections -->
@@ -28,7 +28,7 @@
 
 <body>
 
-{% include "marketing/header/navbar.html" %}
+{% include "marketing/header/navbar/navbar.html" %}
 {% include "marketing/header/hero.html" %}
 {% include "marketing/sections/divider.html" with hero=True %}
 {% include "marketing/sections/trust/trust.html" %}
@@ -46,7 +46,6 @@
 {% include "marketing/sections/footer/footer.html" %}
 
 <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-<script src="{% static 'marketing/header/navbar.js' %}"></script>
 <script src="{% static 'marketing/header/hero.js' %}"></script>
 <script src="{% static 'marketing/sections/trust/trust.js' %}"></script>
 <script src="{% static 'marketing/sections/scope/scope.js' %}"></script>

@@ -4,3 +4,13 @@
 .trust .lbl{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2)}
 .trust .item{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--ink-2)}
 .trust .item svg{color:var(--green)}
+@media(max-width:768px){
+  .trust{padding:4px 0 24px}
+  .trust .wrap{gap:16px 24px;justify-content:flex-start}
+  .trust .lbl{width:100%;text-align:center;margin-bottom:4px}
+  .trust .item{font-size:12px}
+}
+@media(max-width:480px){
+  .trust .wrap{flex-direction:column;align-items:center;gap:12px}
+  .trust .item{justify-content:center;text-align:center}
+}

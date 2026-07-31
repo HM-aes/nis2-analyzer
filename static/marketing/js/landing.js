@@ -4,9 +4,10 @@
 (function () {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const lenis = new Lenis({ duration: 1.1, smoothWheel: true });
+  window.lenis = lenis;
   function raf(t) { lenis.raf(t); requestAnimationFrame(raf); }
   requestAnimationFrame(raf);
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
+  document.querySelectorAll('a[href^="#"]:not(.nav-link)').forEach(a => {
     a.addEventListener("click", e => {
       const el = document.querySelector(a.getAttribute("href"));
       if (el) { e.preventDefault(); lenis.scrollTo(el, { offset: -70 }); }

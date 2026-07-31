@@ -13,3 +13,11 @@
 .deploy ul{list-style:none;display:grid;gap:13px;margin-bottom:24px}
 .deploy li{display:flex;gap:11px;font-size:14px;color:var(--ink-2)}
 .deploy li svg{flex:none;margin-top:3px;color:var(--green)}
+@media(max-width:768px){
+  .deploy{padding:24px}
+  .deploy h3{font-size:20px}
+}
+@media(max-width:480px){
+  .deploy{padding:20px 18px}
+  .deploy .badge{right:16px;font-size:9px}
+}

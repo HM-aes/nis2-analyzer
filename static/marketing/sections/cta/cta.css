@@ -10,3 +10,15 @@
   letter-spacing:-.015em;margin-bottom:14px;color:#F4F7FB}
 .cta-band p{font-size:17px;color:var(--ink-2);max-width:48ch;margin:0 auto 30px}
 .cta-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+@media(max-width:768px){
+  .cta-band{padding:40px 24px;border-radius:16px}
+  .cta-band h2{font-size:clamp(24px,6vw,32px)}
+  .cta-band p{font-size:16px;padding:0 8px}
+}
+@media(max-width:480px){
+  .cta-band{padding:32px 18px}
+  .cta-band p{font-size:15px;margin-bottom:24px}
+  .lead-form{flex-direction:column;align-items:stretch!important}
+  .lead-form input[type=email]{min-width:0!important;width:100%}
+  .lead-form .btn{width:100%}
+}

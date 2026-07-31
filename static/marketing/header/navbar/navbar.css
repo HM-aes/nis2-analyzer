@@ -1,0 +1,117 @@
+/* ============================================================ *
+ * Marketing navbar — self-contained module
+ * Markup: templates/marketing/header/navbar/navbar.html (Alpine.js)
+ * ============================================================ */
+
+.site-nav{
+  --nav-metal-highlight:#9AA2AE;
+  --nav-metal-light:#7C838F;
+  --nav-metal-mid:#636973;
+  --nav-metal-shadow:#4A4F58;
+  --nav-metal-deep:#3A3E45;
+  --nav-bg:#020304;
+  --nav-rim:2px;
+  --nav-radius:18px;
+  /* brand wordmark — neutral light grey, not a status colour */
+  --nav-brand-grey:#C4CAD4;
+  --nav-brand-grey-hover:#F4F6FA;
+  position:sticky;top:0;z-index:50;
+  padding:14px 0;
+  background:transparent;
+}
+.site-nav .wrap{height:auto}
+
+/* light metallic rim on rounded edges */
+.site-nav .nav-bar-frame{
+  padding:var(--nav-rim);
+  border-radius:var(--nav-radius);
+  background:linear-gradient(
+    145deg,
+    var(--nav-metal-light) 0%,
+    var(--nav-metal-shadow) 16%,
+    var(--nav-metal-highlight) 34%,
+    var(--nav-metal-mid) 50%,
+    var(--nav-metal-deep) 64%,
+    var(--nav-metal-light) 82%,
+    var(--nav-metal-highlight) 100%
+  );
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.04),
+    0 8px 28px rgba(0,0,0,.4);
+}
+
+.site-nav .nav-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  min-height:56px;padding:8px 10px 8px 20px;
+  background:var(--nav-bg);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-radius:calc(var(--nav-radius) - var(--nav-rim));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+.site-nav .nav-brand{
+  display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.01em;flex-shrink:0;
+  text-decoration:none;
+  position:relative;
+}
+
+/* wordmark — plain light grey, brightens smoothly on hover */
+.site-nav .nav-brand-text{
+  color:var(--nav-brand-grey);
+  transition:color .25s ease;
+}
+.site-nav .nav-brand:hover .nav-brand-text{color:var(--nav-brand-grey-hover)}
+.site-nav .nav-brand:focus-visible{outline:2px solid var(--nav-brand-grey-hover);outline-offset:4px;border-radius:6px}
+
+.site-nav .nav-brand-glyph{
+  width:26px;height:26px;border-radius:7px;
+  border:1.5px solid var(--amber);
+  display:grid;place-items:center;position:relative;flex-shrink:0;
+  transition:box-shadow .25s ease;
+}
+.site-nav .nav-brand:hover .nav-brand-glyph{box-shadow:0 0 12px var(--amber-soft)}
+.site-nav .nav-brand-glyph::before{
+  content:"";width:8px;height:8px;background:var(--amber);border-radius:2px;
+}
+
+.site-nav .nav-links{
+  display:flex;align-items:center;gap:8px;font-size:14px;flex-wrap:wrap;justify-content:flex-end;
+}
+.site-nav .nav-link{
+  display:inline-flex;align-items:center;
+  color:#E2E8F0;text-decoration:none;
+  padding:8px 16px;border-radius:999px;
+  border:1px solid rgba(156,163,175,.55);
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+  line-height:1;
+  white-space:nowrap;
+  transition:color .2s,background .2s,border-color .2s,box-shadow .2s,transform .15s;
+}
+.site-nav .nav-link:hover{
+  color:#fff;
+  background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.04));
+  border-color:rgba(192,198,208,.75);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 0 10px rgba(156,163,175,.15);
+  transform:translateY(-1px);
+}
+
+@media(max-width:900px){
+  .site-nav .nav-bar{padding:8px 10px 8px 16px;gap:12px}
+  .site-nav .nav-link{padding:8px 12px;font-size:13px}
+}
+@media(max-width:768px){
+  .site-nav{padding:10px 0;--nav-radius:14px}
+  .site-nav .nav-bar{min-height:50px}
+  .site-nav .nav-brand{font-size:14px}
+  .site-nav .nav-brand-glyph{width:22px;height:22px}
+}
+@media(max-width:760px){
+  .site-nav .nav-section{display:none}
+  .site-nav .nav-bar{min-height:48px;padding:6px 8px 6px 12px}
+  .site-nav .nav-links{gap:6px}
+  .site-nav .nav-link{padding:7px 12px;font-size:12px}
+}
+@media(max-width:400px){
+  .site-nav .nav-brand{font-size:13px;gap:8px}
+}

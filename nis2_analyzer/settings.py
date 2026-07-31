@@ -179,12 +179,26 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
-if DEBUG:
-    # Serve directly from static/ in dev — no collectstatic after every CSS edit
+_railway_deploy = any(
+    os.environ.get(key)
+    for key in (
+        "RAILWAY_ENVIRONMENT",
+        "RAILWAY_PUBLIC_DOMAIN",
+        "RAILWAY_SERVICE_ID",
+        "RAILWAY_PROJECT_ID",
+    )
+)
+if DEBUG or not _railway_deploy:
+    # Serve from static/ locally — no collectstatic after every asset edit
     STATICFILES_STORAGE = (
         "django.contrib.staticfiles.storage.StaticFilesStorage"
     )
     WHITENOISE_USE_FINDERS = True
+    # Rescan static/ on every request so new/moved files (e.g. a freshly
+    # added component folder) are picked up without restarting the server.
+    # WhiteNoise otherwise indexes static/ once at startup and 404s anything
+    # added afterwards — this matters here since DEBUG can be False locally.
+    WHITENOISE_AUTOREFRESH = True
 else:
     STATICFILES_STORAGE = (
         "whitenoise.storage.CompressedManifestStaticFilesStorage"

@@ -1,5 +1,6 @@
 {% load static %}
 <form
+  class="lead-form"
   hx-post="{% url 'marketing:lead_capture' %}"
   hx-target="this"
   hx-swap="outerHTML"

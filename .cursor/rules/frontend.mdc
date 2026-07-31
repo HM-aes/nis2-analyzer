@@ -1,0 +1,64 @@
+---
+description: Frontend stack rules — HTML/HTMX/Alpine/CSS only, no React or build step
+alwaysApply: true
+---
+
+# Frontend Stack — read @design-rules.md before any frontend work
+
+This project's frontend is **server-rendered Django templates + HTMX + Alpine.js
++ plain CSS**. There is no build step and no client-side framework.
+
+**Before generating or editing any template, component, or frontend asset, read
+[design-rules.md](mdc:design-rules.md) and follow it.** The full conventions
+(HTMX partial patterns, Alpine scope, CSS tokens, template structure) live there.
+
+## Hard constraints (never violate without asking first)
+
+- **No React / Vue / Svelte / Next / any SPA framework** — not even for one
+  component.
+- **No JS build step** — no Vite, Webpack, esbuild, bundlers, `npm run build`
+  for frontend. No JSX/TSX.
+- **No Tailwind unless already configured** — use semantic CSS with `:root`
+  custom-property tokens. Never hardcode hex values; add a token instead.
+- **No JSON-rendered-to-DOM.** HTMX views return **HTML fragments**, not JSON.
+  The server renders; the client swaps.
+- **No heavy animation libs** (Framer Motion, GSAP). Motion is CSS
+  (`transform`/`opacity` + `@keyframes`), gated on `prefers-reduced-motion`.
+- **Server owns truth.** Real data comes from Django context or an HTMX
+  fragment — never hardcoded in JS or held as authoritative state in Alpine.
+
+## Defaults
+
+- Reach for the smallest tool that works: **static HTML → HTMX → Alpine**.
+- HTMX partials live in `templates/**/partials/` as `_name.html`; always include
+  `{% csrf_token %}` in forms and give every swap a loading + error state.
+- Alpine is for **local, ephemeral** UI state only (toggles, tabs, count-ups).
+- Style only via `var(--token)`; every layout must survive a 380px viewport.
+
+If a request seems to require anything on the banned list, **stop and explain
+why in-stack won't work** before proposing an alternative — do not switch
+silently.
+
+## Mandatory: re-read the rules on EVERY design task
+
+Before writing or editing **any** template, component, HTMX view, Alpine widget,
+or CSS, you must **re-open and re-read [design-rules.md](mdc:design-rules.md)
+first** — every time, not just the first task in a session. Context from an
+earlier task is not a substitute for re-reading; rules drift out of attention
+across a long session, which is exactly when violations happen.
+
+**Start every frontend response by confirming compliance out loud**, in this
+form, before any code:
+
+```
+Design-rules check:
+- Stack: [what you're using — HTML/HTMX/Alpine/CSS] ✓
+- Tokens: [using var(--…), no hardcoded hex] ✓
+- Server-owns-truth: [data source is Django context / HTMX fragment] ✓
+- Motion: [CSS only, reduced-motion gated — or N/A] ✓
+- Swap states: [loading + error present — or N/A] ✓
+```
+
+If any line would be a ✗, stop and resolve it (or ask) before writing code. A
+task that produces code without this check at the top is incomplete and should
+be redone.

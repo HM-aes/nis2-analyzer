@@ -19,6 +19,8 @@
   --green-soft:rgba(63,182,139,0.12);
   --radius:14px;
   --maxw:1140px;
+  --divider:rgba(174,183,198,.72);
+  --divider-glow:rgba(174,183,198,.22);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
@@ -27,9 +29,10 @@ body{
   font-family:'Inter',system-ui,sans-serif;line-height:1.6;
   overflow-x:hidden;
 }
-.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(14px,4vw,24px)}
 .mono{font-family:'JetBrains Mono',monospace}
 .serif{font-family:'Fraunces',Georgia,serif}
+img,svg,video{max-width:100%;height:auto}
 
 /* ---- motion primitives (CSS only) ---- */
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1)}
@@ -44,8 +47,8 @@ body{
 .section-divider-inner{display:flex;align-items:center;gap:20px}
 .section-divider-line{
   flex:1;height:1px;
-  background:rgba(174,183,198,.5);
-  box-shadow:0 0 14px rgba(174,183,198,.1);
+  background:var(--divider);
+  box-shadow:0 0 14px var(--divider-glow);
   transform:scaleX(0);opacity:.9;
   transition:transform .9s cubic-bezier(.22,1,.36,1),opacity .6s ease;
 }
@@ -100,3 +103,27 @@ section{padding:88px 0;position:relative}
 h2.sec-title{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(28px,3.6vw,40px);
   line-height:1.1;letter-spacing:-.015em;color:#F1F5FA;margin-bottom:16px}
 .sec-lead{font-size:17px;color:var(--ink-2)}
+
+/* ---- responsive: tablet & mobile ---- */
+@media(max-width:1024px){
+  section{padding:72px 0}
+  .sec-head{margin-bottom:44px}
+  .section-divider{padding:28px 0 40px}
+}
+@media(max-width:768px){
+  section{padding:56px 0}
+  .sec-head{margin-bottom:36px}
+  .sec-eyebrow{font-size:11px}
+  h2.sec-title{font-size:clamp(24px,6vw,32px)}
+  .sec-lead{font-size:16px}
+  .section-divider{padding:24px 0 32px}
+  .btn-lg{padding:13px 22px;font-size:14px}
+}
+@media(max-width:480px){
+  section{padding:44px 0}
+  .sec-head{margin-bottom:28px}
+  .sec-lead{font-size:15px}
+  .section-divider{padding:20px 0 28px}
+  .btn{width:100%;justify-content:center}
+  .btn-lg{padding:14px 20px}
+}
