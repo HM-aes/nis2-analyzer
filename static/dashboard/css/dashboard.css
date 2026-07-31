@@ -21,8 +21,8 @@
   --card-foreground: #fafafa;
   --popover: #18181b;
   --popover-foreground: #fafafa;
-  --primary: #6366f1;
-  --primary-foreground: #ffffff;
+  --primary: #d97706;
+  --primary-foreground: #1a1405;
   --secondary: #27272a;
   --secondary-foreground: #fafafa;
   --muted: #27272a;
@@ -33,10 +33,10 @@
   --destructive-foreground: #fca5a5;
   --border: #27272a;
   --input: #27272a;
-  --ring: #6366f1;
+  --ring: #d97706;
 
   /* semantic accent colours */
-  --accent-blue: #6366f1;
+  --accent-blue: #d97706;
   --accent-purple: #8b5cf6;
   --accent-cyan: #06b6d4;
   --accent-green: #22c55e;
@@ -55,7 +55,7 @@
   --text-secondary: var(--muted-foreground);
   --text-muted: #71717a;
 
-  --glow-blue: rgba(99, 102, 241, 0.12);
+  --glow-blue: rgba(217, 119, 6, 0.12);
   --glow-purple: rgba(139, 92, 246, 0.12);
   --glow-cyan: rgba(6, 182, 212, 0.10);
   --glow-green: rgba(34, 197, 94, 0.10);
@@ -165,17 +165,17 @@ body::after {
 }
 
 .kpi-card-blue {
-  border-color: rgba(99, 102, 241, 0.3);
+  border-color: rgba(217, 119, 6, 0.3);
 }
 
 .kpi-card-blue:hover {
-  border-color: rgba(99, 102, 241, 0.5);
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.1);
+  border-color: rgba(217, 119, 6, 0.5);
+  box-shadow: 0 4px 16px rgba(217, 119, 6, 0.1);
 }
 
 .kpi-card-blue .kpi-icon-wrap {
-  background: rgba(99, 102, 241, 0.1);
-  border-color: rgba(99, 102, 241, 0.25);
+  background: rgba(217, 119, 6, 0.1);
+  border-color: rgba(217, 119, 6, 0.25);
 }
 
 .kpi-card-blue .kpi-value {
@@ -297,9 +297,9 @@ body::after {
 }
 
 .badge-analysis {
-  background: rgba(99, 102, 241, 0.1);
+  background: rgba(217, 119, 6, 0.1);
   color: var(--accent-blue);
-  border-color: rgba(99, 102, 241, 0.25);
+  border-color: rgba(217, 119, 6, 0.25);
   animation: pulse-bg 2s ease-in-out infinite;
 }
 
@@ -346,9 +346,9 @@ body::after {
 }
 
 .badge-t1 {
-  background: rgba(99, 102, 241, 0.1);
+  background: rgba(217, 119, 6, 0.1);
   color: var(--accent-blue);
-  border-color: rgba(99, 102, 241, 0.25);
+  border-color: rgba(217, 119, 6, 0.25);
 }
 
 .badge-t2 {
@@ -649,11 +649,11 @@ body::after {
 
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+    box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.4);
   }
 
   50% {
-    box-shadow: 0 0 0 6px rgba(99, 102, 241, 0);
+    box-shadow: 0 0 0 6px rgba(217, 119, 6, 0);
   }
 }
 
@@ -805,7 +805,7 @@ body::after {
 .form-select:focus,
 .form-textarea:focus {
   border-color: var(--ring);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
 }
 
 .form-select option {
@@ -855,8 +855,8 @@ body::after {
 }
 
 .btn-primary:hover {
-  background: #4f46e5;
-  border-color: #4f46e5;
+  background: #b45309;
+  border-color: #b45309;
 }
 
 .btn-secondary {
@@ -928,9 +928,9 @@ body::after {
 
 /* ── Processing live card ─────────────────────────────────────── */
 .processing-card {
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  border: 1px solid rgba(217, 119, 6, 0.3);
   border-radius: var(--radius-lg);
-  background: rgba(99, 102, 241, 0.05);
+  background: rgba(217, 119, 6, 0.05);
   padding: 1.25rem;
 }
 
@@ -992,7 +992,7 @@ body::after {
 .upload-zone:hover,
 .upload-zone.dragover {
   border-color: var(--primary);
-  background: rgba(99, 102, 241, 0.05);
+  background: rgba(217, 119, 6, 0.05);
 }
 
 /* ── Tab nav ──────────────────────────────────────────────────── */
@@ -1083,7 +1083,7 @@ body::after {
 .search-input:focus {
   background: var(--surface-3) !important;
   border-color: var(--ring) !important;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15) !important;
   outline: none;
   color: var(--foreground) !important;
 }
@@ -1332,8 +1332,20 @@ body::after {
 }
 
 /* text-blue-600 → accent-blue */
-.text-blue-600 {
+.text-blue-600,
+.hover\:text-blue-600:hover,
+.text-blue-800 {
   color: var(--accent-blue) !important;
+}
+
+/* border-blue-500 / bg-blue-50 → accent-blue (tier selector cards) */
+.border-blue-500,
+.hover\:border-blue-300:hover {
+  border-color: var(--accent-blue) !important;
+}
+
+.bg-blue-50 {
+  background-color: var(--glow-blue) !important;
 }
 
 .text-red-700 {
