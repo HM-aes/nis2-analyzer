@@ -1,5 +1,5 @@
 /* ============ HERO ============ */
-header.hero{padding:76px 0 60px;position:relative}
+header.hero{padding:76px 0 20px;position:relative}
 /* faint grid backdrop — reads as "scan surface", not decoration */
 header.hero::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
   background-image:linear-gradient(var(--line-soft) 1px,transparent 1px),
@@ -20,7 +20,49 @@ h1.hero-title em{font-style:italic;color:var(--amber)}
 .hero-fact{font-size:14px;color:var(--muted);max-width:42ch;margin-bottom:30px;
   padding-left:14px;border-left:2px solid var(--line)}
 .hero-cta{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.hero-cta .note{font-size:13px;color:var(--muted)}
+.hero-cta .note{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:13px;color:var(--ink-2);
+  padding:8px 14px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.05);
+  transition:color .25s,background .25s,border-color .25s,transform .25s,box-shadow .25s;
+}
+.hero-cta .note::before{
+  content:"";width:6px;height:6px;border-radius:50%;flex-shrink:0;
+  background:var(--green);
+  box-shadow:0 0 10px rgba(63,182,139,.45);
+  animation:notePulse 2.4s ease-in-out infinite;
+}
+.hero-cta .note:hover,
+.hero-cta:hover .note{
+  color:var(--ink);
+  background:rgba(255,255,255,.1);
+  border-color:rgba(255,255,255,.15);
+  transform:translateY(-1px);
+  box-shadow:0 4px 16px rgba(0,0,0,.18);
+}
+@keyframes notePulse{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:.65;transform:scale(.88)}
+}
+@media (prefers-reduced-motion:reduce){
+  .hero-cta .note::before{animation:none}
+  .hero-cta .note:hover,
+  .hero-cta:hover .note{transform:none}
+}
+.hero-cta .btn-primary{
+  color:#fff;
+  background:var(--panel);
+  border:1px solid var(--line);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+.hero-cta .btn-primary:hover{
+  color:#fff;
+  background:#1a202b;
+  border-color:rgba(255,255,255,.18);
+  transform:translateY(-1px);
+}
 
 /* ---- hero scope panel (the signature element) ---- */
 .scope-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);

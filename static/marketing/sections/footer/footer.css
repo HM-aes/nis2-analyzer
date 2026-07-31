@@ -1,5 +1,5 @@
 /* ---- footer ---- */
-footer{border-top:1px solid var(--line-soft);padding:44px 0 40px;margin-top:20px}
+footer{padding:44px 0 40px}
 footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;
   font-size:13px;color:var(--muted)}
 footer a{color:var(--ink-2);text-decoration:none}

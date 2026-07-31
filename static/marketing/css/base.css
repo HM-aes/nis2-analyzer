@@ -39,6 +39,36 @@ body{
   *{animation:none!important}
 }
 
+/* ---- section dividers (scroll-animated) ---- */
+.section-divider{padding:32px 0 48px;position:relative}
+.section-divider-inner{display:flex;align-items:center;gap:20px}
+.section-divider-line{
+  flex:1;height:1px;
+  background:rgba(174,183,198,.5);
+  box-shadow:0 0 14px rgba(174,183,198,.1);
+  transform:scaleX(0);opacity:.9;
+  transition:transform .9s cubic-bezier(.22,1,.36,1),opacity .6s ease;
+}
+.section-divider-line--left{transform-origin:right center}
+.section-divider-line--right{transform-origin:left center}
+.section-divider-mark{
+  flex-shrink:0;width:8px;height:8px;border-radius:50%;
+  background:rgba(174,183,198,.6);
+  box-shadow:0 0 10px rgba(174,183,198,.28);
+  opacity:0;transform:scale(0);
+  transition:opacity .5s ease .4s,transform .5s cubic-bezier(.22,1,.36,1) .4s;
+}
+.section-divider.in .section-divider-line{transform:scaleX(1);opacity:1}
+.section-divider.in .section-divider-mark{opacity:1;transform:scale(1)}
+.section-divider--hero.in .section-divider-line,
+.section-divider.is-visible .section-divider-line{transform:scaleX(1);opacity:1}
+.section-divider--hero.in .section-divider-mark,
+.section-divider.is-visible .section-divider-mark{opacity:1;transform:scale(1)}
+@media (prefers-reduced-motion:reduce){
+  .section-divider-line{transform:scaleX(1);opacity:1;transition:none}
+  .section-divider-mark{opacity:1;transform:none;transition:none}
+}
+
 /* ---- status chip ---- */
 .chip{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.06em;
   padding:5px 11px;border-radius:999px;border:1px solid var(--line)}

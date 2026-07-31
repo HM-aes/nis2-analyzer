@@ -1,4 +1,4 @@
-/* dashboard mock — count-up + feed reveal on scroll-into-view */
+/* Product section — dashboard mock (Alpine) */
 function dashMock() {
   return {
     feedIn: false,
@@ -35,11 +35,11 @@ function dashMock() {
         const tick = (t) => {
           const p = Math.min((t - t0) / dur, 1);
           const eased = 1 - Math.pow(1 - p, 3);
-          s.disp = Math.round(s.target * eased).toLocaleString('en-US');
+          s.disp = Math.round(s.target * eased).toLocaleString("en-US");
           if (p < 1) requestAnimationFrame(tick);
         };
         requestAnimationFrame(tick);
       });
     }
-  }
+  };
 }

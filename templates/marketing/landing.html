@@ -6,44 +6,57 @@
 <title>NIS2 Analyzer — Know where you stand on NIS2</title>
 <meta name="description" content="Find out if you're in scope for NIS2, where your gaps are, and what to fix — before your national authority asks. Free scope assessment.">
 
-<!-- Fonts: swap for self-hosted / whitenoise in Django prod -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-<!-- shared tokens, reset, typography, buttons — load first -->
 <link rel="stylesheet" href="{% static 'marketing/css/base.css' %}">
 
-<!-- per-section styles -->
-<link rel="stylesheet" href="{% static 'marketing/css/components/navbar.css' %}">
-<link rel="stylesheet" href="{% static 'marketing/css/components/hero.css' %}">
-<link rel="stylesheet" href="{% static 'marketing/css/components/trust.css' %}">
-<link rel="stylesheet" href="{% static 'marketing/css/components/scope.css' %}">
-<link rel="stylesheet" href="{% static 'marketing/css/components/audit.css' %}">
-<link rel="stylesheet" href="{% static 'marketing/css/dashboard-mock.css' %}">
-<link rel="stylesheet" href="{% static 'marketing/css/components/deploy.css' %}">
-<link rel="stylesheet" href="{% static 'marketing/css/components/cta.css' %}">
-<link rel="stylesheet" href="{% static 'marketing/css/components/footer.css' %}">
+<!-- header -->
+<link rel="stylesheet" href="{% static 'marketing/header/navbar.css' %}">
+<link rel="stylesheet" href="{% static 'marketing/header/hero.css' %}">
+
+<!-- sections -->
+<link rel="stylesheet" href="{% static 'marketing/sections/trust/trust.css' %}">
+<link rel="stylesheet" href="{% static 'marketing/sections/scope/scope.css' %}">
+<link rel="stylesheet" href="{% static 'marketing/sections/audit/audit.css' %}">
+<link rel="stylesheet" href="{% static 'marketing/sections/deploy/deploy.css' %}">
+<link rel="stylesheet" href="{% static 'marketing/sections/product/product.css' %}">
+<link rel="stylesheet" href="{% static 'marketing/sections/cta/cta.css' %}">
+<link rel="stylesheet" href="{% static 'marketing/sections/footer/footer.css' %}">
 </head>
 
 <body>
 
-{% include "marketing/partials/_navbar.html" %}
-{% include "marketing/partials/_hero.html" %}
-{% include "marketing/partials/_trust.html" %}
-{% include "marketing/partials/_scope.html" %}
-{% include "marketing/partials/_audit.html" %}
-{% include "marketing/partials/_product.html" %}
-{% include "marketing/partials/_deploy.html" %}
-{% include "marketing/partials/_cta.html" %}
-{% include "marketing/partials/_footer.html" %}
+{% include "marketing/header/navbar.html" %}
+{% include "marketing/header/hero.html" %}
+{% include "marketing/sections/divider.html" with hero=True %}
+{% include "marketing/sections/trust/trust.html" %}
+{% include "marketing/sections/divider.html" %}
+{% include "marketing/sections/scope/scope.html" %}
+{% include "marketing/sections/divider.html" %}
+{% include "marketing/sections/audit/audit.html" %}
+{% include "marketing/sections/divider.html" %}
+{% include "marketing/sections/deploy/deploy.html" %}
+{% include "marketing/sections/divider.html" %}
+{% include "marketing/sections/product/product.html" %}
+{% include "marketing/sections/divider.html" %}
+{% include "marketing/sections/cta/cta.html" %}
+{% include "marketing/sections/divider.html" %}
+{% include "marketing/sections/footer/footer.html" %}
 
-<!-- ============ SCRIPTS ============ -->
-<!-- Alpine + Lenis via CDN; self-host in Django prod -->
 <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+<script src="{% static 'marketing/header/navbar.js' %}"></script>
+<script src="{% static 'marketing/header/hero.js' %}"></script>
+<script src="{% static 'marketing/sections/trust/trust.js' %}"></script>
+<script src="{% static 'marketing/sections/scope/scope.js' %}"></script>
+<script src="{% static 'marketing/sections/audit/audit.js' %}"></script>
+<script src="{% static 'marketing/sections/deploy/deploy.js' %}"></script>
+<script src="{% static 'marketing/sections/product/product.js' %}"></script>
+<script src="{% static 'marketing/sections/cta/cta.js' %}"></script>
+<script src="{% static 'marketing/sections/footer/footer.js' %}"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
 <script src="{% static 'marketing/js/landing.js' %}"></script>
-<script src="{% static 'marketing/js/dashboard-mock.js' %}"></script>
 </body>
 </html>
