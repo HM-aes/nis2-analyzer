@@ -1,13 +1,16 @@
 {# Marketing landing — navbar markup + Alpine.js. Styles: header/navbar/navbar.css #}
 <nav id="site-nav" class="site-nav" aria-label="Main"
      x-data="{
+       menuOpen: false,
        go(id) {
          const el = document.querySelector(id);
          if (!el) return;
+         this.menuOpen = false;
          if (window.lenis) window.lenis.scrollTo(el, { offset: -70 });
          else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' });
        }
-     }">
+     }"
+     @keydown.escape.window="menuOpen = false">
   <div class="wrap">
     <div class="nav-bar-frame">
       <div class="nav-bar">
@@ -15,7 +18,8 @@
           <span class="nav-brand-glyph" aria-hidden="true"></span>
           <span class="nav-brand-text">NIS2&nbsp;Analyzer</span>
         </a>
-        <div class="nav-links">
+
+        <div class="nav-links nav-links--desktop">
           <a href="#scope" class="nav-link nav-section" @click.prevent="go('#scope')">Am I in scope?</a>
           <a href="#audit" class="nav-link nav-section" @click.prevent="go('#audit')">What it checks</a>
           <a href="#deploy" class="nav-link nav-section" @click.prevent="go('#deploy')">Deployment</a>
@@ -23,6 +27,36 @@
           <a href="{% url 'signup' %}" class="nav-link"
              @click.prevent="$dispatch('open-signup')">Sign up</a>
         </div>
+
+        <button type="button" class="nav-toggle"
+                @click="menuOpen = !menuOpen"
+                :aria-expanded="menuOpen.toString()"
+                aria-controls="nav-menu"
+                :aria-label="menuOpen ? 'Close menu' : 'Open menu'">
+          <span class="nav-toggle-icon" aria-hidden="true">
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+          </span>
+        </button>
+      </div>
+
+      <div id="nav-menu" class="nav-menu"
+           x-show="menuOpen"
+           x-cloak
+           @click.away="menuOpen = false"
+           x-transition:enter="nav-menu-enter"
+           x-transition:enter-start="nav-menu-enter-start"
+           x-transition:enter-end="nav-menu-enter-end"
+           x-transition:leave="nav-menu-leave"
+           x-transition:leave-start="nav-menu-leave-start"
+           x-transition:leave-end="nav-menu-leave-end">
+        <a href="#scope" class="nav-link nav-menu-link" @click.prevent="go('#scope')">Am I in scope?</a>
+        <a href="#audit" class="nav-link nav-menu-link" @click.prevent="go('#audit')">What it checks</a>
+        <a href="#deploy" class="nav-link nav-menu-link" @click.prevent="go('#deploy')">Deployment</a>
+        <a href="{% url 'login' %}" class="nav-link nav-menu-link" @click="menuOpen = false">Log in</a>
+        <a href="{% url 'signup' %}" class="nav-link nav-menu-link"
+           @click.prevent="menuOpen = false; $dispatch('open-signup')">Sign up</a>
       </div>
     </div>
   </div>

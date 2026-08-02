@@ -1,5 +1,6 @@
 /* ============ HERO ============ */
-header.hero{padding:76px 0 20px;position:relative}
+header.hero{padding:58px 0 20px;position:relative}
+header.hero .hero-grid > .reveal:first-child{margin-left:-10px;margin-top:-8px}
 /* faint grid backdrop — reads as "scan surface", not decoration */
 header.hero::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
   background-image:linear-gradient(var(--line-soft) 1px,transparent 1px),
@@ -9,10 +10,11 @@ header.hero::before{content:"";position:absolute;inset:0;z-index:0;pointer-event
   -webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 0%,#000 20%,transparent 75%);
   opacity:.5}
 header.hero .wrap{position:relative;z-index:1}
-.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
-@media(max-width:900px){.hero-grid{grid-template-columns:1fr;gap:40px}}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:72px;align-items:center}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr;gap:48px}}
 @media(max-width:768px){
-  header.hero{padding:48px 0 16px}
+  header.hero{padding:38px 0 16px}
+  header.hero .hero-grid > .reveal:first-child{margin-left:-6px;margin-top:-6px}
   h1.hero-title{font-size:clamp(30px,8vw,42px)}
   .hero-sub{font-size:16px;max-width:none}
   .hero-fact{font-size:13px;max-width:none;margin-bottom:24px}
@@ -23,7 +25,8 @@ header.hero .wrap{position:relative;z-index:1}
   .opt{padding:12px 14px;font-size:13px}
 }
 @media(max-width:480px){
-  header.hero{padding:36px 0 12px}
+  header.hero{padding:28px 0 12px}
+  header.hero .hero-grid > .reveal:first-child{margin-left:-4px;margin-top:-4px}
   .eyebrow{font-size:11px;margin-bottom:16px}
   h1.hero-title{font-size:clamp(26px,9vw,34px);margin-bottom:16px}
   .hero-fact{padding-left:12px}
