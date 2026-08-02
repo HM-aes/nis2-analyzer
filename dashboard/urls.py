@@ -2,14 +2,19 @@
 NIS2 Dashboard URL Configuration
 """
 
-from django.urls import path
+from django.urls import path, reverse_lazy
+from django.views.generic import RedirectView
 from . import views
 
 app_name = "dashboard"
 
 urlpatterns = [
-    # Auth
-    path("login/", views.DashboardLoginView.as_view(), name="login"),
+    # Auth — legacy dashboard login URL redirects to the dedicated auth page
+    path(
+        "login/",
+        RedirectView.as_view(url=reverse_lazy("login"), query_string=True),
+        name="login",
+    ),
     path("logout/", views.DashboardLogoutView.as_view(), name="logout"),
     # Main pages
     path("", views.DashboardHomeView.as_view(), name="home"),

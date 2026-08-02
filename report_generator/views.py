@@ -77,7 +77,7 @@ class GapReportDownloadView(LoginRequiredMixin, View):
     Download gap analysis PDF report for a completed audit.
     Shows download button when gaps exist — no gate on report_generated flag.
     """
-    login_url = '/dashboard/login/'
+    login_url = '/login/'
 
     def get(self, request, pk):
         audit = get_object_or_404(ComplianceAudit, pk=pk)
@@ -119,7 +119,7 @@ class GapReportGenerateView(LoginRequiredMixin, View):
     HTMX endpoint: trigger report generation status check.
     Returns JSON with download URL when ready.
     """
-    login_url = '/dashboard/login/'
+    login_url = '/login/'
 
     def post(self, request, pk):
         audit = get_object_or_404(ComplianceAudit, pk=pk)

@@ -19,8 +19,9 @@
           <a href="#scope" class="nav-link nav-section" @click.prevent="go('#scope')">Am I in scope?</a>
           <a href="#audit" class="nav-link nav-section" @click.prevent="go('#audit')">What it checks</a>
           <a href="#deploy" class="nav-link nav-section" @click.prevent="go('#deploy')">Deployment</a>
-          <a href="{% url 'dashboard:login' %}" class="nav-link">Log in</a>
-          <a href="#start" class="nav-link" @click.prevent="go('#start')">Sign up</a>
+          <a href="{% url 'login' %}" class="nav-link">Log in</a>
+          <a href="{% url 'signup' %}" class="nav-link"
+             @click.prevent="$dispatch('open-signup')">Sign up</a>
         </div>
       </div>
     </div>

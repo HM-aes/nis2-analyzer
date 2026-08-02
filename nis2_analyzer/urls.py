@@ -13,6 +13,7 @@ urlpatterns = [
     path("api/", include("compliance_engine.urls")),
     path("dashboard/", include("dashboard.urls", namespace="dashboard")),
     path("reports/", include("report_generator.urls", namespace="report_generator")),
+    path("", include("accounts.urls")),
     path("", include("marketing.urls", namespace="marketing")),
     path("", TemplateView.as_view(template_name="marketing/landing.html"), name="home"),
 ]

@@ -27,6 +27,13 @@
     border-bottom: 1px solid var(--border);
 }
 
+.sidebar-brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
 .sidebar-brand .brand-icon {
     width: 30px;
     height: 30px;
@@ -43,12 +50,45 @@
     font-weight: 600;
     font-size: 0.875rem;
     letter-spacing: -0.01em;
+    white-space: nowrap;
 }
 
 .sidebar-brand .brand-text .brand-sub {
     color: var(--muted-foreground);
     font-size: 0.6875rem;
     margin-top: 1px;
+    white-space: nowrap;
+}
+
+/* ── Collapse / expand toggle ─────────────────────────────────── */
+.sidebar-toggle {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--secondary);
+    color: var(--muted-foreground);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+    color: var(--foreground);
+    border-color: var(--border-medium);
+}
+
+.sidebar-toggle:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.sidebar-toggle svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s ease;
 }
 
 /* ── Navigation ───────────────────────────────────────────────── */
@@ -112,8 +152,8 @@
 .sidebar-nav a svg,
 .sidebar-nav button svg,
 .sidebar-logout-btn svg {
-    width: 15px;
-    height: 15px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
 }
 
@@ -166,6 +206,70 @@
         height: auto;
         flex-direction: row;
         position: relative;
+    }
+}
+
+/* ── Collapsed rail (user toggle, persisted client-side) ─────────
+   Applies at any viewport width — the manual choice from the
+   sidebar-toggle button wins over the 1024px auto-collapse above. */
+.app-shell.is-collapsed .sidebar {
+    width: 72px;
+}
+
+.app-shell.is-collapsed .sidebar-brand-row {
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.app-shell.is-collapsed .sidebar-brand .brand-text,
+.app-shell.is-collapsed .sidebar-nav a span:not(.nav-icon),
+.app-shell.is-collapsed .sidebar-logout-btn span:not(.nav-icon),
+.app-shell.is-collapsed .sidebar-section-label {
+    display: none;
+}
+
+.app-shell.is-collapsed .sidebar-nav a,
+.app-shell.is-collapsed .sidebar-logout-btn {
+    justify-content: center;
+    padding: 0.6rem;
+}
+
+/* Styled tooltip on hover — the native title="" attribute already
+   gives a fallback tooltip, this is just the polished version. */
+.app-shell.is-collapsed .sidebar-nav a {
+    position: relative;
+}
+
+.app-shell.is-collapsed .sidebar-nav a::after {
+    content: attr(title);
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%) scale(0.92);
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.35rem 0.65rem;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 20;
+}
+
+.app-shell.is-collapsed .sidebar-nav a:hover::after {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sidebar,
+    .sidebar-toggle svg,
+    .app-shell.is-collapsed .sidebar-nav a::after {
+        transition: none;
     }
 }
 

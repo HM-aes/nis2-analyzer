@@ -1,20 +1,33 @@
 {% load static %}
-<nav class="sidebar">
+<nav class="sidebar" :aria-expanded="(!collapsed).toString()">
 
     <!-- Brand -->
     <div class="sidebar-brand">
-        <div class="flex items-center gap-2.5">
-            <div class="brand-icon">
-                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                    stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        <div class="sidebar-brand-row">
+            <div class="flex items-center gap-2.5">
+                <div class="brand-icon">
+                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <div class="brand-name">NIS2 Analyzer</div>
+                    <div class="brand-sub">Compliance Platform</div>
+                </div>
+            </div>
+
+            <!-- Collapse / expand toggle — local UI preference, persisted client-side -->
+            <button type="button" class="sidebar-toggle"
+                    @click="collapsed = !collapsed"
+                    :aria-label="collapsed ? 'Zijbalk uitklappen' : 'Zijbalk inklappen'"
+                    :aria-pressed="collapsed.toString()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     :style="collapsed ? 'transform:rotate(180deg)' : ''">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6" />
                 </svg>
-            </div>
-            <div class="brand-text">
-                <div class="brand-name">NIS2 Analyzer</div>
-                <div class="brand-sub">Compliance Platform</div>
-            </div>
+            </button>
         </div>
     </div>
 
@@ -22,7 +35,7 @@
     <div class="sidebar-nav mt-2 flex-1">
         <div class="sidebar-section-label">Navigatie</div>
 
-        <a href="{% url 'dashboard:home' %}"
+        <a href="{% url 'dashboard:home' %}" title="Dashboard"
             class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 stroke-width="2">
@@ -32,7 +45,7 @@
             <span>Dashboard</span>
         </a>
 
-        <a href="{% url 'dashboard:clients' %}"
+        <a href="{% url 'dashboard:clients' %}" title="Klanten"
             class="{% if 'client' in request.resolver_match.url_name %}active{% endif %}">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 stroke-width="2">
@@ -42,7 +55,7 @@
             <span>Klanten</span>
         </a>
 
-        <a href="{% url 'dashboard:audits' %}"
+        <a href="{% url 'dashboard:audits' %}" title="Audits"
             class="{% if 'audit' in request.resolver_match.url_name %}active{% endif %}">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 stroke-width="2">
@@ -52,7 +65,7 @@
             <span>Audits</span>
         </a>
 
-        <a href="{% url 'dashboard:gaps' %}"
+        <a href="{% url 'dashboard:gaps' %}" title="Gap Analyse"
             class="{% if request.resolver_match.url_name == 'gaps' %}active{% endif %}">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 stroke-width="2">
@@ -66,7 +79,7 @@
     <div class="sidebar-nav mt-2 flex-1">
         <div class="sidebar-section-label">Rapporten</div>
 
-        <a href="{% url 'dashboard:audits' %}"
+        <a href="{% url 'dashboard:audits' %}" title="Audit Rapporten"
             class="{% if 'audit' in request.resolver_match.url_name and request.resolver_match.url_name != 'audit_new' and request.resolver_match.url_name != 'audit_detail' %}active{% endif %}">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 stroke-width="2">
@@ -76,7 +89,7 @@
             <span>Audit Rapporten</span>
         </a>
 
-        <a href="{% url 'report_generator:sector_report' %}"
+        <a href="{% url 'report_generator:sector_report' %}" title="Sector Rapport"
             class="{% if request.resolver_match.url_name == 'sector_report' %}active{% endif %}">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 stroke-width="2">
@@ -92,7 +105,7 @@
     <div class="sidebar-nav pb-3" style="border-top: 1px solid var(--border);">
         <div class="sidebar-section-label">Instellingen</div>
 
-        <a href="/admin/" target="_blank">
+        <a href="/admin/" target="_blank" title="Admin">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -104,7 +117,7 @@
 
         <form method="post" action="{% url 'dashboard:logout' %}">
             {% csrf_token %}
-            <button type="submit" class="sidebar-logout-btn">
+            <button type="submit" class="sidebar-logout-btn" title="Uitloggen">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round"

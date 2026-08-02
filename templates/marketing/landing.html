@@ -1,4 +1,5 @@
-{% load static %}<!DOCTYPE html>
+{% load static %}
+{% load django_htmx %}<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -24,6 +25,7 @@
 <link rel="stylesheet" href="{% static 'marketing/sections/product/product.css' %}">
 <link rel="stylesheet" href="{% static 'marketing/sections/cta/cta.css' %}">
 <link rel="stylesheet" href="{% static 'marketing/sections/footer/footer.css' %}">
+<link rel="stylesheet" href="{% static 'auth/css/auth.css' %}">
 </head>
 
 <body>
@@ -45,7 +47,11 @@
 {% include "marketing/sections/divider.html" %}
 {% include "marketing/sections/footer/footer.html" %}
 
-<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+{% include "auth/_signup_modal.html" %}
+
+<script src="{% static 'js/htmx.min.js' %}"></script>
+{% load django_htmx %}
+{% django_htmx_script %}
 <script src="{% static 'marketing/header/hero.js' %}"></script>
 <script src="{% static 'marketing/sections/trust/trust.js' %}"></script>
 <script src="{% static 'marketing/sections/scope/scope.js' %}"></script>
@@ -54,7 +60,8 @@
 <script src="{% static 'marketing/sections/product/product.js' %}"></script>
 <script src="{% static 'marketing/sections/cta/cta.js' %}"></script>
 <script src="{% static 'marketing/sections/footer/footer.js' %}"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+<script defer src="{% static 'js/alpine-focus.min.js' %}"></script>
+<script defer src="{% static 'js/alpine.min.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
 <script src="{% static 'marketing/js/landing.js' %}"></script>
 </body>

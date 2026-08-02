@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Third party
     "rest_framework",
+    "django_htmx",
     # NIS2 Apps
     "compliance_engine",
     "nis2_agents",
@@ -91,6 +92,7 @@ INSTALLED_APPS = [
     "dashboard",
     "report_generator",
     "marketing",
+    "accounts",
 ]
 
 MIDDLEWARE = [
@@ -100,6 +102,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -194,6 +197,7 @@ if DEBUG or not _railway_deploy:
         "django.contrib.staticfiles.storage.StaticFilesStorage"
     )
     WHITENOISE_USE_FINDERS = True
+    WHITENOISE_MAX_AGE = 0  # no 304/cache in dev — always serve fresh CSS/JS
     # Rescan static/ on every request so new/moved files (e.g. a freshly
     # added component folder) are picked up without restarting the server.
     # WhiteNoise otherwise indexes static/ once at startup and 404s anything

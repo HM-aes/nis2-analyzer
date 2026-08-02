@@ -10,6 +10,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect, get_object_or_404, render
+from django.urls import reverse
 from django.views import View
 from django.views.generic import TemplateView
 from django.http import HttpResponse, JsonResponse
@@ -46,7 +47,7 @@ VALID_TRANSITIONS = {
 
 class UploadDocumentView(LoginRequiredMixin, View):
     """Accept a file upload, store it, and kick off text extraction."""
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def post(self, request, pk):
         audit = get_object_or_404(ComplianceAudit, pk=pk)
@@ -103,7 +104,7 @@ class UploadDocumentView(LoginRequiredMixin, View):
 
 class RunAuditView(LoginRequiredMixin, View):
     """Trigger RAG + Gemini gap analysis pipeline for an audit."""
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def post(self, request, pk):
         audit = get_object_or_404(ComplianceAudit, pk=pk)
@@ -332,6 +333,14 @@ def is_htmx(request):
     return request.headers.get("HX-Request") == "true"
 
 
+def _initials(name):
+    """First letters of up to two words — used for the activity-feed avatar."""
+    parts = [p for p in (name or "").split() if p]
+    if not parts:
+        return "?"
+    return "".join(p[0] for p in parts[:2]).upper()
+
+
 # ─── Auth ─────────────────────────────────────────────────────────────────────
 
 
@@ -354,11 +363,11 @@ class DashboardLoginView(View):
 
 
 class DashboardLogoutView(LoginRequiredMixin, View):
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def post(self, request):
         logout(request)
-        return redirect("dashboard:login")
+        return redirect("home")
 
 
 # ─── Dashboard Home ────────────────────────────────────────────────────────────
@@ -366,7 +375,7 @@ class DashboardLogoutView(LoginRequiredMixin, View):
 
 class DashboardHomeView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard/dashboard.html"
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -490,6 +499,33 @@ class DashboardHomeView(LoginRequiredMixin, TemplateView):
             .order_by("-created_at")[:10]
         )
 
+        # Unified activity feed (audits + gaps, newest first) for the
+        # dashboard-home activity panel — one real, timestamp-sorted stream
+        # instead of two disjoint lists.
+        activity = []
+        for audit in ctx["recent_audits"]:
+            activity.append({
+                "timestamp": audit.updated_at,
+                "client_name": audit.client.company_name,
+                "initials": _initials(audit.client.company_name),
+                "headline": audit.get_status_display(),
+                "url": reverse("dashboard:audit_detail", args=[audit.pk]),
+                "badge_class": f"badge-{audit.status.lower()}",
+                "badge_label": audit.get_status_display(),
+            })
+        for gap in ctx["recent_gaps"]:
+            activity.append({
+                "timestamp": gap.created_at,
+                "client_name": gap.audit.client.company_name,
+                "initials": _initials(gap.audit.client.company_name),
+                "headline": gap.title,
+                "url": reverse("dashboard:audit_detail", args=[gap.audit.pk]),
+                "badge_class": f"badge-{gap.severity.lower()}",
+                "badge_label": gap.get_severity_display(),
+            })
+        activity.sort(key=lambda a: a["timestamp"], reverse=True)
+        ctx["recent_activity"] = activity[:8]
+
         return ctx
 
 
@@ -498,7 +534,7 @@ class DashboardHomeView(LoginRequiredMixin, TemplateView):
 
 class ClientsView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard/clients.html"
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -517,7 +553,7 @@ class ClientsView(LoginRequiredMixin, TemplateView):
 
 class ClientDetailView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard/client_detail.html"
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -549,7 +585,7 @@ class ClientDetailView(LoginRequiredMixin, TemplateView):
 
 
 class NewClientView(LoginRequiredMixin, View):
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def get(self, request):
         return render(
@@ -619,7 +655,7 @@ class NewClientView(LoginRequiredMixin, View):
 
 # TASK 3 — Client Edit View
 class ClientUpdateView(LoginRequiredMixin, View):
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def post(self, request, pk):
         client = get_object_or_404(Client, pk=pk)
@@ -639,7 +675,7 @@ class ClientUpdateView(LoginRequiredMixin, View):
 
 # TASK 2 — New Audit View
 class NewAuditView(LoginRequiredMixin, View):
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def get(self, request):
         clients = Client.objects.all().order_by('company_name')
@@ -676,7 +712,7 @@ class NewAuditView(LoginRequiredMixin, View):
 
 class AuditsView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard/audits.html"
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -703,7 +739,7 @@ class AuditsView(LoginRequiredMixin, TemplateView):
 
 class AuditDetailView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard/audit_detail.html"
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -740,7 +776,7 @@ class AuditDetailView(LoginRequiredMixin, TemplateView):
 
 # TASK 4 — Audit Status Transition
 class AuditTransitionView(LoginRequiredMixin, View):
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def post(self, request, pk):
         audit = get_object_or_404(ComplianceAudit, pk=pk)
@@ -765,7 +801,7 @@ class AuditTransitionView(LoginRequiredMixin, View):
 
 class GapsView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard/gaps.html"
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -801,7 +837,7 @@ class GapsView(LoginRequiredMixin, TemplateView):
 
 # TASK 5 — Gap Mark-as-Addressed
 class GapAddressView(LoginRequiredMixin, View):
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def post(self, request, pk):
         gap = get_object_or_404(ComplianceGap, pk=pk)
@@ -818,7 +854,7 @@ class GapAddressView(LoginRequiredMixin, View):
 
 # TASK 6 — Document Delete / Reprocess
 class DocumentDeleteView(LoginRequiredMixin, View):
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def post(self, request, pk):
         doc = get_object_or_404(ClientDocument, pk=pk)
@@ -836,7 +872,7 @@ class DocumentDeleteView(LoginRequiredMixin, View):
 
 
 class DocumentReprocessView(LoginRequiredMixin, View):
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def post(self, request, pk):
         doc = get_object_or_404(ClientDocument, pk=pk)
@@ -872,7 +908,7 @@ class DocumentReprocessView(LoginRequiredMixin, View):
 
 class HtmxAuditStatus(LoginRequiredMixin, View):
     """Polls every 3s while audit is PROCESSING or ANALYSIS."""
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def get(self, request, pk):
         audit = get_object_or_404(ComplianceAudit, pk=pk)
@@ -880,7 +916,7 @@ class HtmxAuditStatus(LoginRequiredMixin, View):
 
 
 class HtmxGapRows(LoginRequiredMixin, View):
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def get(self, request):
         audit_id = request.GET.get("audit_id")
@@ -918,7 +954,7 @@ class HtmxGapRows(LoginRequiredMixin, View):
 
 
 class HtmxClientSearch(LoginRequiredMixin, View):
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def get(self, request):
         q = request.GET.get("q", "")
@@ -950,7 +986,7 @@ class HtmxClientSearch(LoginRequiredMixin, View):
 
 
 class HtmxAuditRows(LoginRequiredMixin, View):
-    login_url = "/dashboard/login/"
+    login_url = "/login/"
 
     def get(self, request):
         user = request.user

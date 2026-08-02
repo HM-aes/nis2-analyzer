@@ -1,0 +1,111 @@
+/* ============================================================
+ * auth.css — shared styling for /login, /signup pages AND the modal.
+ * Uses the app's existing :root tokens. No hardcoded hex.
+ * Load once (in base or a bundle). Self-host in production.
+ * ============================================================ */
+
+/* ---- form primitives (shared page + modal) ---- */
+.auth-form{display:flex;flex-direction:column;gap:16px;width:100%}
+.auth-field{display:flex;flex-direction:column;gap:7px}
+.auth-field label{font-size:13px;font-weight:500;color:var(--ink-2);letter-spacing:.01em}
+.auth-labelrow{display:flex;align-items:baseline;justify-content:space-between}
+.auth-forgot{font-size:12px;color:var(--amber);text-decoration:none}
+.auth-forgot:hover{text-decoration:underline}
+
+.auth-field input{
+  width:100%;padding:12px 14px;font-family:inherit;font-size:15px;
+  background:var(--panel-2);border:1px solid var(--line);border-radius:10px;
+  color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;
+}
+.auth-field input::placeholder{color:var(--muted)}
+.auth-field input:focus{border-color:var(--amber);box-shadow:0 0 0 3px var(--amber-soft)}
+.auth-field input:user-invalid{border-color:#E05A5A}
+
+/* password field with toggle */
+.auth-pw{position:relative;display:flex}
+.auth-pw input{padding-right:46px}
+.auth-pw-toggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  width:34px;height:34px;border:none;background:transparent;color:var(--muted);
+  cursor:pointer;display:grid;place-items:center;border-radius:7px;transition:color .2s}
+.auth-pw-toggle:hover{color:var(--ink-2)}
+.auth-pw-toggle:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+
+.auth-hint{font-size:12px;color:var(--muted);margin-top:-1px}
+.auth-err{font-size:12.5px;color:#F08A8A}
+.auth-alert{font-size:13px;color:#F5B5B5;background:rgba(224,90,90,.1);
+  border:1px solid rgba(224,90,90,.3);border-radius:9px;padding:11px 13px}
+
+/* submit with inline spinner (HTMX loading state) */
+.auth-submit{width:100%;justify-content:center;position:relative;margin-top:4px;padding:13px}
+.auth-spinner{width:16px;height:16px;border-radius:50%;
+  border:2px solid rgba(26,20,5,.35);border-top-color:#1a1405;
+  display:none;animation:auth-spin .7s linear infinite}
+@keyframes auth-spin{to{transform:rotate(360deg)}}
+/* htmx-request class is added by HTMX to the element during the request */
+.auth-submit.htmx-request .auth-submit-label{opacity:.55}
+.auth-submit.htmx-request .auth-spinner{display:inline-block}
+.auth-submit[disabled]{opacity:.8;cursor:progress}
+
+.auth-consent{font-size:12px;color:var(--muted);line-height:1.55;margin-top:2px}
+.auth-consent a{color:var(--ink-2)}
+.auth-alt{font-size:13.5px;color:var(--muted);text-align:center;margin-top:6px}
+.auth-alt a,.auth-consent a{color:var(--amber);text-decoration:none}
+.auth-alt a:hover{text-decoration:underline}
+
+/* ---- dedicated auth PAGE layout ---- */
+.auth-page{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;background:var(--bg)}
+@media(max-width:860px){.auth-page{grid-template-columns:1fr}}
+
+.auth-panel{display:flex;flex-direction:column;justify-content:center;
+  padding:48px;max-width:480px;margin-left:auto;margin-right:auto;width:100%}
+.auth-brand{display:flex;align-items:center;gap:10px;font-weight:600;
+  letter-spacing:-.01em;color:var(--ink);margin-bottom:36px;text-decoration:none}
+.auth-brand .glyph{width:28px;height:28px;border:1.5px solid var(--amber);border-radius:7px;
+  display:grid;place-items:center}
+.auth-brand .glyph::before{content:"";width:8px;height:8px;background:var(--amber);border-radius:2px}
+.auth-h1{font-family:'Fraunces',serif;font-weight:500;font-size:30px;letter-spacing:-.02em;
+  color:#F4F7FB;margin-bottom:8px}
+.auth-sub{font-size:15px;color:var(--ink-2);margin-bottom:30px}
+
+/* the "aside" half of the page — trust/brand reinforcement */
+.auth-aside{position:relative;overflow:hidden;
+  background:linear-gradient(180deg,var(--panel),var(--panel-2));
+  border-left:1px solid var(--line-soft);
+  display:flex;flex-direction:column;justify-content:center;padding:56px}
+@media(max-width:860px){.auth-aside{display:none}}
+.auth-aside::before{content:"";position:absolute;inset:0;
+  background-image:linear-gradient(var(--line-soft) 1px,transparent 1px),
+    linear-gradient(90deg,var(--line-soft) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(ellipse 60% 60% at 50% 40%,#000,transparent 75%);
+  -webkit-mask-image:radial-gradient(ellipse 60% 60% at 50% 40%,#000,transparent 75%);opacity:.5}
+.auth-aside>*{position:relative;z-index:1}
+.auth-quote{font-family:'Fraunces',serif;font-size:22px;line-height:1.4;color:#F1F5FA;
+  max-width:24ch;margin-bottom:22px}
+.auth-points{list-style:none;display:grid;gap:13px}
+.auth-points li{display:flex;gap:11px;font-size:14px;color:var(--ink-2)}
+.auth-points svg{flex:none;margin-top:3px;color:var(--green)}
+
+/* ---- MODAL (HTMX-loaded signup on landing page) ---- */
+[x-cloak]{display:none!important}
+.modal-overlay{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;
+  background:rgba(6,8,12,.72);backdrop-filter:blur(4px)}
+.modal-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  width:100%;max-width:440px;max-height:92vh;overflow-y:auto;
+  box-shadow:0 40px 100px -30px rgba(0,0,0,.8);padding:30px 28px}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px}
+.modal-title{font-family:'Fraunces',serif;font-weight:500;font-size:23px;letter-spacing:-.015em;
+  color:#F4F7FB;margin-bottom:4px}
+.modal-sub{font-size:13.5px;color:var(--muted)}
+.modal-close{flex:none;width:34px;height:34px;border-radius:8px;border:1px solid var(--line);
+  background:var(--panel-2);color:var(--muted);cursor:pointer;display:grid;place-items:center;
+  transition:color .2s,border-color .2s}
+.modal-close:hover{color:var(--ink);border-color:var(--muted)}
+.modal-close:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+
+.auth-modal-loading{font-size:13px;color:var(--muted);padding:8px 0}
+
+/* modal enter/leave (Alpine x-transition drives these via inline; these are fallbacks) */
+@media (prefers-reduced-motion:reduce){
+  .modal-overlay,.modal-card,.auth-spinner,.auth-pw-toggle{transition:none;animation:none}
+}

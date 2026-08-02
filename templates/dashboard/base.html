@@ -8,10 +8,12 @@
   <meta name="csrf-token" content="{{ csrf_token }}">
   <title>{% block title %}NIS2 Dashboard{% endblock %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="{% static 'dashboard/css/sidebar.css' %}?v=8">
-  <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}?v=8">
+  <link rel="stylesheet" href="{% static 'dashboard/css/sidebar.css' %}?v=9">
+  <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}?v=10">
   <script src="https://unpkg.com/htmx.org@1.9.12"
     integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2uQ5xdAAoBl1fNsLEDVVSlrjMV0tqkLkYP" crossorigin="anonymous"></script>
+  {# $persist plugin must load before Alpine core — remembers the sidebar's open/closed state #}
+  <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.14.8/dist/cdn.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script>
     document.addEventListener('htmx:configRequest', function (e) {
@@ -23,7 +25,9 @@
 
 <body x-data>
 
-  <div class="app-shell">
+  <div class="app-shell"
+       x-data="{ collapsed: $persist(false).as('sidebar_collapsed') }"
+       :class="{ 'is-collapsed': collapsed }">
 
     {% include "dashboard/includes/sidebar.html" %}
 

@@ -32,6 +32,7 @@ body{
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(14px,4vw,24px)}
 .mono{font-family:'JetBrains Mono',monospace}
 .serif{font-family:'Fraunces',Georgia,serif}
+[x-cloak]{display:none!important}
 img,svg,video{max-width:100%;height:auto}
 
 /* ---- motion primitives (CSS only) ---- */
@@ -83,6 +84,7 @@ img,svg,video{max-width:100%;height:auto}
 .dot.pulse::after{content:"";position:absolute;inset:0;border-radius:50%;background:inherit;
   animation:pulse 2s ease-out infinite}
 @keyframes pulse{0%{transform:scale(1);opacity:.6}100%{transform:scale(2.6);opacity:0}}
+@media (prefers-reduced-motion:reduce){.dot.pulse::after{animation:none}}
 
 /* ---- buttons (shared across navbar, hero, deploy, cta) ---- */
 .btn{font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;border:none;

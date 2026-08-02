@@ -29,8 +29,11 @@ header.hero .wrap{position:relative;z-index:1}
   .hero-fact{padding-left:12px}
   .scope-foot{padding:12px 16px}
 }
-.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--amber);margin-bottom:22px}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;
+  font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--amber);margin-bottom:22px;
+  padding:7px 15px 7px 13px;border-radius:999px;
+  border:1px solid rgba(224,168,46,.25);background:var(--amber-soft)}
 h1.hero-title{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(36px,5.2vw,58px);
   line-height:1.04;letter-spacing:-.02em;color:#F4F7FB;margin-bottom:22px}
 h1.hero-title em{font-style:italic;color:var(--amber)}

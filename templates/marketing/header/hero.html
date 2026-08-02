@@ -8,7 +8,8 @@
         <p class="hero-sub">Find out if you're in scope, where your gaps are, and what to fix — before your national authority asks.</p>
         <p class="hero-fact mono">The obligations have been binding since 18 October 2024 — regardless of whether your member state has finished transposing. Late national law is not a grace period.</p>
         <div class="hero-cta">
-          <a href="#start" class="btn btn-primary btn-lg">Start free assessment</a>
+          <a href="{% url 'signup' %}" class="btn btn-primary btn-lg"
+             @click.prevent="$dispatch('open-signup')">Start free assessment</a>
           <span class="note">No account · takes 2 minutes</span>
         </div>
       </div>
@@ -45,7 +46,8 @@
                 <p x-text="verdict.note"></p>
               </div>
             </div>
-            <a href="#start" class="btn btn-primary" style="width:100%;justify-content:center">
+            <a href="{% url 'signup' %}" class="btn btn-primary" style="width:100%;justify-content:center"
+               @click.prevent="$dispatch('open-signup')">
               Get your full breakdown →
             </a>
           </div>

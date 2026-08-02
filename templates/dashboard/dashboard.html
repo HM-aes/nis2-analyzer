@@ -1,8 +1,24 @@
 {% extends "dashboard/base.html" %}
+{% load static %}
 {% block title %}Dashboard — NIS2{% endblock %}
 {% block page_title %}Dashboard{% endblock %}
 
+{% block extra_head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'dashboard/css/home.css' %}?v=1">
+{% endblock %}
+
 {% block content %}
+
+<div class="dash-head">
+    <p class="dash-head-sub mono">Realtime overzicht van uw NIS2-verplichtingen</p>
+    {% if critical_gaps == 0 %}
+    <span class="status-chip status-chip-ready"><span class="status-dot"></span>Audit-ready</span>
+    {% else %}
+    <span class="status-chip status-chip-attention"><span class="status-dot"></span>Actie vereist</span>
+    {% endif %}
+</div>
 
 {# Task 16: Onboarding CTA when no clients #}
 {% if total_clients == 0 %}
@@ -27,58 +43,68 @@
 {% endif %}
 
 <!-- KPI Cards -->
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 stats-row"
+     x-data="statCards({ clients: {{ total_clients }}, audits: {{ active_audits }}, score: {{ avg_score|default:'0' }}, gaps: {{ critical_gaps }} })"
+     x-init="observe($el)">
 
-    <div class="kpi-card kpi-card-blue">
-        <div class="kpi-icon-wrap">
-            <svg class="w-5 h-5" style="color:var(--accent-blue);" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
+    <div class="kpi-card kpi-card-blue stat-card">
+        <div class="stat-card-top">
+            <div class="kpi-icon-wrap">
+                <svg class="w-5 h-5" style="color:var(--accent-blue);" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+            </div>
+            <span class="stat-delta">+{{ new_clients_month }} deze maand</span>
         </div>
-        <div class="kpi-value">{{ total_clients }}</div>
+        <div class="stat-num" x-text="disp.clients"></div>
         <div class="kpi-label">Totaal Klanten</div>
-        <div class="kpi-sub">+{{ new_clients_month }} deze maand</div>
     </div>
 
-    <div class="kpi-card kpi-card-amber">
-        <div class="kpi-icon-wrap">
-            <svg class="w-5 h-5" style="color:var(--accent-amber);" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-            </svg>
+    <div class="kpi-card kpi-card-amber stat-card">
+        <div class="stat-card-top">
+            <div class="kpi-icon-wrap">
+                <svg class="w-5 h-5" style="color:var(--accent-amber);" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+            </div>
+            <span class="stat-delta">{{ processing_audits }} in verwerking</span>
         </div>
-        <div class="kpi-value">{{ active_audits }}</div>
+        <div class="stat-num" x-text="disp.audits"></div>
         <div class="kpi-label">Actieve Audits</div>
-        <div class="kpi-sub">{{ processing_audits }} in verwerking</div>
     </div>
 
-    <div class="kpi-card kpi-card-green">
-        <div class="kpi-icon-wrap">
-            <svg class="w-5 h-5" style="color:var(--accent-green);" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
+    <div class="kpi-card kpi-card-green stat-card">
+        <div class="stat-card-top">
+            <div class="kpi-icon-wrap">
+                <svg class="w-5 h-5" style="color:var(--accent-green);" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+            </div>
+            <span class="stat-delta">over {{ completed_count }} audits</span>
         </div>
-        <div class="kpi-value">{{ avg_score|default:"0" }}%</div>
+        <div class="stat-num"><span x-text="disp.score"></span>%</div>
         <div class="kpi-label">Gem. Compliance Score</div>
-        <div class="kpi-sub">over {{ completed_count }} audits</div>
     </div>
 
-    <div class="kpi-card kpi-card-red">
-        <div class="kpi-icon-wrap">
-            <svg class="w-5 h-5" style="color:var(--accent-red);" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
+    <div class="kpi-card kpi-card-red stat-card">
+        <div class="stat-card-top">
+            <div class="kpi-icon-wrap">
+                <svg class="w-5 h-5" style="color:var(--accent-red);" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <span class="stat-delta">over alle klanten</span>
         </div>
-        <div class="kpi-value">{{ critical_gaps }}</div>
+        <div class="stat-num" x-text="disp.gaps"></div>
         <div class="kpi-label">Kritieke Open Gaps</div>
-        <div class="kpi-sub">over alle klanten</div>
     </div>
 
 </div>
@@ -128,56 +154,20 @@
             <div class="card-title">Recente Activiteit</div>
             <div class="overflow-y-auto" style="max-height:300px;">
 
-                {% for audit in recent_audits %}
-                <div class="activity-item">
-                    <div class="activity-icon">
-                        {% if audit.status == 'COMPLETE' %}&#x2705;{% endif %}
-                        {% if audit.status == 'REVIEW' %}&#x26A0;&#xFE0F;{% endif %}
-                        {% if audit.status == 'PROCESSING' %}&#8635;{% endif %}
-                        {% if audit.status == 'INTAKE' %}&#x1F4CB;{% endif %}
+                {% for item in recent_activity %}
+                <div class="feed-row" style="--i:{{ forloop.counter0 }}">
+                    <span class="feed-avatar mono">{{ item.initials }}</span>
+                    <div class="feed-main">
+                        <a href="{{ item.url }}" class="feed-name">{{ item.client_name }}</a>
+                        <span class="feed-headline">{{ item.headline }}</span>
                     </div>
-                    <div style="min-width:0;">
-                        <p class="text-sm" style="color:var(--text-secondary);">
-                            <a href="{% url 'dashboard:audit_detail' audit.pk %}"
-                                style="color:var(--text-primary);font-weight:600;"
-                                onmouseover="this.style.color='var(--accent-blue)'"
-                                onmouseout="this.style.color='var(--text-primary)'">
-                                {{ audit.client.company_name }}
-                            </a>
-                            &mdash; {{ audit.get_status_display }}
-                            {% if audit.compliance_score %}
-                            <span class="badge badge-complete" style="margin-left:0.25rem;">{{ audit.compliance_score
-                                }}%</span>
-                            {% endif %}
-                        </p>
-                        <p class="text-xs" style="color:var(--text-muted);margin-top:2px;">{{ audit.updated_at|timesince
-                            }} geleden</p>
-                    </div>
+                    <span class="feed-time mono">{{ item.timestamp|timesince }} geleden</span>
+                    <span class="badge {{ item.badge_class }}">{{ item.badge_label }}</span>
                 </div>
                 {% empty %}
                 <div class="empty-state">
                     <div class="empty-state-icon">&#x1F4CB;</div>
                     <div class="empty-state-text">Nog geen activiteit</div>
-                </div>
-                {% endfor %}
-
-                {% for gap in recent_gaps %}
-                <div class="activity-item">
-                    <div class="activity-icon">&#x1F6A8;</div>
-                    <div style="min-width:0;">
-                        <p class="text-sm" style="color:var(--text-secondary);">
-                            <span class="badge badge-{{ gap.severity|lower }}">{{ gap.severity }}</span>
-                            gap &mdash;
-                            <a href="{% url 'dashboard:audit_detail' gap.audit.pk %}"
-                                style="color:var(--text-primary);font-weight:600;"
-                                onmouseover="this.style.color='var(--accent-blue)'"
-                                onmouseout="this.style.color='var(--text-primary)'">
-                                {{ gap.audit.client.company_name }}
-                            </a>
-                        </p>
-                        <p class="text-xs" style="color:var(--text-muted);margin-top:2px;">{{ gap.created_at|timesince
-                            }} geleden</p>
-                    </div>
                 </div>
                 {% endfor %}
 
@@ -308,4 +298,53 @@
 {% endif %}
 {% endif %}
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function statCards(targets) {
+  return {
+    disp: { clients: '0', audits: '0', score: '0.0', gaps: '0' },
+    targets: targets,
+    observe(el) {
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduceMotion) {
+        this.$el.classList.add('is-in');
+        this.showFinal();
+        return;
+      }
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            this.$el.classList.add('is-in');
+            this.run();
+            io.disconnect();
+          }
+        });
+      }, { threshold: 0.3 });
+      io.observe(el);
+    },
+    showFinal() {
+      this.disp.clients = this.targets.clients.toLocaleString('nl-NL');
+      this.disp.audits = this.targets.audits.toLocaleString('nl-NL');
+      this.disp.score = this.targets.score.toFixed(1);
+      this.disp.gaps = this.targets.gaps.toLocaleString('nl-NL');
+    },
+    run() {
+      const duration = 1200;
+      const start = performance.now();
+      const tick = (now) => {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        this.disp.clients = Math.round(this.targets.clients * eased).toLocaleString('nl-NL');
+        this.disp.audits = Math.round(this.targets.audits * eased).toLocaleString('nl-NL');
+        this.disp.score = (this.targets.score * eased).toFixed(1);
+        this.disp.gaps = Math.round(this.targets.gaps * eased).toLocaleString('nl-NL');
+        if (progress < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+  };
+}
+</script>
 {% endblock %}
