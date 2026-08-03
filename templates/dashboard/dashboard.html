@@ -1,297 +1,323 @@
 {% extends "dashboard/base.html" %}
 {% load static %}
-{% block title %}Dashboard — NIS2{% endblock %}
-{% block page_title %}Dashboard{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "Dashboard" %} — NIS2{% endblock %}
+{% block page_title %}{% trans "Dashboard" %}{% endblock %}
 
 {% block extra_head %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'dashboard/css/home.css' %}?v=1">
+<link rel="stylesheet" href="{% static 'dashboard/css/home.css' %}?v=5">
 {% endblock %}
 
 {% block content %}
 
 <div class="dash-head">
-    <p class="dash-head-sub mono">Realtime overzicht van uw NIS2-verplichtingen</p>
+    <p class="dash-head-sub mono">{% trans "Real-time overview of your NIS2 obligations" %}</p>
     {% if critical_gaps == 0 %}
-    <span class="status-chip status-chip-ready"><span class="status-dot"></span>Audit-ready</span>
+    <span class="status-chip status-chip-ready"><span class="status-dot"></span>{% trans "Audit-ready" %}</span>
     {% else %}
-    <span class="status-chip status-chip-attention"><span class="status-dot"></span>Actie vereist</span>
+    <span class="status-chip status-chip-attention"><span class="status-dot"></span>{% trans "Action required" %}</span>
     {% endif %}
 </div>
 
-{# Task 16: Onboarding CTA when no clients #}
 {% if total_clients == 0 %}
-<div class="card mb-6" style="text-align:center; padding:4rem 2rem;">
-    <div style="font-size:4rem; margin-bottom:1rem;">🛡️</div>
-    <h3 style="font-size:1.5rem; font-weight:700; color:var(--foreground); margin-bottom:0.75rem;">
-        Welkom bij NIS2 Analyzer
-    </h3>
-    <p style="color:var(--muted-foreground); margin-bottom:1.5rem; max-width:500px; margin-left:auto; margin-right:auto; line-height:1.6;">
-        Voeg uw eerste klant toe om te beginnen met NIS2 compliance analyses.
-        U kunt daarna een audit aanmaken, documenten uploaden en de AI-analyse starten.
+<div class="card mb-6 onboard-card">
+    <div class="onboard-icon">🛡️</div>
+    <h3 class="onboard-title">{% trans "Welcome to NIS2 Analyzer" %}</h3>
+    <p class="onboard-lead">
+        {% trans "Add your first client to start NIS2 compliance analyses. You can then create an audit, upload documents, and start the AI analysis." %}
     </p>
-    <div style="display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap;">
-        <a href="{% url 'dashboard:client_new' %}" class="btn btn-primary" style="display:inline-flex;">
-            + Eerste Klant Toevoegen
-        </a>
-        <a href="{% url 'report_generator:sector_report' %}" class="btn btn-secondary" style="display:inline-flex;">
-            📊 Gratis Sector Rapport
-        </a>
+    <div class="onboard-actions">
+        <a href="{% url 'dashboard:client_new' %}" class="btn btn-primary">+ {% trans "Add First Client" %}</a>
+        <a href="{% url 'report_generator:sector_report' %}" class="btn btn-secondary">📊 {% trans "Free Sector Report" %}</a>
     </div>
 </div>
 {% endif %}
 
-<!-- KPI Cards -->
+<!-- KPI stat cards — neutral shell, no status spine -->
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 stats-row"
      x-data="statCards({ clients: {{ total_clients }}, audits: {{ active_audits }}, score: {{ avg_score|default:'0' }}, gaps: {{ critical_gaps }} })"
      x-init="observe($el)">
 
-    <div class="kpi-card kpi-card-blue stat-card">
+    <div class="card stat-card">
         <div class="stat-card-top">
             <div class="kpi-icon-wrap">
-                <svg class="w-5 h-5" style="color:var(--accent-blue);" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                    stroke-width="2">
+                <svg class="w-5 h-5 kpi-icon-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
             </div>
-            <span class="stat-delta">+{{ new_clients_month }} deze maand</span>
+            <span class="stat-delta delta-up">{% blocktrans with count=new_clients_month %}+{{ count }} this month{% endblocktrans %}</span>
         </div>
         <div class="stat-num" x-text="disp.clients"></div>
-        <div class="kpi-label">Totaal Klanten</div>
+        <div class="kpi-label">{% trans "Total Clients" %}</div>
     </div>
 
-    <div class="kpi-card kpi-card-amber stat-card">
+    <div class="card stat-card">
         <div class="stat-card-top">
             <div class="kpi-icon-wrap">
-                <svg class="w-5 h-5" style="color:var(--accent-amber);" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
+                <svg class="w-5 h-5 kpi-icon-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                 </svg>
             </div>
-            <span class="stat-delta">{{ processing_audits }} in verwerking</span>
+            <span class="stat-delta">{% blocktrans with count=processing_audits %}{{ count }} processing{% endblocktrans %}</span>
         </div>
         <div class="stat-num" x-text="disp.audits"></div>
-        <div class="kpi-label">Actieve Audits</div>
+        <div class="kpi-label">{% trans "Active Audits" %}</div>
     </div>
 
-    <div class="kpi-card kpi-card-green stat-card">
+    <div class="card stat-card">
         <div class="stat-card-top">
             <div class="kpi-icon-wrap">
-                <svg class="w-5 h-5" style="color:var(--accent-green);" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
+                <svg class="w-5 h-5 kpi-icon-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
             </div>
-            <span class="stat-delta">over {{ completed_count }} audits</span>
+            <span class="stat-delta">{% blocktrans with count=completed_count %}across {{ count }} audits{% endblocktrans %}</span>
         </div>
         <div class="stat-num"><span x-text="disp.score"></span>%</div>
-        <div class="kpi-label">Gem. Compliance Score</div>
+        <div class="kpi-label">{% trans "Avg. Compliance Score" %}</div>
     </div>
 
-    <div class="kpi-card kpi-card-red stat-card">
+    <div class="card stat-card">
         <div class="stat-card-top">
             <div class="kpi-icon-wrap">
-                <svg class="w-5 h-5" style="color:var(--accent-red);" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                    stroke-width="2">
+                <svg class="w-5 h-5 kpi-icon-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
             </div>
-            <span class="stat-delta">over alle klanten</span>
+            <span class="stat-delta">{% trans "across all clients" %}</span>
         </div>
         <div class="stat-num" x-text="disp.gaps"></div>
-        <div class="kpi-label">Kritieke Open Gaps</div>
+        <div class="kpi-label">{% trans "Critical Open Gaps" %}</div>
     </div>
-
 </div>
 
-<!-- Row 2: Pipeline + Activity -->
+{% if priority_gaps %}
+<section class="mb-6">
+    <span class="tag mb-3">{% trans "Priority Gaps" %}</span>
+    <div class="scard-grid scard-grid--3 mt-3">
+        {% for gap in priority_gaps %}
+        <a href="{{ gap.url }}" class="scard {{ gap.status }} scard-link">
+            <div class="scard-head">
+                <span class="scard-title">
+                    <span class="scard-mark" aria-hidden="true"></span>
+                    <span class="st">{{ gap.title|truncatechars:42 }}</span>
+                </span>
+                {% include "dashboard/partials/_status_badge.html" with status=gap.status label=gap.label %}
+            </div>
+            <div class="scard-body"><span class="sd">{{ gap.detail }}</span></div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Pipeline + Activity + Processing -->
 <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
 
-    <!-- Audit Pipeline -->
     <div class="xl:col-span-2">
-        <div class="card">
-            <div class="card-title">Audit Pipeline</div>
-            <div class="kanban-board">
-                {% for col in pipeline %}
-                <div class="kanban-col">
-                    <div class="kanban-header">
-                        <span class="badge badge-{{ col.status|lower }}">{{ col.status|capfirst }}</span>
-                        <span class="kanban-count">{{ col.count }}</span>
-                    </div>
-                    {% for audit in col.audits %}
-                    <a href="{% url 'dashboard:audit_detail' audit.pk %}" class="audit-mini-card">
-                        <div class="client-name">{{ audit.client.company_name|truncatechars:22 }}</div>
-                        <div class="meta flex items-center gap-1.5">
-                            <span class="badge badge-{{ audit.tier|lower }}">{{ audit.tier }}</span>
-                            <span>{{ audit.created_at|timesince }} geleden</span>
+        <div class="card panel-card">
+            <div class="scard-head">
+                <span class="tag">{% trans "Audit Pipeline" %}</span>
+            </div>
+            <div class="panel-body pt-3">
+                <div class="kanban-board">
+                    {% for col in pipeline %}
+                    <div class="kanban-col">
+                        <div class="kanban-header">
+                            {% include "dashboard/partials/_status_badge.html" with status=col.badge_status label=col.status|capfirst %}
+                            <span class="kanban-count">{{ col.count }}</span>
                         </div>
-                    </a>
+                        {% for audit in col.audits %}
+                        <a href="{% url 'dashboard:audit_detail' audit.pk %}" class="audit-mini-card">
+                            <div class="client-name">{{ audit.client.company_name|truncatechars:22 }}</div>
+                            <div class="meta flex items-center gap-1.5">
+                                <span class="badge badge-tier"><span class="badge-dot" aria-hidden="true"></span>{{ audit.tier }}</span>
+                                <span>{% blocktrans with time=audit.created_at|timesince %}{{ time }} ago{% endblocktrans %}</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                        {% if col.extra > 0 %}
+                        <a href="{% url 'dashboard:audits' %}?status={{ col.status }}" class="pipeline-more">
+                            {% blocktrans with count=col.extra %}+{{ count }} more{% endblocktrans %}
+                        </a>
+                        {% endif %}
+                        {% if col.count == 0 %}
+                        <div class="text-xs kanban-empty">{% trans "No audits" %}</div>
+                        {% endif %}
+                    </div>
                     {% endfor %}
-                    {% if col.extra > 0 %}
-                    <a href="{% url 'dashboard:audits' %}?status={{ col.status }}"
-                        style="color:var(--accent-blue);font-size:0.75rem;padding-left:0.25rem;">
-                        +{{ col.extra }} meer
-                    </a>
-                    {% endif %}
-                    {% if col.count == 0 %}
-                    <div style="font-size:0.75rem;text-align:center;padding:0.75rem 0;color:var(--text-muted);">Geen
-                        audits</div>
-                    {% endif %}
                 </div>
-                {% endfor %}
             </div>
         </div>
     </div>
 
-    <!-- Recent Activity -->
-    <div>
-        <div class="card" style="height:100%;">
-            <div class="card-title">Recente Activiteit</div>
-            <div class="overflow-y-auto" style="max-height:300px;">
-
+    <div class="flex flex-col gap-6">
+        <div class="card panel-card feed-card">
+            <div class="scard-head">
+                <span class="tag">{% trans "Recent Activity" %}</span>
+            </div>
+            <div class="panel-body feed-scroll">
                 {% for item in recent_activity %}
-                <div class="feed-row" style="--i:{{ forloop.counter0 }}">
+                <div class="panel-row feed-row" style="--i:{{ forloop.counter0 }}">
                     <span class="feed-avatar mono">{{ item.initials }}</span>
                     <div class="feed-main">
                         <a href="{{ item.url }}" class="feed-name">{{ item.client_name }}</a>
                         <span class="feed-headline">{{ item.headline }}</span>
                     </div>
-                    <span class="feed-time mono">{{ item.timestamp|timesince }} geleden</span>
-                    <span class="badge {{ item.badge_class }}">{{ item.badge_label }}</span>
+                    <span class="feed-time mono">{% blocktrans with time=item.timestamp|timesince %}{{ time }} ago{% endblocktrans %}</span>
+                    {% include "dashboard/partials/_status_badge.html" with status=item.badge_status label=item.badge_label %}
                 </div>
                 {% empty %}
                 <div class="empty-state">
                     <div class="empty-state-icon">&#x1F4CB;</div>
-                    <div class="empty-state-text">Nog geen activiteit</div>
+                    <div class="empty-state-text">{% trans "No activity yet" %}</div>
                 </div>
                 {% endfor %}
+            </div>
+        </div>
 
+        <div class="card panel-card">
+            <div class="scard-head">
+                <span class="tag">{% trans "Processing" %}</span>
+            </div>
+            <div class="panel-body">
+                {% for audit in processing_audits_list %}
+                <div class="panel-row processing-row">
+                    <div class="processing-meta">
+                        <a href="{{ audit.url }}" class="feed-name">{{ audit.client_name|truncatechars:24 }}</a>
+                        <span class="feed-headline">{{ audit.status_label }}</span>
+                    </div>
+                    <div class="progress-track" role="progressbar"
+                         aria-valuenow="{{ audit.progress }}" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-fill{% if audit.progress >= 100 %} is-complete{% endif %}"
+                             style="width:{{ audit.progress }}%;"></div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <div class="empty-state-text">{% trans "No audits in processing" %}</div>
+                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
-
 </div>
 
-<!-- Row 3: Charts -->
+<!-- Charts -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 
-    <!-- Score Distribution -->
-    <div class="card">
-        <div class="card-title">Compliance Score Distributie</div>
-        <div class="flex items-end gap-2 mt-2" style="height:144px;">
-            <div class="hist-bar">
-                <div class="hist-bar-fill"
-                    style="height:{{ score_buckets.0|floatformat:0 }}px;min-height:2px;width:100%;background:linear-gradient(to top,#F87171,rgba(248,113,113,0.4));">
-                </div>
-                <div class="hist-label">0-20</div>
-            </div>
-            <div class="hist-bar">
-                <div class="hist-bar-fill"
-                    style="height:{{ score_buckets.1|floatformat:0 }}px;min-height:2px;width:100%;background:linear-gradient(to top,#fb923c,rgba(251,146,60,0.4));">
-                </div>
-                <div class="hist-label">20-40</div>
-            </div>
-            <div class="hist-bar">
-                <div class="hist-bar-fill"
-                    style="height:{{ score_buckets.2|floatformat:0 }}px;min-height:2px;width:100%;background:linear-gradient(to top,#FBBF24,rgba(251,191,36,0.4));">
-                </div>
-                <div class="hist-label">40-60</div>
-            </div>
-            <div class="hist-bar">
-                <div class="hist-bar-fill"
-                    style="height:{{ score_buckets.3|floatformat:0 }}px;min-height:2px;width:100%;background:linear-gradient(to top,#a3e635,rgba(163,230,53,0.4));">
-                </div>
-                <div class="hist-label">60-80</div>
-            </div>
-            <div class="hist-bar">
-                <div class="hist-bar-fill"
-                    style="height:{{ score_buckets.4|floatformat:0 }}px;min-height:2px;width:100%;background:linear-gradient(to top,#34D399,rgba(52,211,153,0.4));">
-                </div>
-                <div class="hist-label">80-100</div>
-            </div>
+    <div class="card panel-card">
+        <div class="scard-head">
+            <span class="tag">{% trans "Score Distribution" %}</span>
         </div>
-        <p class="text-xs mt-3" style="color:var(--text-muted);">{{ completed_count }} afgeronde audits</p>
+        <div class="panel-body">
+            <div class="flex items-end gap-2 mt-2 hist-chart">
+                <div class="hist-bar">
+                    <div class="hist-bar-fill hist-bar-fill--danger"
+                        style="height:{{ score_buckets.0|floatformat:0 }}px;min-height:2px;width:100%;"></div>
+                    <div class="hist-label">0-20</div>
+                </div>
+                <div class="hist-bar">
+                    <div class="hist-bar-fill hist-bar-fill--danger-2"
+                        style="height:{{ score_buckets.1|floatformat:0 }}px;min-height:2px;width:100%;"></div>
+                    <div class="hist-label">20-40</div>
+                </div>
+                <div class="hist-bar">
+                    <div class="hist-bar-fill hist-bar-fill--warning"
+                        style="height:{{ score_buckets.2|floatformat:0 }}px;min-height:2px;width:100%;"></div>
+                    <div class="hist-label">40-60</div>
+                </div>
+                <div class="hist-bar">
+                    <div class="hist-bar-fill hist-bar-fill--warning-2"
+                        style="height:{{ score_buckets.3|floatformat:0 }}px;min-height:2px;width:100%;"></div>
+                    <div class="hist-label">60-80</div>
+                </div>
+                <div class="hist-bar">
+                    <div class="hist-bar-fill hist-bar-fill--success"
+                        style="height:{{ score_buckets.4|floatformat:0 }}px;min-height:2px;width:100%;"></div>
+                    <div class="hist-label">80-100</div>
+                </div>
+            </div>
+            <p class="text-xs mt-3 chart-caption">{% blocktrans with count=completed_count %}{{ count }} completed audits{% endblocktrans %}</p>
+        </div>
     </div>
 
-    <!-- Gaps by Category -->
-    <div class="card">
-        <div class="card-title">Gaps per Categorie</div>
-        <div class="bar-chart mt-2">
-            {% for cat in gap_categories %}
-            <div class="bar-row">
-                <div class="bar-label" title="{{ cat.label }}">{{ cat.label }}</div>
-                <div class="bar-track">
-                    {% if gap_cat_max > 0 %}
-                    <div style="display:flex;height:100%;">
-                        <div class="bar-fill"
-                            style="width:{% widthratio cat.CRITICAL gap_cat_max 100 %}%;background:var(--accent-red);">
+    <div class="card panel-card">
+        <div class="scard-head">
+            <span class="tag">{% trans "Gaps by Category" %}</span>
+        </div>
+        <div class="panel-body">
+            <div class="bar-chart mt-2">
+                {% for cat in gap_categories %}
+                <div class="bar-row">
+                    <div class="bar-label" title="{{ cat.label }}">{{ cat.label }}</div>
+                    <div class="bar-track">
+                        {% if gap_cat_max > 0 %}
+                        <div class="bar-track-inner">
+                            <div class="bar-fill bar-fill-critical"
+                                style="width:{% widthratio cat.CRITICAL gap_cat_max 100 %}%;"></div>
+                            <div class="bar-fill bar-fill-high"
+                                style="width:{% widthratio cat.HIGH gap_cat_max 100 %}%;"></div>
+                            <div class="bar-fill bar-fill-medium"
+                                style="width:{% widthratio cat.MEDIUM gap_cat_max 100 %}%;"></div>
+                            <div class="bar-fill bar-fill-low"
+                                style="width:{% widthratio cat.LOW gap_cat_max 100 %}%;"></div>
                         </div>
-                        <div class="bar-fill"
-                            style="width:{% widthratio cat.HIGH gap_cat_max 100 %}%;background:#fb923c;"></div>
-                        <div class="bar-fill"
-                            style="width:{% widthratio cat.MEDIUM gap_cat_max 100 %}%;background:var(--accent-amber);">
-                        </div>
-                        <div class="bar-fill"
-                            style="width:{% widthratio cat.LOW gap_cat_max 100 %}%;background:var(--border);">
-                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
+                    <div class="bar-count">{{ cat.total }}</div>
                 </div>
-                <div class="bar-count" style="color:var(--text-secondary);">{{ cat.total }}</div>
+                {% empty %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">&#x1F50D;</div>
+                    <div class="empty-state-text">{% trans "No gap data yet" %}</div>
+                </div>
+                {% endfor %}
             </div>
-            {% empty %}
-            <div class="empty-state">
-                <div class="empty-state-icon">&#x1F50D;</div>
-                <div class="empty-state-text">Nog geen gap data</div>
+            <div class="flex gap-4 mt-4 chart-legend">
+                <span class="flex items-center gap-1.5 text-xs legend-item">
+                    <span class="legend-swatch legend-swatch--danger"></span>{% trans "Critical" %}
+                </span>
+                <span class="flex items-center gap-1.5 text-xs legend-item">
+                    <span class="legend-swatch legend-swatch--warning"></span>{% trans "High" %}
+                </span>
+                <span class="flex items-center gap-1.5 text-xs legend-item">
+                    <span class="legend-swatch legend-swatch--warning"></span>{% trans "Medium" %}
+                </span>
+                <span class="flex items-center gap-1.5 text-xs legend-item">
+                    <span class="legend-swatch legend-swatch--neutral"></span>{% trans "Low" %}
+                </span>
             </div>
-            {% endfor %}
-        </div>
-        <div class="flex gap-4 mt-4">
-            <span class="flex items-center gap-1.5 text-xs" style="color:var(--text-secondary);">
-                <span class="inline-block w-2.5 h-2.5 rounded-sm" style="background:var(--accent-red);"></span>Kritiek
-            </span>
-            <span class="flex items-center gap-1.5 text-xs" style="color:var(--text-secondary);">
-                <span class="inline-block w-2.5 h-2.5 rounded-sm" style="background:#fb923c;"></span>Hoog
-            </span>
-            <span class="flex items-center gap-1.5 text-xs" style="color:var(--text-secondary);">
-                <span class="inline-block w-2.5 h-2.5 rounded-sm" style="background:var(--accent-amber);"></span>Medium
-            </span>
-            <span class="flex items-center gap-1.5 text-xs" style="color:var(--text-secondary);">
-                <span class="inline-block w-2.5 h-2.5 rounded-sm" style="background:var(--border);"></span>Laag
-            </span>
         </div>
     </div>
-
 </div>
 
-<!-- Revenue (admin only) -->
 {% if request.user.is_superuser %}
 {% if revenue_quoted is not None %}
-<div class="card">
-    <div class="card-title">Financieel Overzicht (deze maand)</div>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-2">
-        <div>
-            <div style="font-family:'Inter',sans-serif;font-size:1.5rem;font-weight:800;color:var(--text-primary);">
-                &euro;{{ revenue_quoted|floatformat:0 }}
+<div class="card panel-card">
+    <div class="scard-head">
+        <span class="tag">{% trans "Financial Overview" %}</span>
+    </div>
+    <div class="panel-body">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-2">
+            <div>
+                <div class="revenue-value">&euro;{{ revenue_quoted|floatformat:0 }}</div>
+                <div class="text-xs mt-1 chart-caption">{% trans "Quoted" %}</div>
             </div>
-            <div class="text-xs mt-1" style="color:var(--text-secondary);">Geoffreerd</div>
-        </div>
-        <div>
-            <div style="font-family:'Inter',sans-serif;font-size:1.5rem;font-weight:800;color:var(--accent-green);">
-                &euro;{{ revenue_paid|floatformat:0 }}
+            <div>
+                <div class="revenue-value revenue-value--success">&euro;{{ revenue_paid|floatformat:0 }}</div>
+                <div class="text-xs mt-1 chart-caption">{% trans "Paid" %}</div>
             </div>
-            <div class="text-xs mt-1" style="color:var(--text-secondary);">Betaald</div>
-        </div>
-        <div>
-            <div style="font-family:'Inter',sans-serif;font-size:1.5rem;font-weight:800;color:#fb923c;">
-                &euro;{{ revenue_unpaid|floatformat:0 }}
+            <div>
+                <div class="revenue-value revenue-value--warning">&euro;{{ revenue_unpaid|floatformat:0 }}</div>
+                <div class="text-xs mt-1 chart-caption">{% trans "Outstanding" %}</div>
             </div>
-            <div class="text-xs mt-1" style="color:var(--text-secondary);">Openstaand</div>
         </div>
     </div>
 </div>
@@ -325,10 +351,10 @@ function statCards(targets) {
       io.observe(el);
     },
     showFinal() {
-      this.disp.clients = this.targets.clients.toLocaleString('nl-NL');
-      this.disp.audits = this.targets.audits.toLocaleString('nl-NL');
+      this.disp.clients = this.targets.clients.toLocaleString('en-US');
+      this.disp.audits = this.targets.audits.toLocaleString('en-US');
       this.disp.score = this.targets.score.toFixed(1);
-      this.disp.gaps = this.targets.gaps.toLocaleString('nl-NL');
+      this.disp.gaps = this.targets.gaps.toLocaleString('en-US');
     },
     run() {
       const duration = 1200;
@@ -336,10 +362,10 @@ function statCards(targets) {
       const tick = (now) => {
         const progress = Math.min((now - start) / duration, 1);
         const eased = 1 - Math.pow(1 - progress, 3);
-        this.disp.clients = Math.round(this.targets.clients * eased).toLocaleString('nl-NL');
-        this.disp.audits = Math.round(this.targets.audits * eased).toLocaleString('nl-NL');
+        this.disp.clients = Math.round(this.targets.clients * eased).toLocaleString('en-US');
+        this.disp.audits = Math.round(this.targets.audits * eased).toLocaleString('en-US');
         this.disp.score = (this.targets.score * eased).toFixed(1);
-        this.disp.gaps = Math.round(this.targets.gaps * eased).toLocaleString('nl-NL');
+        this.disp.gaps = Math.round(this.targets.gaps * eased).toLocaleString('en-US');
         if (progress < 1) requestAnimationFrame(tick);
       };
       requestAnimationFrame(tick);

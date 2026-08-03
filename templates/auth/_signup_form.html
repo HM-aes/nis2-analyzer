@@ -1,3 +1,4 @@
+{% load i18n %}
 <form class="auth-form"
       hx-post="{% url 'signup' %}"
       hx-target="this"
@@ -7,10 +8,10 @@
   {% csrf_token %}
 
   <div class="auth-field">
-    <label for="id_org_email">Work email</label>
+    <label for="id_org_email">{% trans "Work email" %}</label>
     <input type="email" name="email" id="id_org_email"
            autocomplete="email" required
-           placeholder="you@organisation.eu"
+           placeholder="{% trans 'you@organisation.eu' %}"
            value="{{ form.email.value|default:'' }}"
            aria-describedby="{% if form.email.errors %}err_email{% endif %}">
     {% if form.email.errors %}
@@ -19,10 +20,10 @@
   </div>
 
   <div class="auth-field">
-    <label for="id_org">Organisation</label>
+    <label for="id_org">{% trans "Organisation" %}</label>
     <input type="text" name="organisation" id="id_org"
            autocomplete="organization" required
-           placeholder="Acme Energy B.V."
+           placeholder="{% trans 'Acme Energy B.V.' %}"
            value="{{ form.organisation.value|default:'' }}"
            aria-describedby="{% if form.organisation.errors %}err_org{% endif %}">
     {% if form.organisation.errors %}
@@ -31,22 +32,22 @@
   </div>
 
   <div class="auth-field">
-    <label for="id_pw1">Password</label>
+    <label for="id_pw1">{% trans "Password" %}</label>
     <div class="auth-pw" x-data="{ show:false }">
       <input :type="show ? 'text' : 'password'"
              name="password1" id="id_pw1"
              autocomplete="new-password" required minlength="10"
-             placeholder="At least 10 characters"
+             placeholder="{% trans 'At least 10 characters' %}"
              aria-describedby="pw_hint{% if form.password1.errors %} err_pw{% endif %}">
       <button type="button" class="auth-pw-toggle"
               @click="show = !show"
-              :aria-label="show ? 'Hide password' : 'Show password'"
+              :aria-label="show ? '{% trans "Hide password" %}' : '{% trans "Show password" %}'"
               :aria-pressed="show.toString()">
         <svg x-show="!show" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         <svg x-show="show" x-cloak width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
       </button>
     </div>
-    <p class="auth-hint" id="pw_hint">Minimum 10 characters. Use a passphrase you don't reuse.</p>
+    <p class="auth-hint" id="pw_hint">{% trans "Minimum 10 characters. Use a passphrase you don't reuse." %}</p>
     {% if form.password1.errors %}
       <p class="auth-err" id="err_pw">{{ form.password1.errors.0 }}</p>
     {% endif %}
@@ -57,18 +58,18 @@
   {% endif %}
 
   <button type="submit" class="btn btn-primary auth-submit">
-    <span class="auth-submit-label">Create account &amp; start assessment</span>
+    <span class="auth-submit-label">{% trans "Create account & start assessment" %}</span>
     <span class="auth-spinner" aria-hidden="true"></span>
   </button>
 
   <p class="auth-consent">
-    By creating an account you agree to our
-    <a href="{% url 'terms' %}">Terms</a> and
-    <a href="{% url 'privacy' %}">Privacy Policy</a>.
-    Your compliance data stays yours.
+    {% trans "By creating an account you agree to our" %}
+    <a href="{% url 'terms' %}">{% trans "Terms" %}</a> {% trans "and" %}
+    <a href="{% url 'privacy' %}">{% trans "Privacy Policy" %}</a>.
+    {% trans "Your compliance data stays yours." %}
   </p>
 
   <p class="auth-alt">
-    Already have an account? <a href="{% url 'login' %}">Log in</a>
+    {% trans "Already have an account?" %} <a href="{% url 'login' %}">{% trans "Log in" %}</a>
   </p>
 </form>

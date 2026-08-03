@@ -1,3 +1,4 @@
+{% load i18n %}
 {% for audit in audits %}
 <tr class="{% if audit.status == 'PROCESSING' %}processing-row{% elif audit.status == 'REVIEW' %}review-row{% endif %}">
     <td>
@@ -35,21 +36,21 @@
     <td><span class="text-sm text-slate-600">{{ audit.documents_uploaded }}</span></td>
     <td>
         <div class="text-sm">{{ audit.created_at|date:"d-m-Y" }}</div>
-        <div class="text-xs text-slate-400">{{ audit.created_at|timesince }} geleden</div>
+        <div class="text-xs text-slate-400">{% blocktrans with time=audit.created_at|timesince %}{{ time }} ago{% endblocktrans %}</div>
     </td>
     <td>
         {% if audit.duration_days is not None %}<span class="text-sm">{{ audit.duration_days }} d</span>
-        {% elif audit.started_at %}<span class="text-sm text-amber-600">Bezig…</span>
+        {% elif audit.started_at %}<span class="text-sm text-amber-600">{% trans "In progress…" %}</span>
         {% else %}<span class="text-slate-400">—</span>
         {% endif %}
     </td>
     <td>
         {% if audit.paid %}<span class="text-green-600 font-medium text-sm">✓</span>
-        {% else %}<span class="text-slate-400 text-sm">Nee</span>
+        {% else %}<span class="text-slate-400 text-sm">{% trans "No" %}</span>
         {% endif %}
     </td>
     <td>
-        <a href="{% url 'dashboard:audit_detail' audit.pk %}" class="btn btn-sm btn-secondary">Bekijken</a>
+        <a href="{% url 'dashboard:audit_detail' audit.pk %}" class="btn btn-sm btn-secondary">{% trans "View" %}</a>
     </td>
 </tr>
 {% empty %}
@@ -57,7 +58,7 @@
     <td colspan="10">
         <div class="empty-state">
             <div class="empty-state-icon">📋</div>
-            <div class="empty-state-text">Geen audits gevonden</div>
+            <div class="empty-state-text">{% trans "No audits found" %}</div>
         </div>
     </td>
 </tr>

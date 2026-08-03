@@ -1,4 +1,5 @@
 {% extends "dashboard/base.html" %}
+{% load i18n %}
 {% block title %}{{ client.company_name }} — NIS2{% endblock %}
 {% block page_title %}{{ client.company_name }}{% endblock %}
 
@@ -17,44 +18,44 @@
                         <span class="mono text-xs px-2 py-0.5 rounded" style="background:var(--secondary);color:var(--muted-foreground);">KVK {{ client.kvk_number }}</span>
                         <span class="badge" style="background:#EFF6FF;color:#1E40AF;">{{ client.get_sector_display }}</span>
                         <span class="badge" style="background:#F1F5F9;color:#475569;">
-                            {% if client.company_size == 'SMALL' %}Klein (10–49){% elif client.company_size == 'MEDIUM' %}Middel (50–249){% else %}Groot (250+){% endif %}
+                            {% if client.company_size == 'SMALL' %}{% trans "Small (10–49)" %}{% elif client.company_size == 'MEDIUM' %}{% trans "Medium (50–249)" %}{% else %}{% trans "Large (250+)" %}{% endif %}
                         </span>
                         {# Task 1: Display country #}
                         <span class="badge" style="background:#F0FDF4;color:#166534;">🌍 {{ client.get_country_display }}</span>
                     </div>
                 </div>
                 <button @click="editing = !editing" class="btn btn-secondary btn-sm">
-                    <span x-show="!editing">Bewerken</span>
-                    <span x-show="editing">Annuleren</span>
+                    <span x-show="!editing">{% trans "Edit" %}</span>
+                    <span x-show="editing">{% trans "Cancel" %}</span>
                 </button>
             </div>
 
             {# Display mode #}
             <div x-show="!editing" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                 <div>
-                    <span class="text-xs uppercase font-medium" style="color:var(--muted-foreground);">Adres</span>
+                    <span class="text-xs uppercase font-medium" style="color:var(--muted-foreground);">{% trans "Address" %}</span>
                     <p class="mt-0.5" style="color:var(--foreground);">{{ client.address }}<br>{{ client.postal_code }} {{ client.city }}</p>
                 </div>
                 <div>
-                    <span class="text-xs uppercase font-medium" style="color:var(--muted-foreground);">Contactpersoon</span>
+                    <span class="text-xs uppercase font-medium" style="color:var(--muted-foreground);">{% trans "Contact person" %}</span>
                     <p class="mt-0.5" style="color:var(--foreground);">{{ client.contact_person }}</p>
                     <p style="color:var(--accent-blue);">{{ client.email }}</p>
                     {% if client.phone %}<p style="color:var(--muted-foreground);">{{ client.phone }}</p>{% endif %}
                 </div>
                 <div>
-                    <span class="text-xs uppercase font-medium" style="color:var(--muted-foreground);">Land</span>
+                    <span class="text-xs uppercase font-medium" style="color:var(--muted-foreground);">{% trans "Country" %}</span>
                     <p class="mt-0.5" style="color:var(--foreground);">{{ client.get_country_display }}</p>
                 </div>
                 <div>
-                    <span class="text-xs uppercase font-medium" style="color:var(--muted-foreground);">Accountmanager</span>
+                    <span class="text-xs uppercase font-medium" style="color:var(--muted-foreground);">{% trans "Account manager" %}</span>
                     <p class="mt-0.5" style="color:var(--foreground);">{{ client.account_manager.get_full_name|default:"—" }}</p>
                 </div>
                 <div>
-                    <span class="text-xs uppercase font-medium" style="color:var(--muted-foreground);">Klant sinds</span>
+                    <span class="text-xs uppercase font-medium" style="color:var(--muted-foreground);">{% trans "Client since" %}</span>
                     <p class="mt-0.5" style="color:var(--foreground);">{{ client.created_at|date:"d-m-Y" }}</p>
                 </div>
                 <div>
-                    <span class="text-xs uppercase font-medium" style="color:var(--muted-foreground);">KVK-nummer</span>
+                    <span class="text-xs uppercase font-medium" style="color:var(--muted-foreground);">{% trans "KVK number" %}</span>
                     <p class="mt-0.5 mono" style="color:var(--muted-foreground);">{{ client.kvk_number }}</p>
                 </div>
             </div>
@@ -66,20 +67,20 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
                         <div class="sm:col-span-2">
-                            <label class="form-label">Bedrijfsnaam *</label>
+                            <label class="form-label">{% trans "Company name" %} *</label>
                             <input type="text" name="company_name" class="form-input" required
                                 value="{{ client.company_name }}">
                         </div>
 
                         <div>
-                            <label class="form-label">KVK-nummer</label>
+                            <label class="form-label">{% trans "KVK number" %}</label>
                             <input type="text" class="form-input" value="{{ client.kvk_number }}" disabled
                                 style="opacity:0.6; cursor:not-allowed;">
-                            <p class="form-hint">KVK-nummer kan niet worden gewijzigd.</p>
+                            <p class="form-hint">{% trans "KVK number cannot be changed." %}</p>
                         </div>
 
                         <div>
-                            <label class="form-label">Sector *</label>
+                            <label class="form-label">{% trans "Sector" %} *</label>
                             <select name="sector" class="form-select" required>
                                 {% for val, label in sectors %}
                                 <option value="{{ val }}" {% if client.sector == val %}selected{% endif %}>{{ label }}</option>
@@ -88,7 +89,7 @@
                         </div>
 
                         <div>
-                            <label class="form-label">Bedrijfsgrootte *</label>
+                            <label class="form-label">{% trans "Company size" %} *</label>
                             <select name="company_size" class="form-select" required>
                                 {% for val, label in sizes %}
                                 <option value="{{ val }}" {% if client.company_size == val %}selected{% endif %}>{{ label }}</option>
@@ -98,7 +99,7 @@
 
                         {# Task 1: Country in edit form #}
                         <div>
-                            <label class="form-label">Land *</label>
+                            <label class="form-label">{% trans "Country" %} *</label>
                             <select name="country" class="form-select" required>
                                 {% for val, label in country_choices %}
                                 <option value="{{ val }}" {% if client.country == val %}selected{% endif %}>{{ label }}</option>
@@ -107,13 +108,13 @@
                         </div>
 
                         <div>
-                            <label class="form-label">Contactpersoon *</label>
+                            <label class="form-label">{% trans "Contact person" %} *</label>
                             <input type="text" name="contact_person" class="form-input" required
                                 value="{{ client.contact_person }}">
                         </div>
 
                         <div>
-                            <label class="form-label">E-mailadres *</label>
+                            <label class="form-label">{% trans "Email address" %} *</label>
                             <input type="email" name="email" class="form-input" required
                                 value="{{ client.email }}">
                         </div>
@@ -121,8 +122,8 @@
                     </div>
 
                     <div class="flex gap-3 mt-4" style="border-top:1px solid var(--border); padding-top:1rem;">
-                        <button type="submit" class="btn btn-primary">Opslaan</button>
-                        <button type="button" @click="editing = false" class="btn btn-secondary">Annuleren</button>
+                        <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+                        <button type="button" @click="editing = false" class="btn btn-secondary">{% trans "Cancel" %}</button>
                     </div>
                 </form>
             </div>
@@ -131,20 +132,20 @@
         {# Audit History #}
         <div class="card p-0 overflow-hidden">
             <div class="flex items-center justify-between px-6 py-4" style="border-bottom:1px solid var(--border);">
-                <span class="text-sm font-semibold uppercase tracking-wide" style="color:var(--muted-foreground);">Audit Geschiedenis</span>
+                <span class="text-sm font-semibold uppercase tracking-wide" style="color:var(--muted-foreground);">{% trans "Audit History" %}</span>
                 {# Task 2: Wire button to audit_new URL with client pre-selected #}
-                <a href="{% url 'dashboard:audit_new' %}?client_id={{ client.pk }}" class="btn btn-primary btn-sm">+ Nieuwe Audit Starten</a>
+                <a href="{% url 'dashboard:audit_new' %}?client_id={{ client.pk }}" class="btn btn-primary btn-sm">+ {% trans "Start New Audit" %}</a>
             </div>
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Datum</th>
-                        <th>Tier</th>
-                        <th>Status</th>
-                        <th>Score</th>
-                        <th>Gaps</th>
-                        <th>Doorlooptijd</th>
-                        <th>Betaald</th>
+                        <th>{% trans "Date" %}</th>
+                        <th>{% trans "Tier" %}</th>
+                        <th>{% trans "Status" %}</th>
+                        <th>{% trans "Score" %}</th>
+                        <th>{% trans "Gaps" %}</th>
+                        <th>{% trans "Duration" %}</th>
+                        <th>{% trans "Paid" %}</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -166,11 +167,11 @@
                             {% else %}<span style="color:var(--text-muted);">—</span>{% endif %}
                         </td>
                         <td><span class="text-sm">{{ audit.gaps_identified }}</span></td>
-                        <td><span class="text-sm">{% if audit.duration_days is not None %}{{ audit.duration_days }} d{% else %}—{% endif %}</span></td>
-                        <td>{% if audit.paid %}<span class="text-green-600">✓</span>{% else %}<span style="color:var(--muted-foreground);">Nee</span>{% endif %}</td>
+                        <td><span class="text-sm">{% if audit.duration_days is not None %}{% blocktrans with days=audit.duration_days %}{{ days }}d{% endblocktrans %}{% else %}—{% endif %}</span></td>
+                        <td>{% if audit.paid %}<span class="text-green-600">✓</span>{% else %}<span style="color:var(--muted-foreground);">{% trans "No" %}</span>{% endif %}</td>
                         <td>
                             <div class="flex gap-1">
-                                <a href="{% url 'dashboard:audit_detail' audit.pk %}" class="btn btn-sm btn-secondary">Bekijken</a>
+                                <a href="{% url 'dashboard:audit_detail' audit.pk %}" class="btn btn-sm btn-secondary">{% trans "View" %}</a>
                                 {% if audit.gaps.count > 0 %}
                                 <a href="{% url 'report_generator:gap_report_download' audit.pk %}" class="btn btn-sm btn-ghost">↓</a>
                                 {% endif %}
@@ -182,8 +183,8 @@
                         <td colspan="8">
                             <div class="empty-state">
                                 <div class="empty-state-icon">📋</div>
-                                <div class="empty-state-text">Nog geen audits voor deze klant</div>
-                                <a href="{% url 'dashboard:audit_new' %}?client_id={{ client.pk }}" class="btn btn-primary btn-sm mt-3">+ Eerste Audit Starten</a>
+                                <div class="empty-state-text">{% trans "No audits for this client yet" %}</div>
+                                <a href="{% url 'dashboard:audit_new' %}?client_id={{ client.pk }}" class="btn btn-primary btn-sm mt-3">+ {% trans "Start First Audit" %}</a>
                             </div>
                         </td>
                     </tr>
@@ -199,7 +200,7 @@
         {# Compliance Trend #}
         {% if trend_scores|length >= 2 %}
         <div class="card">
-            <div class="card-title">Compliance Trend</div>
+            <div class="card-title">{% trans "Compliance Trend" %}</div>
             <div class="flex items-end gap-1 h-24 mt-2">
                 {% for score in trend_scores %}
                 <div class="flex-1 flex flex-col items-center gap-1">
@@ -215,9 +216,9 @@
 
         {# Sector Benchmark #}
         <div class="card">
-            <div class="card-title">Sector Benchmark</div>
+            <div class="card-title">{% trans "Sector Benchmark" %}</div>
             <div class="text-sm" style="color:var(--muted-foreground);">
-                Gemiddelde compliance voor <strong>{{ client.get_sector_display }}</strong>:
+                {% blocktrans with sector=client.get_sector_display %}Average compliance for <strong>{{ sector }}</strong>:{% endblocktrans %}
             </div>
             <div class="text-3xl font-bold mt-2 {% if sector_avg >= 70 %}text-green-600{% elif sector_avg >= 40 %}text-yellow-500{% else %}text-red-500{% endif %}">
                 {{ sector_avg }}%
@@ -226,17 +227,17 @@
 
         {# Quick Actions #}
         <div class="card">
-            <div class="card-title">Snelle Acties</div>
+            <div class="card-title">{% trans "Quick Actions" %}</div>
             <div class="space-y-2">
                 {# Task 2: Wire button to audit_new #}
                 <a href="{% url 'dashboard:audit_new' %}?client_id={{ client.pk }}"
                     class="btn btn-primary w-full justify-center">
-                    ＋ Nieuwe Audit Starten
+                    ＋ {% trans "Start New Audit" %}
                 </a>
                 {% if latest_audit and latest_audit.gaps.count > 0 %}
                 <a href="{% url 'report_generator:gap_report_download' latest_audit.pk %}"
                     class="btn btn-secondary w-full justify-center">
-                    ↓ Laatste Rapport Downloaden
+                    ↓ {% trans "Download Latest Report" %}
                 </a>
                 {% endif %}
             </div>

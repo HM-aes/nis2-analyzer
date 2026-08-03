@@ -1,6 +1,7 @@
 {% extends "dashboard/base.html" %}
-{% block title %}Gap Analyse — NIS2{% endblock %}
-{% block page_title %}Gap Analyse Browser{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "Gap Analysis" %} — NIS2{% endblock %}
+{% block page_title %}{% trans "Gap Analysis Browser" %}{% endblock %}
 
 {% block content %}
 
@@ -8,25 +9,25 @@
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
     <div class="kpi-card" style="border-left-color:#EF4444;">
         <div class="kpi-value">{{ total_gaps }}</div>
-        <div class="kpi-label">Totale Gaps</div>
+        <div class="kpi-label">{% trans "Total Gaps" %}</div>
     </div>
     <div class="kpi-card" style="border-left-color:#EF4444;">
         <div class="kpi-value text-red-600">{{ critical_open }}</div>
-        <div class="kpi-label">Kritiek & Open</div>
+        <div class="kpi-label">{% trans "Critical & Open" %}</div>
     </div>
     <div class="kpi-card" style="border-left-color:#F97316;">
         <div class="kpi-value">{{ avg_risk }}</div>
-        <div class="kpi-label">Gem. Risico / 10</div>
+        <div class="kpi-label">{% trans "Avg. Risk / 10" %}</div>
     </div>
     <div class="kpi-card" style="border-left-color:#3B82F6;">
         <div class="kpi-value">{{ total_effort }}u</div>
-        <div class="kpi-label">Totale Hersteltijd</div>
+        <div class="kpi-label">{% trans "Total Remediation Time" %}</div>
     </div>
 </div>
 
 {# ── Treemap ───────────────────────────────────────────────────── #}
 <div class="card mb-5">
-    <div class="card-title">Gaps per Categorie (treemap)</div>
+    <div class="card-title">{% trans "Gaps by Category (treemap)" %}</div>
     <div class="treemap mt-2">
         {% for cat in treemap_data %}
         <div class="treemap-cell" style="flex-basis: {% widthratio cat.n treemap_max 30 %}%; min-width: 80px;
@@ -44,41 +45,40 @@
 <div class="card p-0 overflow-hidden" x-data="{ severity: '', category: '', addressed: '' }">
     <div class="flex flex-wrap gap-3 p-4" style="border-bottom:1px solid var(--border);">
         <div class="pill-filter">
-            <span @click="severity = ''" :class="{ active: severity === '' }" class="pill cursor-pointer">Alle
-                ernst</span>
+            <span @click="severity = ''" :class="{ active: severity === '' }" class="pill cursor-pointer">{% trans "All severities" %}</span>
             <span @click="severity = 'CRITICAL'" :class="{ active: severity === 'CRITICAL' }"
-                class="pill cursor-pointer">🔴 Kritiek</span>
+                class="pill cursor-pointer">🔴 {% trans "Critical" %}</span>
             <span @click="severity = 'HIGH'" :class="{ active: severity === 'HIGH' }" class="pill cursor-pointer">🟠
-                Hoog</span>
+                {% trans "High" %}</span>
             <span @click="severity = 'MEDIUM'" :class="{ active: severity === 'MEDIUM' }" class="pill cursor-pointer">🟡
-                Medium</span>
+                {% trans "Medium" %}</span>
             <span @click="severity = 'LOW'" :class="{ active: severity === 'LOW' }" class="pill cursor-pointer">⚪
-                Laag</span>
+                {% trans "Low" %}</span>
         </div>
         <select class="form-select text-sm w-44" x-model="category">
-            <option value="">Alle categorieën</option>
+            <option value="">{% trans "All categories" %}</option>
             {% for val, label in category_choices %}
             <option value="{{ val }}">{{ label }}</option>
             {% endfor %}
         </select>
         <select class="form-select text-sm w-36" x-model="addressed">
-            <option value="">Alle statussen</option>
-            <option value="open">Open</option>
-            <option value="resolved">Opgelost</option>
+            <option value="">{% trans "All statuses" %}</option>
+            <option value="open">{% trans "Open" %}</option>
+            <option value="resolved">{% trans "Resolved" %}</option>
         </select>
     </div>
 
     <table class="data-table">
         <thead>
             <tr>
-                <th>Ernst</th>
-                <th>Klant</th>
-                <th>Titel</th>
-                <th>NIS2</th>
-                <th>Categorie</th>
-                <th>Risico</th>
-                <th>Uren</th>
-                <th>Status</th>
+                <th>{% trans "Severity" %}</th>
+                <th>{% trans "Client" %}</th>
+                <th>{% trans "Title" %}</th>
+                <th>{% trans "NIS2" %}</th>
+                <th>{% trans "Category" %}</th>
+                <th>{% trans "Risk" %}</th>
+                <th>{% trans "Hours" %}</th>
+                <th>{% trans "Status" %}</th>
             </tr>
         </thead>
         <tbody id="gap-tbody">
@@ -92,7 +92,7 @@
                         class="text-sm font-medium hover:underline" style="color:var(--accent-blue);">{{ gap.audit.client.company_name
                         }}</a>
                     <div class="text-xs" style="color:var(--text-muted);">
-                        <a href="{% url 'dashboard:audit_detail' gap.audit.pk %}" class="hover:underline">Audit →</a>
+                        <a href="{% url 'dashboard:audit_detail' gap.audit.pk %}" class="hover:underline">{% trans "Audit →" %}</a>
                     </div>
                 </td>
                 <td @click="expanded=!expanded"><span class="text-sm">{{ gap.title|truncatechars:40 }}</span></td>
@@ -110,8 +110,8 @@
                 </td>
                 <td @click="expanded=!expanded"><span class="text-sm">{{ gap.estimated_effort_hours }}u</span></td>
                 <td>
-                    {% if gap.addressed %}<span class="text-green-600 text-sm font-medium">✓ Opgelost</span>
-                    {% else %}<span class="text-red-500 text-sm">● Open</span>{% endif %}
+                    {% if gap.addressed %}<span class="text-green-600 text-sm font-medium">✓ {% trans "Resolved" %}</span>
+                    {% else %}<span class="text-red-500 text-sm">● {% trans "Open" %}</span>{% endif %}
                 </td>
             </tr>
             <tr x-show="expanded" style="background:var(--secondary);">
@@ -119,11 +119,11 @@
                     <div class="gap-detail">
                         <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-8">
                             <div>
-                                <dt>Huidige Situatie</dt>
+                                <dt>{% trans "Current State" %}</dt>
                                 <dd>{{ gap.current_state }}</dd>
                             </div>
                             <div>
-                                <dt>Aanbeveling</dt>
+                                <dt>{% trans "Recommendation" %}</dt>
                                 <dd>{{ gap.recommendation }}</dd>
                             </div>
                         </dl>
@@ -135,12 +135,12 @@
                 <td colspan="8">
                     <div class="empty-state py-16">
                         <div class="empty-state-icon">🔍</div>
-                        <div class="empty-state-text">Nog geen gaps gevonden</div>
+                        <div class="empty-state-text">{% trans "No gaps found yet" %}</div>
                         <p class="text-sm mt-2 mb-4" style="color:var(--text-muted);">
-                            Maak eerst een audit aan, upload beleidsdocumenten en start de AI-analyse.
+                            {% trans "Create an audit first, upload policy documents, and start the AI analysis." %}
                         </p>
                         <a href="{% url 'dashboard:audit_new' %}" class="btn btn-primary btn-sm" style="display:inline-flex;">
-                            + Nieuwe Audit Starten
+                            {% trans "+ Start New Audit" %}
                         </a>
                     </div>
                 </td>

@@ -11,6 +11,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.views import View
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from compliance_engine.models import ComplianceAudit, ComplianceGap, Client
 from .generator import NIS2ReportGenerator
@@ -42,7 +43,7 @@ class SectorReportFormView(View):
             return render(request, 'report_generator/sector_report.html', {
                 'sector_choices': Client.SECTOR_CHOICES,
                 'country_choices': Client.COUNTRY_CHOICES,
-                'error': 'Bedrijfsnaam is verplicht.',
+                'error': _('Company name is required.'),
                 'data': request.POST,
             })
 
@@ -59,7 +60,7 @@ class SectorReportFormView(View):
             return render(request, 'report_generator/sector_report.html', {
                 'sector_choices': Client.SECTOR_CHOICES,
                 'country_choices': Client.COUNTRY_CHOICES,
-                'error': f'Fout bij het genereren van het rapport: {str(e)}',
+                'error': _('Error generating report: %(error)s') % {'error': str(e)},
                 'data': request.POST,
             })
 
@@ -85,7 +86,7 @@ class GapReportDownloadView(LoginRequiredMixin, View):
         gaps = ComplianceGap.objects.filter(audit=audit)
 
         if not gaps.exists():
-            messages.error(request, 'Geen gaps gevonden voor dit audit')
+            messages.error(request, _('No gaps found for this audit'))
             return redirect('dashboard:audit_detail', pk=pk)
 
         try:
@@ -96,7 +97,10 @@ class GapReportDownloadView(LoginRequiredMixin, View):
                 client=client,
             )
         except Exception as e:
-            messages.error(request, f'Fout bij het genereren van het rapport: {str(e)}')
+            messages.error(
+                request,
+                _('Error generating report: %(error)s') % {'error': str(e)},
+            )
             return redirect('dashboard:audit_detail', pk=pk)
 
         # Mark report as generated
@@ -132,5 +136,5 @@ class GapReportGenerateView(LoginRequiredMixin, View):
             })
         return JsonResponse({
             'status': 'no_gaps',
-            'message': 'Geen gaps gevonden. Voer eerst een AI analyse uit.',
+            'message': _('No gaps found. Run an AI analysis first.'),
         })

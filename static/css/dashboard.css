@@ -1,0 +1,633 @@
+/* ================================================================
+   Dashboard card design system — light mode
+   Requires static/css/tokens.css
+   ================================================================ */
+
+/* ── Base card (shadcn-style light shell) ────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}
+
+/* Shared dark card header strip */
+.card.stat-card .stat-card-top,
+.card.panel-card .scard-head,
+.scard-head {
+  background: var(--card-header-bg);
+  color: var(--card-header-fg);
+  border-bottom: 1px solid var(--card-header-border);
+}
+
+/* Stat cards */
+.card.stat-card {
+  padding: 0;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.card.stat-card .stat-card-top {
+  margin-bottom: 0;
+  padding: 0.75rem 1.125rem;
+}
+
+.card.stat-card .stat-num {
+  padding: 0.875rem 1.125rem 0.25rem;
+  color: var(--foreground);
+}
+
+.card.stat-card .kpi-label {
+  padding: 0 1.125rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.01em;
+}
+
+.card.stat-card .stat-card-top .stat-delta {
+  color: var(--card-header-muted);
+}
+
+.card.stat-card .stat-card-top .delta-up {
+  color: var(--card-header-positive);
+}
+
+.card.stat-card .stat-card-top .delta-down {
+  color: var(--card-header-negative);
+}
+
+.card.stat-card .kpi-icon-wrap {
+  background: var(--card-header-icon-bg);
+  border: 1px solid var(--card-header-icon-border);
+  box-shadow: none;
+  color: var(--card-header-fg);
+}
+
+.card.stat-card .kpi-icon-muted {
+  color: var(--card-header-fg);
+}
+
+/* Panel cards */
+.card.panel-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.card.panel-card .scard-head {
+  padding: 0.875rem 1.25rem;
+}
+
+.card.panel-card .scard-head .st,
+.card.panel-card .card-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--card-header-fg);
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+.panel-card .panel-body {
+  padding: 0 1rem 1rem 1.25rem;
+  background: var(--surface);
+}
+
+/* Priority / record cards (.scard) */
+.scard {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.scard:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.scard::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  z-index: 2;
+  background: var(--dim);
+  border-radius: 3px 0 0 3px;
+}
+
+.scard.ok::before   { background: var(--success); }
+.scard.todo::before { background: var(--warning); }
+.scard.bad::before  { background: var(--danger); }
+
+.scard-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem 0.75rem 1.25rem;
+}
+
+.scard-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.scard-mark {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  background: var(--card-header-fg);
+  border-radius: 2px;
+  opacity: 0.9;
+}
+
+.scard-title .st {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--card-header-fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.scard-body {
+  padding: 1rem 1rem 1.125rem 1.25rem;
+  background: var(--surface);
+}
+
+.scard-body .sd {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scard {
+    transition: none;
+  }
+}
+
+/* ── Status badges (soft fill + dot) ──────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-badge);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: 1px solid;
+  line-height: 1.2;
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.badge.ok {
+  background: var(--success-soft);
+  color: var(--success-text);
+  border-color: var(--success-edge);
+}
+
+.badge.ok .badge-dot { background: var(--success); }
+
+.badge.todo {
+  background: var(--warning-soft);
+  color: var(--warning-text);
+  border-color: var(--warning-edge);
+}
+
+.badge.todo .badge-dot { background: var(--warning); }
+
+.badge.bad {
+  background: var(--danger-soft);
+  color: var(--danger-text);
+  border-color: var(--danger-edge);
+}
+
+.badge.bad .badge-dot { background: var(--danger); }
+
+.badge-tier {
+  background: var(--surface-secondary);
+  color: var(--muted);
+  border-color: var(--border);
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.badge-tier .badge-dot {
+  background: var(--dim);
+}
+
+/* ── Section tags (dark inverse + amber dot) ──────────────────── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: fit-content;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--surface);
+  background: var(--foreground);
+  padding: 6px 12px;
+  border-radius: var(--radius-badge);
+}
+
+.tag::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--warning);
+  flex-shrink: 0;
+}
+
+/* ── Panel rows + progress ────────────────────────────────────── */
+.panel-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0;
+  border-bottom: 1px solid var(--separator);
+}
+
+.panel-row:last-child {
+  border-bottom: none;
+}
+
+.progress-track {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--radius-badge);
+  border: 1px solid var(--border);
+  background: var(--surface-secondary);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: calc(var(--radius-badge) - 1px);
+  background: var(--warning);
+  transition: width 0.4s ease, background 0.3s ease;
+}
+
+.progress-fill.is-complete {
+  background: var(--success);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-fill {
+    transition: none;
+  }
+}
+
+/* ── Deltas ───────────────────────────────────────────────────── */
+.delta-up {
+  color: var(--success-text);
+}
+
+.delta-down {
+  color: var(--danger-text);
+}
+
+/* ── Scard grid ───────────────────────────────────────────────── */
+.scard-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .scard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .scard-grid--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ── Filter bar (Klanten + list pages) ──────────────────────────── */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.filter-control {
+  appearance: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  color: var(--foreground);
+  outline: none;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    color 0.18s ease;
+}
+
+.filter-control:focus,
+.filter-control:focus-visible {
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 3px var(--field-focus);
+}
+
+.filter-control--default,
+.filter-control--warning {
+  background: var(--filter-bg);
+  color: var(--filter-fg);
+  border-color: var(--filter-border);
+}
+
+.filter-control--default:hover,
+.filter-control--warning:hover {
+  background: var(--filter-bg-hover);
+  border-color: color-mix(in oklab, var(--surface) 24%, var(--foreground));
+}
+
+.filter-control--active {
+  background: var(--danger);
+  color: var(--filter-fg);
+  border-color: color-mix(in oklab, var(--danger) 70%, black);
+}
+
+.filter-control--active:hover {
+  background: color-mix(in oklab, var(--danger) 88%, black);
+  border-color: color-mix(in oklab, var(--danger) 60%, black);
+}
+
+.filter-select {
+  padding: 0.5rem 2rem 0.5rem 0.875rem;
+  min-width: 9rem;
+  cursor: pointer;
+}
+
+.filter-select-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.filter-select-wrap::after {
+  content: "";
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-right: 2px solid var(--filter-muted);
+  border-bottom: 2px solid var(--filter-muted);
+  transform: translateY(-65%) rotate(45deg);
+  pointer-events: none;
+}
+
+.filter-select-wrap:has(.filter-control--warning)::after,
+.filter-select-wrap:has(.filter-control--default)::after {
+  border-color: var(--filter-muted);
+}
+
+.filter-select-wrap:has(.filter-control--active)::after {
+  border-color: var(--filter-fg);
+}
+
+.search-wrap--filter {
+  min-width: 16rem;
+  background: var(--filter-bg);
+  border: 1px solid var(--filter-border);
+  border-radius: var(--radius);
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.search-wrap--filter:hover {
+  background: var(--filter-bg-hover);
+  border-color: color-mix(in oklab, var(--surface) 24%, var(--foreground));
+}
+
+.search-wrap--filter:focus-within {
+  border-color: color-mix(in oklab, var(--surface) 28%, var(--foreground));
+  box-shadow: 0 0 0 3px var(--filter-focus-ring);
+  background: var(--filter-bg-hover);
+}
+
+.search-wrap--filter .search-icon {
+  color: var(--filter-muted);
+}
+
+.search-wrap--filter .search-input {
+  color: var(--filter-fg);
+}
+
+.search-wrap--filter .search-input::placeholder {
+  color: var(--filter-muted);
+}
+
+.search-input--embedded {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.search-input--embedded:hover,
+.search-input--embedded:focus {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.search-input--topbar {
+  height: 2.25rem;
+}
+
+/* ── Search wrap variants ───────────────────────────────────────── */
+.search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-wrap .search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+  background: var(--default);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.8125rem;
+  color: var(--foreground);
+  outline: none;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.search-input::placeholder {
+  color: var(--muted);
+}
+
+.search-input:hover {
+  background: var(--default-hover);
+  border-color: var(--border-strong);
+}
+
+.search-input:focus {
+  background: var(--surface);
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 3px var(--field-focus);
+}
+
+.search-wrap--pill .search-input {
+  border-radius: 999px;
+  padding-right: 5.5rem;
+  background: var(--filter-bg);
+  border: 1px solid var(--filter-border);
+  color: var(--filter-fg);
+}
+
+.search-wrap--pill .search-input::placeholder {
+  color: var(--filter-muted);
+}
+
+.search-wrap--pill .search-input:hover {
+  background: var(--filter-bg-hover);
+  border-color: color-mix(in oklab, var(--surface) 24%, var(--foreground));
+}
+
+.search-wrap--pill .search-input:focus {
+  background: var(--filter-bg-hover);
+  border-color: color-mix(in oklab, var(--surface) 28%, var(--foreground));
+  box-shadow: 0 0 0 3px var(--filter-focus-ring);
+}
+
+.search-wrap--pill .search-icon {
+  color: var(--filter-muted);
+}
+
+.search-wrap--pill .search-submit {
+  position: absolute;
+  right: 0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0.3rem 0.75rem;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  background: var(--filter-fg);
+  color: var(--filter-bg);
+  transition: background 0.18s ease, opacity 0.18s ease;
+}
+
+.search-wrap--pill .search-submit:hover {
+  background: color-mix(in oklab, var(--filter-fg) 92%, var(--filter-bg));
+}
+
+.search-wrap--pill .search-submit:focus-visible {
+  outline: 2px solid var(--border-strong);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .filter-control,
+  .search-input,
+  .search-wrap--pill .search-submit {
+    transition: none;
+  }
+}
+
+/* ── Pill CTA (e.g. Nieuwe Klant) ───────────────────────────────── */
+.btn-pill {
+  border-radius: 999px;
+  padding: 0.5rem 1.125rem;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+}
+
+.btn-cta {
+  background: var(--filter-bg);
+  color: var(--filter-fg);
+  border: 1px solid var(--filter-border);
+  box-shadow: var(--shadow-sm);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.btn-cta:hover {
+  background: var(--filter-bg-hover);
+  color: var(--filter-fg);
+  border-color: color-mix(in oklab, var(--surface) 28%, var(--foreground));
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-cta:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-cta:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-md), 0 0 0 3px var(--filter-focus-ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-cta,
+  .btn-cta:hover,
+  .btn-cta:active {
+    transform: none;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+}
+

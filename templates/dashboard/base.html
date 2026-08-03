@@ -1,6 +1,7 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="nl" data-theme="dark">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
@@ -8,8 +9,11 @@
   <meta name="csrf-token" content="{{ csrf_token }}">
   <title>{% block title %}NIS2 Dashboard{% endblock %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="{% static 'dashboard/css/sidebar.css' %}?v=9">
-  <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}?v=10">
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=7">
+  <link rel="stylesheet" href="{% static 'dashboard/css/sidebar.css' %}?v=13">
+  <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}?v=14">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=8">
+  <link rel="stylesheet" href="{% static 'dashboard/css/dashboard-theme.css' %}?v=11">
   <script src="https://unpkg.com/htmx.org@1.9.12"
     integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2uQ5xdAAoBl1fNsLEDVVSlrjMV0tqkLkYP" crossorigin="anonymous"></script>
   {# $persist plugin must load before Alpine core — remembers the sidebar's open/closed state #}
@@ -40,13 +44,13 @@
         </div>
         <div class="flex items-center gap-3">
 
-          <div class="search-wrap hidden sm:block">
-            <svg class="search-icon w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div class="search-wrap search-wrap--pill hidden sm:flex" style="width:15rem;">
+            <svg class="search-icon w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
             </svg>
-            <input type="text" placeholder="Zoeken..." class="form-input search-input py-1.5 text-sm w-52"
-              style="height:36px;">
+            <input type="search" placeholder="{% trans 'Search…' %}" class="search-input search-input--topbar" aria-label="{% trans 'Search' %}">
+            <button type="button" class="search-submit">{% trans "Search" %}</button>
           </div>
 
           <!-- Bell -->
@@ -65,11 +69,11 @@
             <div x-show="open" @click.away="open = false" x-transition class="topbar-dropdown">
               <div class="topbar-dropdown-header">
                 <div class="topbar-dropdown-name">{{ request.user.get_full_name|default:request.user.username }}</div>
-                <div class="topbar-dropdown-role">{{ request.user.is_superuser|yesno:"Administrator,Consultant" }}</div>
+                <div class="topbar-dropdown-role">{% if request.user.is_superuser %}{% trans "Administrator" %}{% else %}{% trans "Consultant" %}{% endif %}</div>
               </div>
               <form method="post" action="{% url 'dashboard:logout' %}">
                 {% csrf_token %}
-                <button type="submit" class="topbar-dropdown-logout">Uitloggen</button>
+                <button type="submit" class="topbar-dropdown-logout">{% trans "Log out" %}</button>
               </form>
             </div>
           </div>

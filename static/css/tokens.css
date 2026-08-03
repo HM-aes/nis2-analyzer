@@ -1,0 +1,145 @@
+@layer base {
+  :root {
+    color-scheme: light;
+
+    /* ── Light canvas + surfaces ─────────────────────────────── */
+    --background:        oklch(0.955 0.006 85);
+    --surface:           oklch(1 0 0);
+    --surface-secondary: oklch(0.972 0.004 85);
+    --border:            oklch(0.72 0.006 265);
+    --border-strong:     oklch(0.62 0.008 265);
+    --separator:         oklch(0.90 0.004 265);
+    --header-strip:      oklch(0.968 0.004 265);
+    --foreground:        oklch(0.24 0.010 75);
+    --muted:             oklch(0.52 0.014 75);
+    --dim:               oklch(0.62 0.012 78);
+
+    --shadow-sm: 0 1px 2px oklch(0.25 0.02 265 / 0.10),
+                 0 2px 6px -1px oklch(0.25 0.02 265 / 0.13);
+    --shadow-md: 0 2px 4px oklch(0.25 0.02 265 / 0.13),
+                 0 8px 20px -3px oklch(0.25 0.02 265 / 0.20);
+
+    /* ── Status bases (deepened for light contrast) ──────────── */
+    --success: oklch(0.60 0.14 150);
+    --warning: oklch(0.68 0.15 62);
+    --danger:  oklch(0.56 0.20 27);
+
+    --success-soft: color-mix(in oklab, var(--success) 12%, var(--surface));
+    --success-text: color-mix(in oklab, var(--success) 80%, black);
+    --success-edge: color-mix(in oklab, var(--success) 34%, var(--surface));
+    --warning-soft: color-mix(in oklab, var(--warning) 11%, var(--surface));
+    --warning-text: color-mix(in oklab, var(--warning) 72%, black);
+    --warning-edge: color-mix(in oklab, var(--warning) 22%, var(--surface));
+    --danger-soft:  color-mix(in oklab, var(--danger) 11%, var(--surface));
+    --danger-text:  color-mix(in oklab, var(--danger) 78%, black);
+    --danger-edge:  color-mix(in oklab, var(--danger) 32%, var(--surface));
+
+    /* ── HeroUI-style interactive fills (filters, fields) ─────── */
+    --default-hover:       color-mix(in oklab, var(--default) 90%, var(--foreground) 10%);
+    --warning-soft-hover:  color-mix(in oklab, var(--warning) 16%, var(--surface));
+    --danger-soft-hover:   color-mix(in oklab, var(--danger) 16%, var(--surface));
+    --field-focus:         color-mix(in oklab, var(--foreground) 8%, transparent);
+
+    --radius: 10px;
+    --radius-sm: 8px;
+    --radius-badge: 6px;
+
+    /* ── Legacy aliases (dashboard shell + sidebar bridge) ───── */
+    --surface-foreground:    var(--foreground);
+    --default:               var(--surface-secondary);
+    --default-foreground:    var(--foreground);
+    --background-inverse:            var(--foreground);
+    --background-inverse-foreground: var(--surface);
+    --link:                  var(--foreground);
+    --backdrop:              oklch(0% 0 0 / 20%);
+    --success-foreground:    var(--success-text);
+    --warning-foreground:    var(--warning-text);
+    --danger-foreground:     var(--danger-text);
+
+    --background-secondary: color-mix(in oklab, var(--background) 96%, var(--foreground) 4%);
+    --background-tertiary:  color-mix(in oklab, var(--background) 92%, var(--foreground) 8%);
+    --surface-tertiary:     color-mix(in oklab, var(--surface) 92%, var(--foreground) 8%);
+    --field-background:     var(--surface-secondary);
+    --field-border:         var(--border);
+
+    /* ── Dark filter chrome (Klanten + topbar search) ─────────── */
+    --filter-bg:         var(--foreground);
+    --filter-fg:         var(--surface);
+    --filter-muted:      color-mix(in oklab, var(--surface) 62%, var(--foreground));
+    --filter-border:     color-mix(in oklab, var(--surface) 16%, var(--foreground));
+    --filter-bg-hover:   color-mix(in oklab, var(--foreground) 86%, var(--surface));
+    --filter-focus-ring: color-mix(in oklab, var(--surface) 24%, transparent);
+
+    /* ── Card chrome — dark header strip on light cards ──────── */
+    --card-header-bg:            var(--filter-bg);
+    --card-header-fg:            var(--filter-fg);
+    --card-header-muted:         var(--filter-muted);
+    --card-header-border:        var(--filter-border);
+    --card-header-icon-bg:       color-mix(in oklab, var(--surface) 12%, var(--foreground));
+    --card-header-icon-border:   color-mix(in oklab, var(--surface) 24%, var(--foreground));
+    --card-header-positive:      color-mix(in oklab, var(--success) 72%, var(--surface));
+    --card-header-negative:      color-mix(in oklab, var(--danger) 72%, var(--surface));
+  }
+
+  [x-cloak] { display: none !important; }
+}
+
+/* ── OKLCH fallback (hex ONLY here) ───────────────────────────── */
+@supports not (color: oklch(0 0 0)) {
+  :root {
+    --background:        #f2f0eb;
+    --surface:           #ffffff;
+    --surface-secondary: #f7f6f3;
+    --border:            #a8a8b0;
+    --border-strong:     #8f8f98;
+    --separator:         #e4e4e8;
+    --header-strip:      #f5f5f7;
+    --foreground:        #2e2c28;
+    --muted:             #6b6760;
+    --dim:               #8a857c;
+
+    --shadow-sm: 0 1px 2px rgb(38 38 48 / 0.10), 0 2px 6px -1px rgb(38 38 48 / 0.13);
+    --shadow-md: 0 2px 4px rgb(38 38 48 / 0.13), 0 8px 20px -3px rgb(38 38 48 / 0.20);
+
+    --success: #2d9a5e;
+    --warning: #c4841a;
+    --danger:  #c43d2a;
+
+    --success-soft: #e8f5ee;
+    --success-text: #1f6b40;
+    --success-edge: #a8d4bc;
+    --warning-soft: #fdf8ef;
+    --warning-text: #9a6b12;
+    --warning-edge: #f0e0c4;
+    --danger-soft:  #faeae7;
+    --danger-text:  #8f2a1c;
+    --danger-edge:  #e4b0a8;
+
+    --default-hover:      #eeede8;
+    --warning-soft-hover: #faf3e4;
+    --danger-soft-hover:  #f5ddd8;
+    --field-focus:        rgb(46 44 40 / 0.08);
+
+    --background-secondary: #ebe9e4;
+    --background-tertiary:  #e4e2dc;
+    --surface-tertiary:     #eceae5;
+    --field-background:     #f7f6f3;
+    --field-border:         #a8a8b0;
+
+    --filter-bg:         #2e2c28;
+    --filter-fg:         #ffffff;
+    --filter-muted:      #b8b4ac;
+    --filter-border:     #4a4742;
+    --filter-bg-hover:   #3a3834;
+    --filter-focus-ring: rgb(255 255 255 / 0.24);
+
+    --card-header-bg:            var(--filter-bg);
+    --card-header-fg:            var(--filter-fg);
+    --card-header-muted:         var(--filter-muted);
+    --card-header-border:        var(--filter-border);
+    --card-header-icon-bg:       rgb(255 255 255 / 0.12);
+    --card-header-icon-border:   rgb(255 255 255 / 0.24);
+    --card-header-positive:      #7fd4a8;
+    --card-header-negative:      #f0a090;
+  }
+}

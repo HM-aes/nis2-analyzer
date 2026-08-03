@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext_lazy as _
 from .models import Client, ComplianceAudit, ComplianceGap, ClientDocument
 from .serializers import (
     ClientSerializer, ComplianceAuditSerializer, 
@@ -46,7 +47,7 @@ class ComplianceAuditViewSet(viewsets.ModelViewSet):
         
         if audit.status != 'INTAKE':
             return Response(
-                {'error': 'Audit must be in INTAKE status'},
+                {'error': _('Audit must be in INTAKE status')},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -58,7 +59,7 @@ class ComplianceAuditViewSet(viewsets.ModelViewSet):
         result = orchestrator.process_audit(audit.id)
         
         return Response({
-            'message': 'Processing started',
+            'message': _('Processing started'),
             'audit_id': str(audit.id),
             'status': result.get('status')
         })
@@ -72,7 +73,7 @@ class ComplianceAuditViewSet(viewsets.ModelViewSet):
         
         if not audit.report_generated or not audit.report_file:
             return Response(
-                {'error': 'Report not yet generated'},
+                {'error': _('Report not yet generated')},
                 status=status.HTTP_404_NOT_FOUND
             )
         
@@ -127,7 +128,7 @@ class ClientDocumentViewSet(viewsets.ModelViewSet):
         result = gatekeeper.scan_document(document)
         
         return Response({
-            'message': 'Document processed',
+            'message': _('Document processed'),
             'document_id': str(document.id),
             'virus_found': result.get('virus_found', False),
             'pii_detected': result.get('pii_detected', False)

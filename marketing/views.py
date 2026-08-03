@@ -3,6 +3,8 @@ from django.core.validators import validate_email
 from django.shortcuts import render
 from django.views import View
 
+from django.utils.translation import gettext_lazy as _
+
 from .models import AssessmentLead
 
 
@@ -12,7 +14,7 @@ class LeadCaptureView(View):
         try:
             validate_email(email)
         except ValidationError:
-            return render(request, "marketing/_lead_form.html", {"error": "Enter a valid email address."})
+            return render(request, "marketing/_lead_form.html", {"error": _("Enter a valid email address.")})
 
         AssessmentLead.objects.get_or_create(email=email)
         return render(request, "marketing/_lead_confirmation.html", {"email": email})

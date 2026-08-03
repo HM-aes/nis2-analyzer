@@ -1,11 +1,12 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="nl" data-theme="dark">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gratis NIS2 Sector Rapport | NIS2 Analyzer</title>
-    <meta name="description" content="Ontvang een gratis NIS2 compliance vereisten rapport voor uw sector. AI-aangedreven analyse van uw NIS2-verplichtingen, boetes en aanbevelingen.">
+    <title>{% trans "Free NIS2 Sector Report" %} | NIS2 Analyzer</title>
+    <meta name="description" content="{% trans 'Get a free NIS2 compliance requirements report for your sector. AI-powered analysis of your NIS2 obligations, fines, and recommendations.' %}">
     <link rel="stylesheet" href="{% static 'report_generator/css/sector_report.css' %}?v=1">
     <script defer src="{% static 'js/alpine.min.js' %}"></script>
     <script>
@@ -36,17 +37,17 @@
             <div class="sector-nav-logo" aria-hidden="true">🛡️</div>
             <div>
                 <div class="sector-nav-title">NIS2 Analyzer</div>
-                <div class="sector-nav-sub">Compliance Platform</div>
+                <div class="sector-nav-sub">{% trans "Compliance Platform" %}</div>
             </div>
         </a>
         <div class="sector-nav-actions">
             <button type="button" class="sector-theme-btn"
                     @click="toggleTheme()"
-                    :aria-label="theme === 'dark' ? 'Schakel naar licht thema' : 'Schakel naar donker thema'">
+                    :aria-label="theme === 'dark' ? '{% trans "Switch to light theme" %}' : '{% trans "Switch to dark theme" %}'">
                 <span x-show="theme === 'dark'" aria-hidden="true">☀️</span>
                 <span x-show="theme === 'light'" x-cloak aria-hidden="true">🌙</span>
             </button>
-            <a href="{% url 'dashboard:home' %}" class="sector-nav-link">Dashboard →</a>
+            <a href="{% url 'dashboard:home' %}" class="sector-nav-link">{% trans "Dashboard →" %}</a>
         </div>
     </nav>
 
@@ -55,24 +56,24 @@
         <header class="sector-hero">
             <div class="sector-eyebrow">
                 <span aria-hidden="true">🤖</span>
-                AI-aangedreven NIS2 Analyse
+                {% trans "AI-Powered NIS2 Analysis" %}
             </div>
-            <h1>Gratis NIS2 Sector Vereistenrapport</h1>
-            <p class="sector-hero-lead">Ontvang direct een professioneel PDF-rapport met alle NIS2-verplichtingen voor uw sector, maximale boetes en geprioriteerde actieplannen.</p>
+            <h1>{% trans "Free NIS2 Sector Requirements Report" %}</h1>
+            <p class="sector-hero-lead">{% trans "Get an instant professional PDF report with all NIS2 obligations for your sector, maximum fines, and prioritised action plans." %}</p>
 
             <div class="sector-features">
-                <span class="sector-feature">📄 Professioneel PDF rapport</span>
-                <span class="sector-feature">🤖 Aangedreven door Claude AI</span>
-                <span class="sector-feature">⚡ Direct gegenereerd</span>
-                <span class="sector-feature">🏛️ NIS2 Richtlijn 2022/2555</span>
-                <span class="sector-feature">💶 Boeteberekening</span>
+                <span class="sector-feature">📄 {% trans "Professional PDF report" %}</span>
+                <span class="sector-feature">🤖 {% trans "Powered by Claude AI" %}</span>
+                <span class="sector-feature">⚡ {% trans "Generated instantly" %}</span>
+                <span class="sector-feature">🏛️ {% trans "NIS2 Directive 2022/2555" %}</span>
+                <span class="sector-feature">💶 {% trans "Fine calculation" %}</span>
             </div>
         </header>
 
         <div class="sector-form-card">
             <div class="sector-form-inner">
-                <h2>Genereer Uw Rapport</h2>
-                <p class="sector-form-sub">Vul uw gegevens in. Uw rapport wordt direct gegenereerd en gedownload.</p>
+                <h2>{% trans "Generate Your Report" %}</h2>
+                <p class="sector-form-sub">{% trans "Enter your details. Your report will be generated and downloaded immediately." %}</p>
 
                 {% if error %}
                 <div class="sector-error" role="alert">⚠️ {{ error }}</div>
@@ -82,15 +83,15 @@
                     {% csrf_token %}
 
                     <div class="sector-field">
-                        <label for="company_name">Bedrijfsnaam *</label>
+                        <label for="company_name">{% trans "Company name *" %}</label>
                         <input type="text" id="company_name" name="company_name"
-                            placeholder="bijv. TechBedrijf BV"
+                            placeholder="{% trans 'e.g. TechCompany Ltd' %}"
                             value="{{ data.company_name|default:'' }}" required>
                     </div>
 
                     <div class="sector-grid-2">
                         <div class="sector-field">
-                            <label for="sector">Sector *</label>
+                            <label for="sector">{% trans "Sector *" %}</label>
                             <select id="sector" name="sector" required>
                                 {% for val, label in sector_choices %}
                                 <option value="{{ val }}" {% if data.sector == val %}selected{% endif %}>{{ label }}</option>
@@ -98,7 +99,7 @@
                             </select>
                         </div>
                         <div class="sector-field">
-                            <label for="country">Land *</label>
+                            <label for="country">{% trans "Country *" %}</label>
                             <select id="country" name="country" required>
                                 {% for val, label in country_choices %}
                                 <option value="{{ val }}" {% if data.country == val or val == 'NL' and not data.country %}selected{% endif %}>{{ label }}</option>
@@ -108,16 +109,16 @@
                     </div>
 
                     <div class="sector-field">
-                        <label for="company_size">Bedrijfsgrootte *</label>
+                        <label for="company_size">{% trans "Company size *" %}</label>
                         <select id="company_size" name="company_size" required>
-                            <option value="SMALL" {% if data.company_size == 'SMALL' %}selected{% endif %}>Klein: 10 tot 49 medewerkers</option>
-                            <option value="MEDIUM" {% if data.company_size == 'MEDIUM' or not data.company_size %}selected{% endif %}>Middel: 50 tot 249 medewerkers</option>
-                            <option value="LARGE" {% if data.company_size == 'LARGE' %}selected{% endif %}>Groot: 250 of meer medewerkers</option>
+                            <option value="SMALL" {% if data.company_size == 'SMALL' %}selected{% endif %}>{% trans "Small: 10 to 49 employees" %}</option>
+                            <option value="MEDIUM" {% if data.company_size == 'MEDIUM' or not data.company_size %}selected{% endif %}>{% trans "Medium: 50 to 249 employees" %}</option>
+                            <option value="LARGE" {% if data.company_size == 'LARGE' %}selected{% endif %}>{% trans "Large: 250 or more employees" %}</option>
                         </select>
                     </div>
 
                     <div class="sector-field">
-                        <label id="entity-type-label">Entiteitstype *</label>
+                        <label id="entity-type-label">{% trans "Entity type *" %}</label>
                         <div class="sector-entity-cards" role="radiogroup" aria-labelledby="entity-type-label">
                             <div class="sector-entity-card"
                                 :class="entityType === 'ESSENTIAL' ? 'is-selected' : ''"
@@ -129,9 +130,9 @@
                                 :aria-checked="entityType === 'ESSENTIAL'">
                                 <input type="radio" name="entity_type" value="ESSENTIAL"
                                     :checked="entityType === 'ESSENTIAL'" class="sr-only">
-                                <h4>🔴 Essentiële Entiteit</h4>
-                                <p>Grote organisaties in kritieke sectoren. Hogere eisen, strikter toezicht.</p>
-                                <span class="sector-fine sector-fine--essential">Max. €10M of 2% omzet</span>
+                                <h4>🔴 {% trans "Essential Entity" %}</h4>
+                                <p>{% trans "Large organisations in critical sectors. Higher requirements, stricter supervision." %}</p>
+                                <span class="sector-fine sector-fine--essential">{% trans "Max. €10M or 2% turnover" %}</span>
                             </div>
                             <div class="sector-entity-card"
                                 :class="entityType === 'IMPORTANT' ? 'is-selected' : ''"
@@ -143,28 +144,28 @@
                                 :aria-checked="entityType === 'IMPORTANT'">
                                 <input type="radio" name="entity_type" value="IMPORTANT"
                                     :checked="entityType === 'IMPORTANT'" class="sr-only">
-                                <h4>🟡 Belangrijke Entiteit</h4>
-                                <p>Middelgrote organisaties. Ex-post toezicht met zelfrapportage.</p>
-                                <span class="sector-fine sector-fine--important">Max. €7M of 1.4% omzet</span>
+                                <h4>🟡 {% trans "Important Entity" %}</h4>
+                                <p>{% trans "Medium-sized organisations. Ex-post supervision with self-reporting." %}</p>
+                                <span class="sector-fine sector-fine--important">{% trans "Max. €7M or 1.4% turnover" %}</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="sector-field">
-                        <label for="email">E-mailadres (optioneel)</label>
+                        <label for="email">{% trans "Email address (optional)" %}</label>
                         <input type="email" id="email" name="email"
-                            placeholder="voor een gratis consultatie"
+                            placeholder="{% trans 'for a free consultation' %}"
                             value="{{ data.email|default:'' }}">
                     </div>
 
                     <button type="submit" class="sector-submit" :disabled="generating">
                         <template x-if="!generating">
-                            <span>🚀 Rapport Genereren &amp; Downloaden</span>
+                            <span>🚀 {% trans "Generate & Download Report" %}</span>
                         </template>
                         <template x-if="generating">
                             <span class="sector-submit-loading">
                                 <span class="sector-spinner" aria-hidden="true"></span>
-                                Claude AI is aan het analyseren…
+                                {% trans "Claude AI is analysing…" %}
                             </span>
                         </template>
                     </button>
@@ -175,54 +176,54 @@
         <div class="sector-trust">
             <div class="sector-trust-item">
                 <div class="sector-trust-icon" aria-hidden="true">🔒</div>
-                <span>Uw gegevens worden niet opgeslagen</span>
+                <span>{% trans "Your data is not stored" %}</span>
             </div>
             <div class="sector-trust-item">
                 <div class="sector-trust-icon" aria-hidden="true">🤖</div>
-                <span>Claude Sonnet AI analyse</span>
+                <span>{% trans "Claude Sonnet AI analysis" %}</span>
             </div>
             <div class="sector-trust-item">
                 <div class="sector-trust-icon" aria-hidden="true">📋</div>
-                <span>Gebaseerd op officiële NIS2 (EU) 2022/2555</span>
+                <span>{% trans "Based on official NIS2 (EU) 2022/2555" %}</span>
             </div>
             <div class="sector-trust-item">
                 <div class="sector-trust-icon" aria-hidden="true">⚡</div>
-                <span>Rapport in 30-60 seconden gereed</span>
+                <span>{% trans "Report ready in 30–60 seconds" %}</span>
             </div>
         </div>
 
         <section class="sector-inside" aria-labelledby="inside-heading">
-            <h2 id="inside-heading">Wat staat er in uw rapport?</h2>
+            <h2 id="inside-heading">{% trans "What's in your report?" %}</h2>
             <div class="sector-inside-grid">
                 <article class="sector-inside-card">
                     <div class="sector-inside-icon" aria-hidden="true">🏛️</div>
-                    <h3 class="sector-inside-title">Entiteitsclassificatie</h3>
-                    <p class="sector-inside-desc">Bepaal of u een Essentiële of Belangrijke Entiteit bent onder Artikel 3.</p>
+                    <h3 class="sector-inside-title">{% trans "Entity classification" %}</h3>
+                    <p class="sector-inside-desc">{% trans "Determine whether you are an Essential or Important Entity under Article 3." %}</p>
                 </article>
                 <article class="sector-inside-card">
                     <div class="sector-inside-icon" aria-hidden="true">📋</div>
-                    <h3 class="sector-inside-title">10 Verplichte Maatregelen</h3>
-                    <p class="sector-inside-desc">Alle beveiligingseisen van Artikel 21 uitgelegd per sector.</p>
+                    <h3 class="sector-inside-title">{% trans "10 Mandatory Measures" %}</h3>
+                    <p class="sector-inside-desc">{% trans "All security requirements from Article 21 explained per sector." %}</p>
                 </article>
                 <article class="sector-inside-card">
                     <div class="sector-inside-icon" aria-hidden="true">🚨</div>
-                    <h3 class="sector-inside-title">Incidentmeldingsvereisten</h3>
-                    <p class="sector-inside-desc">24u-vroege waarschuwing, 72u-melding en maandrapportage.</p>
+                    <h3 class="sector-inside-title">{% trans "Incident reporting requirements" %}</h3>
+                    <p class="sector-inside-desc">{% trans "24-hour early warning, 72-hour notification, and monthly reporting." %}</p>
                 </article>
                 <article class="sector-inside-card">
                     <div class="sector-inside-icon" aria-hidden="true">💰</div>
-                    <h3 class="sector-inside-title">Boeteberekening</h3>
-                    <p class="sector-inside-desc">Maximale boetes voor uw entiteitstype en persoonlijke aansprakelijkheid.</p>
+                    <h3 class="sector-inside-title">{% trans "Fine calculation" %}</h3>
+                    <p class="sector-inside-desc">{% trans "Maximum fines for your entity type and personal liability." %}</p>
                 </article>
                 <article class="sector-inside-card">
                     <div class="sector-inside-icon" aria-hidden="true">🔗</div>
-                    <h3 class="sector-inside-title">Supply Chain Vereisten</h3>
-                    <p class="sector-inside-desc">Leveranciersbeveiligingsvereisten specifiek voor uw sector.</p>
+                    <h3 class="sector-inside-title">{% trans "Supply chain requirements" %}</h3>
+                    <p class="sector-inside-desc">{% trans "Supplier security requirements specific to your sector." %}</p>
                 </article>
                 <article class="sector-inside-card">
                     <div class="sector-inside-icon" aria-hidden="true">📍</div>
-                    <h3 class="sector-inside-title">Actieplan</h3>
-                    <p class="sector-inside-desc">Geprioriteerde aanbevelingen voor directe compliance-verbeteringen.</p>
+                    <h3 class="sector-inside-title">{% trans "Action plan" %}</h3>
+                    <p class="sector-inside-desc">{% trans "Prioritised recommendations for immediate compliance improvements." %}</p>
                 </article>
             </div>
         </section>
@@ -230,8 +231,8 @@
     </main>
 
     <footer class="sector-footer">
-        <p>© 2026 NIS2 Analyzer, Compliance Platform</p>
-        <p>Dit rapport is informatief en vervangt geen juridisch advies. Gebaseerd op NIS2 Richtlijn (EU) 2022/2555.</p>
+        <p>© 2026 NIS2 Analyzer, {% trans "Compliance Platform" %}</p>
+        <p>{% trans "This report is informational and does not replace legal advice. Based on NIS2 Directive (EU) 2022/2555." %}</p>
     </footer>
 
 </div>

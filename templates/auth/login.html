@@ -1,11 +1,12 @@
 {% load static %}
 {% load django_htmx %}
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Log in — NIS2 Analyzer</title>
+  <title>{% trans "Log in" %} — NIS2 Analyzer</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'marketing/css/base.css' %}">
   <link rel="stylesheet" href="{% static 'auth/css/auth.css' %}">
@@ -14,18 +15,18 @@
   <div class="auth-page">
     <div class="auth-panel">
       <a href="{% url 'home' %}" class="auth-brand"><span class="glyph"></span> NIS2 Analyzer</a>
-      <h1 class="auth-h1">Welcome back</h1>
-      <p class="auth-sub">Log in to your compliance workspace.</p>
+      <h1 class="auth-h1">{% trans "Welcome back" %}</h1>
+      <p class="auth-sub">{% trans "Log in to your compliance workspace." %}</p>
 
-      {% include "auth/_login_form.html" %}
+      {% include "auth/_login_panel.html" %}
     </div>
 
     <aside class="auth-aside">
-      <p class="auth-quote">“One surface for your whole compliance posture.”</p>
+      <p class="auth-quote">"{% trans "One surface for your whole compliance posture." %}"</p>
       <ul class="auth-points">
-        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Live view of your NIS2 obligations</li>
-        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Audit-ready evidence, always current</li>
-        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Your data stays in your building</li>
+        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> {% trans "Live view of your NIS2 obligations" %}</li>
+        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> {% trans "Audit-ready evidence, always current" %}</li>
+        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> {% trans "Your data stays in your building" %}</li>
       </ul>
     </aside>
   </div>

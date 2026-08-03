@@ -52,6 +52,46 @@
 .auth-alt a,.auth-consent a{color:var(--amber);text-decoration:none}
 .auth-alt a:hover{text-decoration:underline}
 
+/* OAuth panel — Google first, then "or", then email form */
+.auth-oauth-panel{display:flex;flex-direction:column;gap:0;width:100%}
+
+/* OAuth divider + Google button (Google brand G colors stay on SVG paths) */
+.auth-oauth-divider{display:flex;align-items:center;gap:12px;margin:1.25rem 0}
+.auth-oauth-divider::before,.auth-oauth-divider::after{content:"";flex:1;height:1px;background:var(--line)}
+.auth-oauth-divider span{font-size:0.875rem;color:var(--muted);white-space:nowrap}
+
+.auth-page{
+  --auth-google-btn-bg:oklch(0.99 0 0);
+  --auth-google-btn-hover:oklch(0.96 0.004 265);
+  --auth-google-btn-border:oklch(0.82 0.008 265);
+  --auth-google-btn-fg:oklch(0.28 0.015 265);
+}
+
+.auth-google-btn{
+  display:flex;align-items:center;justify-content:center;gap:12px;width:100%;
+  padding:0.625rem 1rem;font-family:inherit;font-size:0.875rem;font-weight:500;
+  background:var(--auth-google-btn-bg);border:1px solid var(--auth-google-btn-border);
+  border-radius:10px;color:var(--auth-google-btn-fg);text-decoration:none;cursor:pointer;
+  transition:border-color .2s,background .2s;
+}
+.auth-google-btn:hover{background:var(--auth-google-btn-hover);border-color:oklch(0.76 0.01 265)}
+.auth-google-btn:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.auth-google-btn--disabled{
+  opacity:.88;cursor:not-allowed;
+}
+.auth-google-btn--disabled:hover{
+  background:var(--auth-google-btn-bg);border-color:var(--auth-google-btn-border);
+}
+.auth-google-icon{
+  width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;
+  display:block;
+}
+.auth-google-label{line-height:1.2}
+
+.auth-google-setup-hint{
+  font-size:11.5px;color:var(--muted);line-height:1.45;margin:8px 0 0;text-align:center;
+}
+
 /* ---- dedicated auth PAGE layout ---- */
 .auth-page{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;background:var(--bg)}
 @media(max-width:860px){.auth-page{grid-template-columns:1fr}}

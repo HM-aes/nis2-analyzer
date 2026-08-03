@@ -123,7 +123,7 @@ class Task2NewAuditViewTest(TestCase):
     def test_get_renders_form(self):
         resp = self.tc.get(reverse('dashboard:audit_new'))
         self.assertEqual(resp.status_code, 200)
-        self.assertContains(resp, 'Nieuwe Audit')
+        self.assertContains(resp, 'New Audit')
 
     def test_get_preselects_client_from_query_param(self):
         resp = self.tc.get(
@@ -253,13 +253,13 @@ class Task4AuditTransitionTest(TestCase):
     def test_transition_buttons_in_review_template(self):
         audit = make_audit(self.client_obj, status='REVIEW')
         resp = self.tc.get(reverse('dashboard:audit_detail', kwargs={'pk': audit.pk}))
-        self.assertContains(resp, 'Analyse Goedkeuren')
-        self.assertContains(resp, 'Opnieuw Starten')
+        self.assertContains(resp, 'Approve Analysis')
+        self.assertContains(resp, 'Restart')
 
     def test_transition_buttons_in_complete_template(self):
         audit = make_audit(self.client_obj, status='COMPLETE')
         resp = self.tc.get(reverse('dashboard:audit_detail', kwargs={'pk': audit.pk}))
-        self.assertContains(resp, 'Rapport Geleverd')
+        self.assertContains(resp, 'Report Delivered')
 
 
 # ─── Task 5: Gap Mark-as-Addressed ─────────────────────────────────────────────
@@ -289,7 +289,7 @@ class Task5GapAddressViewTest(TestCase):
             {'implementation_notes': 'Done'},
         )
         self.assertEqual(resp.status_code, 200)
-        self.assertContains(resp, 'Opgelost')
+        self.assertContains(resp, 'Resolved')
 
     def test_gap_address_url_exists(self):
         url = reverse('dashboard:gap_address', kwargs={'pk': self.gap.pk})
@@ -299,7 +299,7 @@ class Task5GapAddressViewTest(TestCase):
         resp = self.tc.get(reverse('dashboard:audit_detail', kwargs={'pk': self.audit.pk}))
         # The HTMX form posts to /dashboard/gaps/<pk>/address/
         self.assertContains(resp, '/address/')
-        self.assertContains(resp, 'Markeer als Opgelost')
+        self.assertContains(resp, 'Mark as Resolved')
 
 
 # ─── Task 6: Document Delete / Reprocess ───────────────────────────────────────
@@ -340,7 +340,7 @@ class Task6DocumentViewsTest(TestCase):
 
     def test_document_tab_rendered_in_audit_detail(self):
         resp = self.tc.get(reverse('dashboard:audit_detail', kwargs={'pk': self.audit.pk}))
-        self.assertContains(resp, 'Documenten')
+        self.assertContains(resp, 'Documents')
 
     def test_document_delete_url_exists(self):
         doc = self._make_doc()
@@ -380,7 +380,7 @@ class Task7TimelineTest(TestCase):
     def test_timeline_tab_renders_in_template(self):
         resp = self.tc.get(reverse('dashboard:audit_detail', kwargs={'pk': self.audit.pk}))
         self.assertContains(resp, 'Timeline')
-        self.assertContains(resp, 'Audit Tijdlijn')
+        self.assertContains(resp, 'Audit Timeline')
 
 
 # ─── Task 8–12: Report Generator App ──────────────────────────────────────────
@@ -496,7 +496,7 @@ class Task14ToastSystemTest(TestCase):
             'city': 'Utrecht',
             'postal_code': '3512 AB',
         }, follow=True)
-        self.assertContains(resp, 'aangemaakt')
+        self.assertContains(resp, 'created')
 
 
 # ─── Task 15: Loading States ────────────────────────────────────────────────────
@@ -526,7 +526,7 @@ class Task15LoadingStatesTest(TestCase):
     def test_audit_new_submit_has_loading_state(self):
         resp = self.tc.get(reverse('dashboard:audit_new'))
         self.assertContains(resp, 'running')
-        self.assertContains(resp, 'Aanmaken...')
+        self.assertContains(resp, 'Creating')
 
 
 # ─── Task 16: Empty State CTAs ─────────────────────────────────────────────────
@@ -539,22 +539,22 @@ class Task16EmptyStatesTest(TestCase):
 
     def test_dashboard_has_onboarding_cta_when_no_clients(self):
         resp = self.tc.get(reverse('dashboard:home'))
-        self.assertContains(resp, 'Welkom bij NIS2 Analyzer')
-        self.assertContains(resp, 'Eerste Klant Toevoegen')
+        self.assertContains(resp, 'Welcome to NIS2 Analyzer')
+        self.assertContains(resp, 'Add First Client')
 
     def test_clients_has_empty_state(self):
         resp = self.tc.get(reverse('dashboard:clients'))
-        self.assertContains(resp, 'Voeg uw eerste klant')
+        self.assertContains(resp, 'Add your first client')
 
     def test_audits_has_empty_state(self):
         resp = self.tc.get(reverse('dashboard:audits'))
-        self.assertContains(resp, 'Nog geen audits')
-        self.assertContains(resp, 'Eerste Audit Aanmaken')
+        self.assertContains(resp, 'No audits yet')
+        self.assertContains(resp, 'Create First Audit')
 
     def test_gaps_has_empty_state(self):
         resp = self.tc.get(reverse('dashboard:gaps'))
-        self.assertContains(resp, 'Nog geen gaps gevonden')
-        self.assertContains(resp, 'Nieuwe Audit Starten')
+        self.assertContains(resp, 'No gaps found yet')
+        self.assertContains(resp, 'Start New Audit')
 
 
 # ─── Task 17: report_generated Pipeline Hook ───────────────────────────────────
@@ -573,12 +573,12 @@ class Task17ReportGeneratedTest(TestCase):
         resp = self.tc.get(reverse('dashboard:audit_detail', kwargs={'pk': audit.pk}))
         # The download button links to /reports/audit/<pk>/download/
         self.assertContains(resp, '/reports/audit/')
-        self.assertContains(resp, 'Rapport Downloaden')
+        self.assertContains(resp, 'Download Report')
 
     def test_download_button_absent_with_no_gaps(self):
         audit = make_audit(self.client_obj, status='INTAKE')
         resp = self.tc.get(reverse('dashboard:audit_detail', kwargs={'pk': audit.pk}))
-        self.assertNotContains(resp, 'Rapport Downloaden')
+        self.assertNotContains(resp, 'Download Report')
 
     def test_gap_report_redirects_when_no_gaps(self):
         audit = make_audit(self.client_obj, status='COMPLETE')
@@ -586,7 +586,7 @@ class Task17ReportGeneratedTest(TestCase):
             reverse('report_generator:gap_report_download', kwargs={'pk': audit.pk}),
             follow=True,
         )
-        self.assertContains(resp, 'Geen gaps')
+        self.assertContains(resp, 'No gaps')
 
 
 # ─── Task 18: Sidebar Navigation ───────────────────────────────────────────────
@@ -599,7 +599,7 @@ class Task18SidebarNavTest(TestCase):
 
     def test_sidebar_has_rapporten_section(self):
         resp = self.tc.get(reverse('dashboard:home'))
-        self.assertContains(resp, 'Rapporten')
+        self.assertContains(resp, 'Reports')
 
     def test_sidebar_has_sector_report_link(self):
         resp = self.tc.get(reverse('dashboard:home'))
@@ -611,7 +611,7 @@ class Task18SidebarNavTest(TestCase):
 
     def test_sector_report_link_in_sidebar_text(self):
         resp = self.tc.get(reverse('dashboard:home'))
-        self.assertContains(resp, 'Sector Rapport')
+        self.assertContains(resp, 'Sector Report')
 
 
 # ─── URL Routing Smoke Tests ────────────────────────────────────────────────────

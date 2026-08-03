@@ -6,6 +6,7 @@ Database models for tracking clients, audits, gaps, and documents
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
+from django.utils.translation import gettext_lazy as _
 import uuid
 
 
@@ -14,38 +15,38 @@ class Client(models.Model):
     Dutch IT companies requiring NIS2 compliance
     """
     SECTOR_CHOICES = [
-        ('MSP', 'Managed Service Provider'),
-        ('HOSTING', 'Hosting Provider'),
-        ('CLOUD', 'Cloud Service Provider'),
-        ('TRANSPORT', 'Digital Transport'),
-        ('ENERGY', 'Energy Sector'),
-        ('HEALTHCARE', 'Healthcare IT'),
-        ('FINANCE', 'Financial Services'),
-        ('TELECOM', 'Telecommunications'),
-        ('OTHER', 'Other Essential Service'),
+        ('MSP', _('Managed Service Provider')),
+        ('HOSTING', _('Hosting Provider')),
+        ('CLOUD', _('Cloud Service Provider')),
+        ('TRANSPORT', _('Digital Transport')),
+        ('ENERGY', _('Energy Sector')),
+        ('HEALTHCARE', _('Healthcare IT')),
+        ('FINANCE', _('Financial Services')),
+        ('TELECOM', _('Telecommunications')),
+        ('OTHER', _('Other Essential Service')),
     ]
 
     COMPANY_SIZE_CHOICES = [
-        ('SMALL', '10-49 employees'),
-        ('MEDIUM', '50-249 employees'),
-        ('LARGE', '250+ employees'),
+        ('SMALL', _('10-49 employees')),
+        ('MEDIUM', _('50-249 employees')),
+        ('LARGE', _('250+ employees')),
     ]
 
     COUNTRY_CHOICES = [
-        ('NL', 'Netherlands'),
-        ('DE', 'Germany'),
-        ('BE', 'Belgium'),
-        ('FR', 'France'),
-        ('ES', 'Spain'),
-        ('IT', 'Italy'),
-        ('PL', 'Poland'),
-        ('SE', 'Sweden'),
-        ('DK', 'Denmark'),
-        ('FI', 'Finland'),
-        ('AT', 'Austria'),
-        ('IE', 'Ireland'),
-        ('GB', 'United Kingdom'),
-        ('OTHER', 'Other EU'),
+        ('NL', _('Netherlands')),
+        ('DE', _('Germany')),
+        ('BE', _('Belgium')),
+        ('FR', _('France')),
+        ('ES', _('Spain')),
+        ('IT', _('Italy')),
+        ('PL', _('Poland')),
+        ('SE', _('Sweden')),
+        ('DK', _('Denmark')),
+        ('FI', _('Finland')),
+        ('AT', _('Austria')),
+        ('IE', _('Ireland')),
+        ('GB', _('United Kingdom')),
+        ('OTHER', _('Other EU')),
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -74,8 +75,8 @@ class Client(models.Model):
     
     class Meta:
         ordering = ['company_name']
-        verbose_name = 'Client'
-        verbose_name_plural = 'Clients'
+        verbose_name = _('Client')
+        verbose_name_plural = _('Clients')
     
     def __str__(self):
         return f"{self.company_name} ({self.kvk_number})"
@@ -87,18 +88,18 @@ class ComplianceAudit(models.Model):
     Tracks the overall audit process and results
     """
     STATUS_CHOICES = [
-        ('INTAKE', 'Document Intake'),
-        ('PROCESSING', 'AI Processing'),
-        ('ANALYSIS', 'Gap Analysis'),
-        ('REVIEW', 'Human Review'),
-        ('COMPLETE', 'Completed'),
-        ('DELIVERED', 'Delivered to Client'),
+        ('INTAKE', _('Document Intake')),
+        ('PROCESSING', _('AI Processing')),
+        ('ANALYSIS', _('Gap Analysis')),
+        ('REVIEW', _('Human Review')),
+        ('COMPLETE', _('Completed')),
+        ('DELIVERED', _('Delivered to Client')),
     ]
-    
+
     TIER_CHOICES = [
-        ('T1', 'Tier 1 - Gap Analysis (€950)'),
-        ('T2', 'Tier 2 - Implementation Docs (€2,500)'),
-        ('T3', 'Tier 3 - Full Package (€5,000)'),
+        ('T1', _('Tier 1 - Gap Analysis (€950)')),
+        ('T2', _('Tier 2 - Implementation Docs (€2,500)')),
+        ('T3', _('Tier 3 - Full Package (€5,000)')),
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -139,8 +140,8 @@ class ComplianceAudit(models.Model):
     
     class Meta:
         ordering = ['-created_at']
-        verbose_name = 'Compliance Audit'
-        verbose_name_plural = 'Compliance Audits'
+        verbose_name = _('Compliance Audit')
+        verbose_name_plural = _('Compliance Audits')
     
     def __str__(self):
         return f"{self.client.company_name} - {self.get_tier_display()} ({self.status})"
@@ -158,23 +159,23 @@ class ComplianceGap(models.Model):
     Individual NIS2 compliance gaps identified during audit
     """
     SEVERITY_CHOICES = [
-        ('CRITICAL', 'Critical - Immediate Action Required'),
-        ('HIGH', 'High - Must Address Before Certification'),
-        ('MEDIUM', 'Medium - Should Address'),
-        ('LOW', 'Low - Nice to Have'),
+        ('CRITICAL', _('Critical - Immediate Action Required')),
+        ('HIGH', _('High - Must Address Before Certification')),
+        ('MEDIUM', _('Medium - Should Address')),
+        ('LOW', _('Low - Nice to Have')),
     ]
-    
+
     CATEGORY_CHOICES = [
-        ('TECHNICAL', 'Technical Controls'),
-        ('ORGANIZATIONAL', 'Organizational Measures'),
-        ('INCIDENT_RESPONSE', 'Incident Response'),
-        ('SUPPLY_CHAIN', 'Supply Chain Security'),
-        ('ENCRYPTION', 'Encryption & Cryptography'),
-        ('ACCESS_CONTROL', 'Access Control'),
-        ('LOGGING', 'Logging & Monitoring'),
-        ('TRAINING', 'Security Awareness Training'),
-        ('GOVERNANCE', 'Governance & Risk Management'),
-        ('OTHER', 'Other'),
+        ('TECHNICAL', _('Technical Controls')),
+        ('ORGANIZATIONAL', _('Organizational Measures')),
+        ('INCIDENT_RESPONSE', _('Incident Response')),
+        ('SUPPLY_CHAIN', _('Supply Chain Security')),
+        ('ENCRYPTION', _('Encryption & Cryptography')),
+        ('ACCESS_CONTROL', _('Access Control')),
+        ('LOGGING', _('Logging & Monitoring')),
+        ('TRAINING', _('Security Awareness Training')),
+        ('GOVERNANCE', _('Governance & Risk Management')),
+        ('OTHER', _('Other')),
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -214,8 +215,8 @@ class ComplianceGap(models.Model):
     
     class Meta:
         ordering = ['-severity', '-risk_score', 'category']
-        verbose_name = 'Compliance Gap'
-        verbose_name_plural = 'Compliance Gaps'
+        verbose_name = _('Compliance Gap')
+        verbose_name_plural = _('Compliance Gaps')
     
     def __str__(self):
         return f"{self.get_severity_display()} - {self.title}"
@@ -226,15 +227,15 @@ class ClientDocument(models.Model):
     Documents uploaded by clients for audit analysis
     """
     DOCUMENT_TYPE_CHOICES = [
-        ('POLICY', 'Security Policy'),
-        ('PROCEDURE', 'Security Procedure'),
-        ('NETWORK_DIAGRAM', 'Network Diagram'),
-        ('INCIDENT_PLAN', 'Incident Response Plan'),
-        ('BCP', 'Business Continuity Plan'),
-        ('RISK_ASSESSMENT', 'Risk Assessment'),
-        ('AUDIT_REPORT', 'Previous Audit Report'),
-        ('CERTIFICATE', 'Security Certificate'),
-        ('OTHER', 'Other Document'),
+        ('POLICY', _('Security Policy')),
+        ('PROCEDURE', _('Security Procedure')),
+        ('NETWORK_DIAGRAM', _('Network Diagram')),
+        ('INCIDENT_PLAN', _('Incident Response Plan')),
+        ('BCP', _('Business Continuity Plan')),
+        ('RISK_ASSESSMENT', _('Risk Assessment')),
+        ('AUDIT_REPORT', _('Previous Audit Report')),
+        ('CERTIFICATE', _('Security Certificate')),
+        ('OTHER', _('Other Document')),
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -272,8 +273,8 @@ class ClientDocument(models.Model):
     
     class Meta:
         ordering = ['-uploaded_at']
-        verbose_name = 'Client Document'
-        verbose_name_plural = 'Client Documents'
+        verbose_name = _('Client Document')
+        verbose_name_plural = _('Client Documents')
     
     def __str__(self):
         return f"{self.original_filename} ({self.get_document_type_display()})"
@@ -285,12 +286,12 @@ class KnowledgeDocument(models.Model):
     Tracks which documents have been ingested into the RAG system
     """
     SOURCE_CHOICES = [
-        ('NIS2_DIRECTIVE', 'NIS2 Directive (Official)'),
-        ('CYBERBEVEILIGINGSWET', 'Dutch Cyberbeveiligingswet'),
-        ('NCSC_FACTSHEET', 'NCSC-NL Factsheet'),
-        ('ISO_27001', 'ISO 27001 Mapping'),
-        ('ENISA_GUIDELINE', 'ENISA Guideline'),
-        ('INTERNAL', 'Internal Knowledge'),
+        ('NIS2_DIRECTIVE', _('NIS2 Directive (Official)')),
+        ('CYBERBEVEILIGINGSWET', _('Dutch Cyberbeveiligingswet')),
+        ('NCSC_FACTSHEET', _('NCSC-NL Factsheet')),
+        ('ISO_27001', _('ISO 27001 Mapping')),
+        ('ENISA_GUIDELINE', _('ENISA Guideline')),
+        ('INTERNAL', _('Internal Knowledge')),
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -298,7 +299,7 @@ class KnowledgeDocument(models.Model):
     # Document Information
     title = models.CharField(max_length=300)
     source = models.CharField(max_length=30, choices=SOURCE_CHOICES)
-    language = models.CharField(max_length=2, choices=[('en', 'English'), ('nl', 'Dutch')])
+    language = models.CharField(max_length=2, choices=[('en', _('English')), ('nl', _('Dutch'))])
     url = models.URLField(blank=True, help_text="Source URL if available")
     file = models.FileField(upload_to='knowledge_base/', null=True, blank=True)
     
@@ -324,8 +325,8 @@ class KnowledgeDocument(models.Model):
     
     class Meta:
         ordering = ['-authority_level', 'source', 'title']
-        verbose_name = 'Knowledge Document'
-        verbose_name_plural = 'Knowledge Documents'
+        verbose_name = _('Knowledge Document')
+        verbose_name_plural = _('Knowledge Documents')
     
     def __str__(self):
         return f"{self.title} ({self.get_source_display()})"

@@ -11,6 +11,7 @@ whitenoise
 # Django REST Framework
 djangorestframework
 django-htmx
+django-allauth>=65.0
 
 # Vector Database + Embeddings
 qdrant-client[fastembed]

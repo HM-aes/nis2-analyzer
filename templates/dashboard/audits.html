@@ -1,6 +1,7 @@
 {% extends "dashboard/base.html" %}
-{% block title %}Audits — NIS2{% endblock %}
-{% block page_title %}Audits{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "Audits" %} — NIS2{% endblock %}
+{% block page_title %}{% trans "Audits" %}{% endblock %}
 
 {% block content %}
 <div class="flex items-center justify-between mb-5">
@@ -8,7 +9,7 @@
         <div class="flex flex-wrap items-center gap-3">
             <div class="pill-filter">
                 <a href="{% url 'dashboard:audits' %}" class="pill {% if not current_status %}active{% endif %}"
-                    hx-get="{% url 'dashboard:htmx_audit_rows' %}" hx-target="#audit-tbody" hx-push-url="true">Alle</a>
+                    hx-get="{% url 'dashboard:htmx_audit_rows' %}" hx-target="#audit-tbody" hx-push-url="true">{% trans "All" %}</a>
                 {% for val, label in status_choices %}
                 <a href="{% url 'dashboard:audits' %}?status={{ val }}"
                     class="pill {% if current_status == val %}active{% endif %}"
@@ -20,7 +21,7 @@
                 <div class="pill-filter">
                     <a class="pill {% if not current_tier %}active{% endif %}"
                         hx-get="{% url 'dashboard:htmx_audit_rows' %}?status={{ current_status }}"
-                        hx-target="#audit-tbody">Alle tiers</a>
+                        hx-target="#audit-tbody">{% trans "All tiers" %}</a>
                     {% for val, label in tier_choices %}
                     <a class="pill {% if current_tier == val %}active{% endif %}"
                         hx-get="{% url 'dashboard:htmx_audit_rows' %}?status={{ current_status }}&tier={{ val }}"
@@ -34,7 +35,7 @@
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
-        Nieuwe Audit
+        {% trans "New Audit" %}
     </a>
 </div>
 
@@ -42,18 +43,17 @@
 <div class="card" style="text-align:center; padding:4rem 2rem;">
     <div style="font-size:4rem; margin-bottom:1rem;">📋</div>
     <h3 style="font-size:1.25rem; font-weight:700; color:var(--foreground); margin-bottom:0.5rem;">
-        Nog geen audits
+        {% trans "No audits yet" %}
     </h3>
     <p style="color:var(--muted-foreground); margin-bottom:1.5rem; max-width:400px; margin-left:auto; margin-right:auto;">
-        Maak uw eerste NIS2 compliance audit aan. Selecteer een klant,
-        kies het tier en upload de beleidsdocumenten om de AI-analyse te starten.
+        {% trans "Create your first NIS2 compliance audit. Select a client, choose the tier, and upload policy documents to start the AI analysis." %}
     </p>
     <div style="display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap;">
         <a href="{% url 'dashboard:audit_new' %}" class="btn btn-primary" style="display:inline-flex;">
-            + Eerste Audit Aanmaken
+            {% trans "+ Create First Audit" %}
         </a>
         <a href="{% url 'dashboard:clients' %}" class="btn btn-secondary" style="display:inline-flex;">
-            Naar Klanten
+            {% trans "Go to Clients" %}
         </a>
     </div>
 </div>
@@ -62,15 +62,15 @@
     <table class="data-table">
         <thead>
             <tr>
-                <th>Klant</th>
-                <th>Tier</th>
-                <th>Status</th>
-                <th>Score</th>
-                <th>Gaps</th>
-                <th>Docs</th>
-                <th>Aangemaakt</th>
-                <th>Doorlooptijd</th>
-                <th>Betaald</th>
+                <th>{% trans "Client" %}</th>
+                <th>{% trans "Tier" %}</th>
+                <th>{% trans "Status" %}</th>
+                <th>{% trans "Score" %}</th>
+                <th>{% trans "Gaps" %}</th>
+                <th>{% trans "Docs" %}</th>
+                <th>{% trans "Created" %}</th>
+                <th>{% trans "Duration" %}</th>
+                <th>{% trans "Paid" %}</th>
                 <th></th>
             </tr>
         </thead>

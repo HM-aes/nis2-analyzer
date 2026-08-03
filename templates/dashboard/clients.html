@@ -1,44 +1,52 @@
 {% extends "dashboard/base.html" %}
-{% block title %}Klanten — NIS2{% endblock %}
-{% block page_title %}Klanten{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "Clients" %} — NIS2{% endblock %}
+{% block page_title %}{% trans "Clients" %}{% endblock %}
 
 {% block content %}
 <div class="flex items-center justify-between mb-5">
-    <div class="flex items-center gap-3">
-        <!-- HTMX live search -->
-        <div class="search-wrap">
-            <svg class="search-icon w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div class="filter-bar" x-data="{ sector: '', size: '' }">
+        <div class="search-wrap search-wrap--filter">
+            <svg class="search-icon w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
             </svg>
-            <input type="text" name="q" placeholder="Zoek klant, KVK..." class="form-input search-input text-sm w-64"
+            <input type="text" name="q" placeholder="{% trans 'Search client, KVK…' %}" class="search-input search-input--embedded text-sm"
                 hx-get="{% url 'dashboard:htmx_client_search' %}" hx-trigger="keyup changed delay:300ms"
                 hx-target="#client-table-body" hx-include="#filter-sector,#filter-size">
         </div>
-        <!-- Sector filter -->
-        <select id="filter-sector" name="sector" class="form-select text-sm w-40"
-            hx-get="{% url 'dashboard:htmx_client_search' %}" hx-trigger="change" hx-target="#client-table-body"
-            hx-include="[name='q'],#filter-size">
-            <option value="">Alle sectoren</option>
-            {% for val, label in sectors %}
-            <option value="{{ val }}">{{ label }}</option>
-            {% endfor %}
-        </select>
-        <!-- Size filter -->
-        <select id="filter-size" name="size" class="form-select text-sm w-36"
-            hx-get="{% url 'dashboard:htmx_client_search' %}" hx-trigger="change" hx-target="#client-table-body"
-            hx-include="[name='q'],#filter-sector">
-            <option value="">Alle groottes</option>
-            {% for val, label in sizes %}
-            <option value="{{ val }}">{{ label }}</option>
-            {% endfor %}
-        </select>
+        <div class="filter-select-wrap">
+            <select id="filter-sector" name="sector"
+                class="filter-control filter-select filter-control--warning"
+                :class="sector && 'filter-control--active'"
+                x-model="sector"
+                hx-get="{% url 'dashboard:htmx_client_search' %}" hx-trigger="change" hx-target="#client-table-body"
+                hx-include="[name='q'],#filter-size">
+                <option value="">{% trans "All sectors" %}</option>
+                {% for val, label in sectors %}
+                <option value="{{ val }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-select-wrap">
+            <select id="filter-size" name="size"
+                class="filter-control filter-select filter-control--default"
+                :class="size && 'filter-control--active'"
+                x-model="size"
+                hx-get="{% url 'dashboard:htmx_client_search' %}" hx-trigger="change" hx-target="#client-table-body"
+                hx-include="[name='q'],#filter-sector">
+                <option value="">{% trans "All sizes" %}</option>
+                {% for val, label in sizes %}
+                <option value="{{ val }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
     </div>
-    <a href="{% url 'dashboard:client_new' %}" class="btn btn-primary">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <a href="{% url 'dashboard:client_new' %}" class="btn btn-primary btn-pill btn-cta">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
-        Nieuwe Klant
+        {% trans "New Client" %}
     </a>
 </div>
 
@@ -46,14 +54,13 @@
 <div class="card" style="text-align:center; padding:4rem 2rem;">
     <div style="font-size:4rem; margin-bottom:1rem;">🛡️</div>
     <h3 style="font-size:1.25rem; font-weight:700; color:var(--foreground); margin-bottom:0.5rem;">
-        Nog geen klanten
+        {% trans "No clients yet" %}
     </h3>
     <p style="color:var(--muted-foreground); margin-bottom:1.5rem; max-width:400px; margin-left:auto; margin-right:auto;">
-        Voeg uw eerste klant toe om te beginnen met NIS2 compliance analyses.
-        U kunt daarna direct een audit aanmaken en documenten uploaden.
+        {% trans "Add your first client to start NIS2 compliance analyses. You can then create an audit and upload documents right away." %}
     </p>
     <a href="{% url 'dashboard:client_new' %}" class="btn btn-primary" style="display:inline-flex;">
-        + Eerste Klant Toevoegen
+        + {% trans "Add First Client" %}
     </a>
 </div>
 {% else %}
@@ -61,13 +68,13 @@
     <table class="data-table">
         <thead>
             <tr>
-                <th>Bedrijf</th>
-                <th>KVK</th>
-                <th>Sector</th>
-                <th>Grootte</th>
-                <th>Audits</th>
-                <th>Laatste Score</th>
-                <th>Contact</th>
+                <th>{% trans "Company" %}</th>
+                <th>{% trans "KVK" %}</th>
+                <th>{% trans "Sector" %}</th>
+                <th>{% trans "Size" %}</th>
+                <th>{% trans "Audits" %}</th>
+                <th>{% trans "Latest Score" %}</th>
+                <th>{% trans "Contact" %}</th>
                 <th></th>
             </tr>
         </thead>

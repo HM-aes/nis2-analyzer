@@ -1,11 +1,12 @@
 {# HTMX partial: single gap row after mark-as-addressed. Replaces the entire <tr> pair. #}
+{% load i18n %}
 <tr style="background:var(--secondary);">
     <td colspan="8" class="p-0">
         <div class="gap-detail">
             <div class="flex items-center gap-2 mb-2">
                 <span class="badge badge-{{ gap.severity|lower }}">{{ gap.get_severity_display }}</span>
                 <span class="font-medium text-sm" style="color:var(--foreground);">{{ gap.title }}</span>
-                <span class="text-green-600 font-medium text-sm ml-auto">✅ Opgelost op {{ gap.addressed_date|date:"d-m-Y" }}</span>
+                <span class="text-green-600 font-medium text-sm ml-auto">✅ {% blocktrans with date=gap.addressed_date|date:"d-m-Y" %}Resolved on {{ date }}{% endblocktrans %}</span>
             </div>
             {% if gap.implementation_notes %}
             <p class="text-sm" style="color:var(--muted-foreground);">{{ gap.implementation_notes }}</p>

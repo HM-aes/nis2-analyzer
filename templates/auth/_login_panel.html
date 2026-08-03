@@ -1,0 +1,11 @@
+{% load i18n %}
+
+<div class="auth-oauth-panel">
+  {% include "auth/_google_auth_button.html" %}
+
+  <div class="auth-oauth-divider" aria-hidden="true">
+    <span>{% trans "or" %}</span>
+  </div>
+
+  {% include "auth/_login_form.html" %}
+</div>

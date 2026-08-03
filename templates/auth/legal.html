@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,9 +14,9 @@
     <div class="auth-panel" style="max-width:640px;">
       <a href="{% url 'home' %}" class="auth-brand"><span class="glyph"></span> NIS2 Analyzer</a>
       <h1 class="auth-h1">{{ page_title }}</h1>
-      <p class="auth-sub">This page is being finalised. Contact support if you need a copy in the meantime.</p>
+      <p class="auth-sub">{% trans "This page is being finalised. Contact support if you need a copy in the meantime." %}</p>
       <p class="auth-alt" style="text-align:left;margin-top:24px;">
-        <a href="{% url 'signup' %}">Create an account</a> · <a href="{% url 'login' %}">Log in</a>
+        <a href="{% url 'signup' %}">{% trans "Create an account" %}</a> · <a href="{% url 'login' %}">{% trans "Log in" %}</a>
       </p>
     </div>
   </div>

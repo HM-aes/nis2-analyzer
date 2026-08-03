@@ -1,0 +1,326 @@
+/* ================================================================
+   Dashboard Pass 2 — light card system (main content only)
+   Requires static/css/tokens.css + static/css/dashboard.css
+   Sidebar untouched.
+   ================================================================ */
+
+/* ── Sidebar legacy bridge — keeps sidebar.css vars stable ─────── */
+.sidebar {
+  --card: oklch(0.2103 0.0059 285.89);
+  --foreground: oklch(0.9911 0 0);
+  --border: oklch(0.27 0.006 286);
+  --border-medium: oklch(0.35 0.006 286);
+  --secondary: oklch(0.27 0.006 286);
+  --muted-foreground: oklch(0.70 0.010 286);
+  --primary: oklch(0.681 0.162 55);
+  --primary-foreground: oklch(0.9911 0 0);
+  --accent-blue: oklch(0.681 0.162 55);
+  --accent-purple: oklch(0.606 0.25 292);
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --pill-bg: oklch(0.27 0.006 286);
+  --pill-border: oklch(0.35 0.006 286);
+  --pill-fg: oklch(0.70 0.010 286);
+  --pill-accent-bg: color-mix(in oklab, oklch(0.681 0.162 55) 15%, transparent);
+  --pill-accent-border: color-mix(in oklab, oklch(0.681 0.162 55) 28%, transparent);
+  --pill-accent-fg: oklch(0.681 0.162 55);
+  --pill-bg-hover: oklch(0.35 0.006 286);
+  --pill-border-hover: oklch(0.45 0.006 286);
+  --pill-fg-hover: oklch(0.9911 0 0);
+  --pill-accent-bg-hover: color-mix(in oklab, oklch(0.681 0.162 55) 22%, transparent);
+  --pill-accent-border-hover: color-mix(in oklab, oklch(0.681 0.162 55) 48%, transparent);
+  --pill-accent-fg-hover: oklch(0.7819 0.1585 72.33);
+  /* Sidebar section labels + home active */
+  --sidebar-home-active-bg: oklch(0.42 0.012 286);
+  --sidebar-home-active-fg: oklch(0.98 0 0);
+  --sidebar-home-active-border: oklch(0.52 0.014 286);
+  --sidebar-label-nav-bg: oklch(0.42 0.17 264);
+  --sidebar-label-nav-border: oklch(0.52 0.19 264);
+  --sidebar-label-nav-fg: oklch(0.98 0.02 264);
+  --sidebar-label-reports-bg: oklch(0.44 0.16 150);
+  --sidebar-label-reports-border: oklch(0.54 0.18 150);
+  --sidebar-label-reports-fg: oklch(0.98 0.03 150);
+}
+
+/* ── Main content token aliases ───────────────────────────────── */
+.main-content {
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --secondary: var(--surface-secondary);
+  --surface-3: var(--surface-tertiary);
+  --muted-foreground: var(--muted);
+  --text-primary: var(--foreground);
+  --text-secondary: var(--muted);
+  --text-muted: var(--dim);
+  --primary: var(--foreground);
+  --primary-foreground: var(--surface);
+  --ring: var(--foreground);
+  --destructive: var(--danger);
+  --destructive-foreground: var(--danger-text);
+  --accent-green: var(--success);
+  --accent-amber: var(--warning);
+  --accent-red: var(--danger);
+  --accent-blue: var(--muted);
+  --accent-purple: var(--muted);
+  --accent-cyan: var(--muted);
+  --border-medium: var(--border-strong);
+  --grid-line: color-mix(in oklab, var(--border) 55%, transparent);
+  --grid-size: 44px;
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-sm);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.2);
+  --pill-bg: var(--surface-secondary);
+  --pill-border: var(--border);
+  --pill-fg: var(--muted);
+  --pill-accent-bg: var(--surface-secondary);
+  --pill-accent-border: var(--border);
+  --pill-accent-fg: var(--muted);
+  --pill-bg-hover: var(--header-strip);
+  --pill-border-hover: var(--border-strong);
+  --pill-fg-hover: var(--foreground);
+  --pill-accent-bg-hover: var(--header-strip);
+  --pill-accent-border-hover: var(--border-strong);
+  --pill-accent-fg-hover: var(--foreground);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.main-content::before {
+  opacity: 0.35;
+}
+
+/* ── Structural surfaces ──────────────────────────────────────── */
+.main-content .card,
+.main-content .scard,
+.main-content .kpi-card,
+.main-content .audit-mini-card {
+  background: var(--surface);
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.main-content .card:hover,
+.main-content .scard:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.main-content .card.stat-card {
+  background: var(--surface);
+}
+
+.main-content .card.stat-card .stat-card-top,
+.main-content .card.panel-card .scard-head,
+.main-content .scard-head {
+  background: var(--card-header-bg);
+  color: var(--card-header-fg);
+  border-bottom-color: var(--card-header-border);
+}
+
+.main-content .card.panel-card .scard-head .st,
+.main-content .card.panel-card .card-title,
+.main-content .scard-title .st {
+  color: var(--card-header-fg);
+}
+
+.main-content .topbar {
+  background: var(--surface);
+  border-bottom-color: var(--separator);
+}
+
+.main-content .kanban-col {
+  background: var(--surface-secondary);
+  border: 1px solid var(--separator);
+}
+
+.main-content .bar-track,
+.main-content .score-bar {
+  background: var(--surface-secondary);
+  border: 1px solid var(--border);
+}
+
+.main-content .data-table th,
+.main-content .gap-detail,
+.main-content .upload-zone {
+  background: var(--surface-secondary);
+}
+
+.main-content .data-table tr:hover td {
+  background: var(--header-strip);
+}
+
+/* ── Neutral KPI / stat icons ─────────────────────────────────── */
+.main-content .kpi-card .kpi-icon-wrap,
+.main-content .stat-card .kpi-icon-wrap {
+  background: var(--surface-secondary);
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+/* ── Buttons ──────────────────────────────────────────────────── */
+.main-content .btn-primary {
+  background: var(--foreground);
+  color: var(--surface);
+  border-color: var(--foreground);
+}
+
+.main-content .btn-primary:hover {
+  background: color-mix(in oklab, var(--foreground) 88%, var(--surface) 12%);
+  border-color: color-mix(in oklab, var(--foreground) 88%, var(--surface) 12%);
+}
+
+.main-content .btn-primary.btn-cta {
+  background: var(--filter-bg);
+  color: var(--filter-fg);
+  border-color: var(--filter-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.main-content .btn-primary.btn-cta:hover {
+  background: var(--filter-bg-hover);
+  color: var(--filter-fg);
+  border-color: color-mix(in oklab, var(--surface) 28%, var(--foreground));
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.main-content .btn-primary.btn-cta:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.main-content .btn-secondary {
+  background: var(--surface);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+.main-content .btn-secondary:hover {
+  border-color: var(--border-strong);
+  background: var(--header-strip);
+}
+
+.main-content .btn-ghost {
+  color: var(--muted);
+}
+
+.main-content .btn-ghost:hover {
+  color: var(--foreground);
+  background: var(--surface-secondary);
+}
+
+/* ── Links — neutral, no blue accent ──────────────────────────── */
+.main-content a:not(.btn):not(.scard-link):not(.feed-name):not(.audit-mini-card) {
+  color: var(--foreground);
+}
+
+.main-content .pipeline-more {
+  color: var(--muted);
+}
+
+.main-content .pipeline-more:hover {
+  color: var(--foreground);
+}
+
+.main-content .feed-name:hover {
+  color: var(--foreground);
+}
+
+/* ── Tier chip in kanban — neutral ────────────────────────────── */
+.main-content .badge-tier {
+  background: var(--surface-secondary);
+  color: var(--muted);
+  border-color: var(--border);
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.main-content .badge-tier .badge-dot {
+  background: var(--dim);
+}
+
+/* ── Filter bar + topbar search — dark chrome, light text ─────── */
+.main-content .search-wrap--filter {
+  background: var(--filter-bg);
+  border-color: var(--filter-border);
+}
+
+.main-content .search-wrap--filter:focus-within {
+  background: var(--filter-bg-hover);
+}
+
+.main-content .search-input--embedded {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--filter-fg) !important;
+}
+
+.main-content .search-input--embedded::placeholder {
+  color: var(--filter-muted) !important;
+}
+
+.main-content .search-input--embedded:focus {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.main-content .search-wrap--pill .search-input {
+  background: var(--filter-bg) !important;
+  border: 1px solid var(--filter-border) !important;
+  box-shadow: none !important;
+  color: var(--filter-fg) !important;
+}
+
+.main-content .search-wrap--pill .search-input::placeholder {
+  color: var(--filter-muted) !important;
+}
+
+.main-content .search-wrap--pill .search-input:hover {
+  background: var(--filter-bg-hover) !important;
+  border-color: color-mix(in oklab, var(--surface) 24%, var(--foreground)) !important;
+}
+
+.main-content .search-wrap--pill .search-input:focus {
+  background: var(--filter-bg-hover) !important;
+  border-color: color-mix(in oklab, var(--surface) 28%, var(--foreground)) !important;
+  box-shadow: 0 0 0 3px var(--filter-focus-ring) !important;
+}
+
+.main-content .search-wrap--filter .search-icon,
+.main-content .search-wrap--pill .search-icon {
+  color: var(--filter-muted);
+}
+
+.main-content .filter-control--default,
+.main-content .filter-control--warning {
+  background: var(--filter-bg);
+  color: var(--filter-fg);
+  border-color: var(--filter-border);
+}
+
+.main-content .filter-control--active {
+  background: var(--danger);
+  color: var(--filter-fg);
+  border-color: color-mix(in oklab, var(--danger) 70%, black);
+}
+
+.main-content .filter-select option {
+  background: var(--filter-bg);
+  color: var(--filter-fg);
+}
+
+.main-content .dash-head-sub:hover {
+  background: var(--surface-secondary);
+  border-color: var(--separator);
+  color: var(--foreground);
+}
+
+.main-content .dash-head-sub:hover::before {
+  background: var(--foreground);
+}

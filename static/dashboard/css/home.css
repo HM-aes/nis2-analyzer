@@ -1,23 +1,45 @@
 /* ================================================================
-   Dashboard Home — stat cards, activity feed
-   Scoped to templates/dashboard/dashboard.html only. Builds on the
-   tokens defined in dashboard.css (--card, --border, --accent-*,
-   --radius-*) rather than introducing a second palette.
+   Dashboard Home — Pass 1 neutral-first
+   Semantic colour only on status chips + trend deltas.
    ================================================================ */
 
-/* ── Section head (title + live status chip) ───────────────────── */
 .dash-head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 1.25rem;
 }
 
 .dash-head-sub {
-  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: fit-content;
+  padding: 0.36rem 0.85rem 0.36rem 0.72rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
   letter-spacing: 0.04em;
-  color: var(--text-muted);
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--default);
+  border: 1px solid var(--border);
+}
+
+.dash-head-sub::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+}
+
+.dash-head-sub:hover {
+  background: var(--surface-secondary);
+  border-color: var(--separator);
+  color: var(--foreground);
 }
 
 .status-chip {
@@ -34,15 +56,19 @@
 }
 
 .status-chip-ready {
-  color: var(--accent-green);
-  background: rgba(34, 197, 94, 0.1);
-  border-color: rgba(34, 197, 94, 0.25);
+  color: var(--success-text);
+  background: var(--success-soft);
+  border-color: var(--success-edge);
 }
 
 .status-chip-attention {
-  color: var(--accent-red);
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.25);
+  color: var(--danger-text);
+  background: var(--danger-soft);
+  border-color: var(--danger-edge);
+}
+
+.status-chip:hover {
+  filter: brightness(1.06);
 }
 
 .status-dot {
@@ -70,10 +96,9 @@
   100% { transform: scale(2.6); opacity: 0; }
 }
 
-/* ── Stat cards ──────────────────────────────────────────────────
-   Extends the existing .kpi-card system with a top row (icon +
-   delta), a large tabular-figure headline number, and a count-up
-   reveal driven by Alpine from real server-rendered targets. */
+@media (prefers-reduced-motion: reduce) {
+  .status-dot::after { animation: none; }
+}
 
 .stats-row .stat-card {
   display: flex;
@@ -101,23 +126,33 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 0.75rem;
 }
 
 .stat-card-top .kpi-icon-wrap {
   margin-bottom: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-sm);
+  display: grid;
+  place-items: center;
 }
 
 .stat-delta {
   font-size: 0.7rem;
   font-weight: 600;
   margin-top: 0.2rem;
+  color: var(--muted);
 }
 
-.kpi-card-blue .stat-delta { color: var(--accent-blue); }
-.kpi-card-amber .stat-delta { color: var(--accent-amber); }
-.kpi-card-green .stat-delta { color: var(--accent-green); }
-.kpi-card-red .stat-delta { color: var(--accent-red); }
+.stat-delta--up,
+.delta-up {
+  color: var(--success-text);
+}
+
+.stat-delta--down,
+.delta-down {
+  color: var(--danger-text);
+}
 
 .stat-num {
   font-family: 'Fraunces', serif;
@@ -129,21 +164,20 @@
   font-variant-numeric: tabular-nums;
 }
 
-.kpi-card-blue .stat-num { color: var(--accent-blue); }
-.kpi-card-amber .stat-num { color: var(--accent-amber); }
-.kpi-card-green .stat-num { color: var(--accent-green); }
-.kpi-card-red .stat-num { color: var(--accent-red); }
+.kpi-icon-muted {
+  color: var(--muted);
+}
 
-/* ── Activity feed ───────────────────────────────────────────────
-   Replaces the plain activity-item rows with an avatar + name +
-   headline + time + status-badge layout, staggered in on load. */
+.feed-card {
+  height: 100%;
+}
 
 .feed-row {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.6rem 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--separator);
 }
 
 .feed-row:last-child {
@@ -163,18 +197,22 @@
   to   { opacity: 1; transform: none; }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .feed-row { opacity: 1; animation: none; }
+}
+
 .feed-avatar {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: var(--secondary);
+  background: var(--surface-secondary);
   border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.6875rem;
   font-weight: 600;
-  color: var(--muted-foreground);
+  color: var(--muted);
   flex-shrink: 0;
 }
 
@@ -188,17 +226,17 @@
 .feed-name {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--foreground);
   text-decoration: none;
 }
 
 .feed-name:hover {
-  color: var(--accent-blue);
+  color: var(--link);
 }
 
 .feed-headline {
   font-size: 0.75rem;
-  color: var(--text-muted);
+  color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -206,6 +244,132 @@
 
 .feed-time {
   font-size: 0.6875rem;
-  color: var(--text-muted);
+  color: var(--muted);
   flex-shrink: 0;
+}
+
+.hist-bar-fill--danger  { background: color-mix(in oklab, var(--danger) 70%, var(--surface) 30%); }
+.hist-bar-fill--warning { background: color-mix(in oklab, var(--warning) 70%, var(--surface) 30%); }
+.hist-bar-fill--success { background: color-mix(in oklab, var(--success) 70%, var(--surface) 30%); }
+
+.hist-bar-fill--danger-2  { background: color-mix(in oklab, var(--danger) 55%, var(--surface) 45%); }
+.hist-bar-fill--warning-2 { background: color-mix(in oklab, var(--warning) 55%, var(--surface) 45%); }
+.hist-bar-fill--success-2 { background: color-mix(in oklab, var(--success) 55%, var(--surface) 45%); }
+
+.bar-fill-high {
+  background: color-mix(in oklab, var(--danger) 80%, transparent);
+}
+
+.onboard-card {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.onboard-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.onboard-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 0.75rem;
+}
+
+.onboard-lead {
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+.onboard-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.revenue-value {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--foreground);
+}
+
+.revenue-value--success {
+  color: var(--success);
+}
+
+.revenue-value--warning {
+  color: var(--warning);
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 0.125rem;
+}
+
+.legend-swatch--danger  { background: var(--danger); }
+.legend-swatch--warning { background: var(--warning); }
+.legend-swatch--success { background: var(--success); }
+.legend-swatch--neutral { background: var(--border); }
+
+.pipeline-more {
+  color: var(--link);
+  font-size: 0.75rem;
+  padding-left: 0.25rem;
+}
+
+.feed-scroll {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.hist-chart {
+  height: 144px;
+}
+
+.scard-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.scard-link:hover {
+  text-decoration: none;
+}
+
+.processing-row {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.processing-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.chart-caption,
+.kanban-empty,
+.legend-item,
+.bar-count {
+  color: var(--muted);
+}
+
+.bar-fill-critical { background: var(--danger); }
+.bar-fill-high     { background: color-mix(in oklab, var(--danger) 80%, var(--warning) 20%); }
+.bar-fill-medium   { background: var(--warning); }
+.bar-fill-low      { background: var(--border); }
+
+.bar-track-inner {
+  display: flex;
+  height: 100%;
 }

@@ -5,6 +5,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from django.views.generic import TemplateView
+from django.utils.translation import gettext_lazy as _
 
 from .forms import LoginForm, SignupForm
 
@@ -31,6 +32,12 @@ def _authenticate_login(request, identifier, password):
 
 
 @require_http_methods(["GET", "POST"])
+def home_view(request):
+    """Landing page — includes signup form for the modal."""
+    return render(request, "marketing/landing.html", {"form": SignupForm()})
+
+
+@require_http_methods(["GET", "POST"])
 def signup(request):
     if request.user.is_authenticated:
         return redirect(DASHBOARD_URL)
@@ -50,7 +57,7 @@ def signup(request):
 
     form = SignupForm()
     if _is_htmx(request):
-        return render(request, "auth/_signup_form.html", {"form": form})
+        return render(request, "auth/_signup_panel.html", {"form": form})
     return render(request, "auth/signup.html", {"form": form})
 
 
@@ -76,7 +83,7 @@ def login_view(request):
                     resp["HX-Redirect"] = target
                     return resp
                 return redirect(target)
-            form.add_error(None, "Email or password is incorrect.")
+            form.add_error(None, _("Email or password is incorrect."))
         return render(
             request, "auth/_login_form.html", {"form": form, "next": next_url}
         )
@@ -97,11 +104,11 @@ class LegalPageView(TemplateView):
 
 
 class TermsView(LegalPageView):
-    page_title = "Terms of Service"
+    page_title = _("Terms of Service")
 
 
 class PrivacyView(LegalPageView):
-    page_title = "Privacy Policy"
+    page_title = _("Privacy Policy")
 
 
 class PasswordResetPlaceholderView(TemplateView):
@@ -109,5 +116,5 @@ class PasswordResetPlaceholderView(TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["page_title"] = "Reset password"
+        ctx["page_title"] = _("Reset password")
         return ctx

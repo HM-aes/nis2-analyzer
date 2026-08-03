@@ -20,6 +20,8 @@ from reportlab.platypus import (
     HRFlowable, KeepTogether,
 )
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
+from django.utils.translation import gettext_lazy as _
+
 import anthropic
 
 from .charts import (
@@ -162,14 +164,14 @@ class NIS2ReportGenerator:
         elements.append(Paragraph(company_name, self.styles['H2']))
         elements.append(Spacer(1, 0.3 * cm))
         elements.append(Paragraph(
-            f'Sector: {sector} | Datum: {date_str}',
+            _('Sector: %(sector)s | Date: %(date)s') % {'sector': sector, 'date': date_str},
             self.styles['Body']
         ))
         elements.append(Spacer(1, 0.5 * cm))
         elements.append(HRFlowable(width='100%', thickness=2, color=BRAND_BLUE))
         elements.append(Spacer(1, 0.5 * cm))
         elements.append(Paragraph(
-            'Opgesteld door AES AI Solutions | aes-ai.nl | support@aes-ai.nl',
+            _('Prepared by AES AI Solutions | aes-ai.nl | support@aes-ai.nl'),
             self.styles['Caption']
         ))
         elements.append(PageBreak())
@@ -219,13 +221,13 @@ class NIS2ReportGenerator:
         # Cover page
         self._cover_page(
             elements,
-            'Sector Requirements Analysis',
+            _('Sector Requirements Analysis'),
             company_name, sector, date_str
         )
 
         # Section header
         elements.append(Paragraph(
-            f'NIS2 Vereisten voor {company_name}',
+            _('NIS2 Requirements for %(company)s') % {'company': company_name},
             self.styles['H1']
         ))
         elements.append(HRFlowable(width='100%', thickness=1, color=BRAND_BLUE))
@@ -244,7 +246,7 @@ class NIS2ReportGenerator:
 
         # Fine exposure section
         elements.append(PageBreak())
-        elements.append(Paragraph('Regulatory Fine Exposure', self.styles['H1']))
+        elements.append(Paragraph(_('Regulatory Fine Exposure'), self.styles['H1']))
         elements.append(HRFlowable(width='100%', thickness=1, color=BRAND_BLUE))
         elements.append(Spacer(1, 0.3 * cm))
         fine_prompt = FINE_EXPOSURE_PROMPT.format(
@@ -259,13 +261,15 @@ class NIS2ReportGenerator:
 
         # Call to action page
         elements.append(PageBreak())
-        elements.append(Paragraph('Volgende Stappen', self.styles['H1']))
+        elements.append(Paragraph(_('Next Steps'), self.styles['H1']))
         elements.append(HRFlowable(width='100%', thickness=1, color=BRAND_BLUE))
         elements.append(Spacer(1, 0.3 * cm))
         elements.append(Paragraph(
-            'Dit rapport beschrijft uw NIS2-vereisten op basis van uw sector en entiteitstype. '
-            'Om uw huidige nalevingspositie te begrijpen, upload uw bestaande beleids- en '
-            'proceduredocumenten voor een volledige gap-analyse.',
+            _(
+                'This report describes your NIS2 requirements based on your sector and entity type. '
+                'To understand your current compliance position, upload your existing policy and '
+                'procedure documents for a full gap analysis.'
+            ),
             self.styles['Body']
         ))
         elements.append(Spacer(1, 0.5 * cm))
@@ -273,8 +277,10 @@ class NIS2ReportGenerator:
         # CTA box
         cta_data = [[
             Paragraph(
-                '🔍 Volledige Gap-analyse: €950\n\nUpload uw documenten via ons platform voor '
-                'een AI-aangedreven NIS2 gap-analyse.\nContact: support@aes-ai.nl',
+                _(
+                    '🔍 Full Gap Analysis: €950\n\nUpload your documents via our platform for '
+                    'an AI-powered NIS2 gap analysis.\nContact: support@aes-ai.nl'
+                ),
                 self.styles['Body']
             )
         ]]
@@ -292,12 +298,14 @@ class NIS2ReportGenerator:
 
         # About AES
         elements.append(PageBreak())
-        elements.append(Paragraph('Over AES AI Solutions', self.styles['H1']))
+        elements.append(Paragraph(_('About AES AI Solutions'), self.styles['H1']))
         elements.append(Paragraph(
-            'AES AI Solutions is een gespecialiseerd NIS2-compliancetechnologiebedrijf gevestigd '
-            'in Nederland. Wij combineren AI-aangedreven analyse met diepgaande regelgevingsexpertise '
-            'om organisaties te helpen NIS2-naleving te bereiken en te behouden. '
-            'Neem contact met ons op via support@aes-ai.nl of bezoek aes-ai.nl.',
+            _(
+                'AES AI Solutions is a specialized NIS2 compliance technology company based '
+                'in the Netherlands. We combine AI-powered analysis with deep regulatory expertise '
+                'to help organizations achieve and maintain NIS2 compliance. '
+                'Contact us at support@aes-ai.nl or visit aes-ai.nl.'
+            ),
             self.styles['Body']
         ))
 
@@ -418,8 +426,16 @@ class NIS2ReportGenerator:
             gauge_img = png_to_reportlab_image(gauge_png, 12 * cm, 8 * cm)
             elements.append(Image(gauge_img, width=12 * cm, height=8 * cm))
             elements.append(Paragraph(
-                f'NIS2 Compliance Score: {audit.compliance_score or 0}% — '
-                f'{"Goed" if (audit.compliance_score or 0) >= 70 else "Verbetering Vereist" if (audit.compliance_score or 0) >= 40 else "Kritieke Actie Vereist"}',
+                _('NIS2 Compliance Score: %(score)s%% — %(label)s') % {
+                    'score': audit.compliance_score or 0,
+                    'label': (
+                        _('Good')
+                        if (audit.compliance_score or 0) >= 70
+                        else _('Improvement Required')
+                        if (audit.compliance_score or 0) >= 40
+                        else _('Critical Action Required')
+                    ),
+                },
                 self.styles['Caption']
             ))
         except Exception:
@@ -627,16 +643,18 @@ class NIS2ReportGenerator:
         elements.append(HRFlowable(width='100%', thickness=1, color=BRAND_BLUE))
         elements.append(Spacer(1, 0.3 * cm))
         elements.append(Paragraph(
-            'AES AI Solutions is een gespecialiseerd NIS2-compliancetechnologiebedrijf gevestigd '
-            'in Nederland. Wij combineren AI-aangedreven analyse met diepgaande regelgevingsexpertise '
-            'om organisaties te helpen NIS2-naleving te bereiken en te behouden. '
-            'Onze AI-aangedreven analyseplatform verwerkt uw bestaande documenten en identificeert '
-            'compliance-hiaten op basis van de officiële NIS2-richtlijn (EU) 2022/2555.',
+            _(
+                'AES AI Solutions is a specialized NIS2 compliance technology company based '
+                'in the Netherlands. We combine AI-powered analysis with deep regulatory expertise '
+                'to help organizations achieve and maintain NIS2 compliance. '
+                'Our AI-powered analysis platform processes your existing documents and identifies '
+                'compliance gaps based on the official NIS2 Directive (EU) 2022/2555.'
+            ),
             self.styles['Body']
         ))
         elements.append(Spacer(1, 0.3 * cm))
         elements.append(Paragraph(
-            'Contact: support@aes-ai.nl | Website: aes-ai.nl',
+            _('Contact: support@aes-ai.nl | Website: aes-ai.nl'),
             self.styles['Body']
         ))
 

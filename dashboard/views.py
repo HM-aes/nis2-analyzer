@@ -16,6 +16,7 @@ from django.views.generic import TemplateView
 from django.http import HttpResponse, JsonResponse
 from django.db.models import Count, Avg, Sum, Q
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from datetime import timedelta
 import logging
 
@@ -55,12 +56,12 @@ class UploadDocumentView(LoginRequiredMixin, View):
         document_type = request.POST.get("document_type", "OTHER")
 
         if not uploaded_file:
-            return HttpResponse("Geen bestand geselecteerd.", status=400)
+            return HttpResponse(_("No file selected."), status=400)
 
         # Validate extension
         name = uploaded_file.name.lower()
         if not any(name.endswith(ext) for ext in [".pdf", ".docx", ".txt"]):
-            return HttpResponse("Alleen PDF, DOCX of TXT bestanden.", status=400)
+            return HttpResponse(_("Only PDF, DOCX, or TXT files are allowed."), status=400)
 
         doc = ClientDocument.objects.create(
             audit=audit,
@@ -94,7 +95,10 @@ class UploadDocumentView(LoginRequiredMixin, View):
         audit.documents_uploaded = audit.documents.count()
         audit.save(update_fields=["documents_uploaded"])
 
-        messages.success(request, f'Document "{doc.original_filename}" geüpload')
+        messages.success(
+            request,
+            _('Document "%(filename)s" uploaded') % {"filename": doc.original_filename},
+        )
         # Redirect back to documents tab
         return redirect(f"/dashboard/audits/{audit.pk}/?tab=documents")
 
@@ -111,12 +115,12 @@ class RunAuditView(LoginRequiredMixin, View):
 
         if audit.status != "INTAKE":
             return HttpResponse(
-                "Audit is niet in de INTAKE-fase.", status=400
+                _("Audit is not in the INTAKE phase."), status=400
             )
 
         if not audit.documents.exists():
             return HttpResponse(
-                "Upload eerst minimaal één document.", status=400
+                _("Upload at least one document first."), status=400
             )
 
         # Transition to PROCESSING
@@ -239,7 +243,7 @@ def _run_nis2_pipeline(audit_id):
         try:
             ComplianceAudit.objects.filter(pk=audit_id).update(
                 status="INTAKE",
-                internal_notes=f"Pipeline fout: {e}",
+                internal_notes=_("Pipeline error: %(error)s") % {"error": e},
             )
         except Exception:
             pass
@@ -272,8 +276,11 @@ def build_audit_timeline(audit, gaps, documents):
         'timestamp': audit.created_at,
         'type': 'created',
         'icon': '📋',
-        'title': 'Audit aangemaakt',
-        'detail': f'Tier {audit.tier} — €{audit.quoted_price}',
+        'title': _('Audit created'),
+        'detail': _('Tier %(tier)s — €%(price)s') % {
+            'tier': audit.tier,
+            'price': audit.quoted_price,
+        },
     })
 
     for doc in documents:
@@ -281,7 +288,7 @@ def build_audit_timeline(audit, gaps, documents):
             'timestamp': doc.uploaded_at,
             'type': 'document',
             'icon': '📄',
-            'title': 'Document geüpload',
+            'title': _('Document uploaded'),
             'detail': doc.original_filename,
         })
 
@@ -290,8 +297,8 @@ def build_audit_timeline(audit, gaps, documents):
             'timestamp': audit.started_at,
             'type': 'processing',
             'icon': '🤖',
-            'title': 'AI analyse gestart',
-            'detail': 'Claude NIS2 analyse actief',
+            'title': _('AI analysis started'),
+            'detail': _('Claude NIS2 analysis in progress'),
         })
 
     for gap in gaps.order_by('created_at'):
@@ -301,7 +308,7 @@ def build_audit_timeline(audit, gaps, documents):
             'icon': '🔴' if gap.severity == 'CRITICAL'
                     else '⚠️' if gap.severity == 'HIGH'
                     else '🟡',
-            'title': f'Gap gevonden: {gap.title}',
+            'title': _('Gap found: %(title)s') % {'title': gap.title},
             'detail': f'{gap.severity} — {gap.category}',
         })
 
@@ -310,8 +317,8 @@ def build_audit_timeline(audit, gaps, documents):
             'timestamp': audit.completed_at,
             'type': 'completed',
             'icon': '✅',
-            'title': 'Analyse voltooid',
-            'detail': f'Score: {audit.compliance_score}%',
+            'title': _('Analysis completed'),
+            'detail': _('Score: %(score)s%%') % {'score': audit.compliance_score},
         })
 
     if audit.delivered_at:
@@ -319,7 +326,7 @@ def build_audit_timeline(audit, gaps, documents):
             'timestamp': audit.delivered_at,
             'type': 'delivered',
             'icon': '🚀',
-            'title': 'Rapport geleverd aan klant',
+            'title': _('Report delivered to client'),
             'detail': '',
         })
 
@@ -341,6 +348,32 @@ def _initials(name):
     return "".join(p[0] for p in parts[:2]).upper()
 
 
+def _audit_badge_status(status):
+    if status in ("COMPLETE", "DELIVERED"):
+        return "ok"
+    return "todo"
+
+
+def _gap_badge_status(severity):
+    if severity == "CRITICAL":
+        return "bad"
+    if severity in ("HIGH", "MEDIUM"):
+        return "todo"
+    return "ok"
+
+
+def _audit_progress_pct(status):
+    stages = {
+        "INTAKE": 15,
+        "PROCESSING": 55,
+        "ANALYSIS": 70,
+        "REVIEW": 85,
+        "COMPLETE": 100,
+        "DELIVERED": 100,
+    }
+    return stages.get(status, 20)
+
+
 # ─── Auth ─────────────────────────────────────────────────────────────────────
 
 
@@ -358,7 +391,7 @@ class DashboardLoginView(View):
             login(request, user)
             return redirect(request.GET.get("next", "dashboard:home"))
         return render(
-            request, "dashboard/login.html", {"error": "Ongeldige inloggegevens."}
+            request, "dashboard/login.html", {"error": _("Invalid login credentials.")}
         )
 
 
@@ -450,6 +483,7 @@ class DashboardHomeView(LoginRequiredMixin, TemplateView):
             pipeline.append(
                 {
                     "status": s,
+                    "badge_status": _audit_badge_status(s),
                     "count": col_audits.count(),
                     "audits": col_audits[:3],
                     "extra": max(0, col_audits.count() - 3),
@@ -510,7 +544,7 @@ class DashboardHomeView(LoginRequiredMixin, TemplateView):
                 "initials": _initials(audit.client.company_name),
                 "headline": audit.get_status_display(),
                 "url": reverse("dashboard:audit_detail", args=[audit.pk]),
-                "badge_class": f"badge-{audit.status.lower()}",
+                "badge_status": _audit_badge_status(audit.status),
                 "badge_label": audit.get_status_display(),
             })
         for gap in ctx["recent_gaps"]:
@@ -520,11 +554,34 @@ class DashboardHomeView(LoginRequiredMixin, TemplateView):
                 "initials": _initials(gap.audit.client.company_name),
                 "headline": gap.title,
                 "url": reverse("dashboard:audit_detail", args=[gap.audit.pk]),
-                "badge_class": f"badge-{gap.severity.lower()}",
+                "badge_status": _gap_badge_status(gap.severity),
                 "badge_label": gap.get_severity_display(),
             })
         activity.sort(key=lambda a: a["timestamp"], reverse=True)
         ctx["recent_activity"] = activity[:8]
+
+        ctx["priority_gaps"] = [
+            {
+                "title": gap.title,
+                "detail": (gap.description or gap.get_severity_display())[:140],
+                "status": _gap_badge_status(gap.severity),
+                "label": gap.get_severity_display(),
+                "url": reverse("dashboard:audit_detail", args=[gap.audit.pk]),
+            }
+            for gap in ctx["recent_gaps"][:4]
+        ]
+
+        ctx["processing_audits_list"] = [
+            {
+                "client_name": audit.client.company_name,
+                "status_label": audit.get_status_display(),
+                "progress": _audit_progress_pct(audit.status),
+                "url": reverse("dashboard:audit_detail", args=[audit.pk]),
+            }
+            for audit in audits_qs.filter(status="PROCESSING")
+            .select_related("client")
+            .order_by("-updated_at")[:5]
+        ]
 
         return ctx
 
@@ -604,9 +661,9 @@ class NewClientView(LoginRequiredMixin, View):
 
         kvk = data.get("kvk_number", "").strip()
         if len(kvk) != 8 or not kvk.isdigit():
-            errors["kvk_number"] = "KVK-nummer moet precies 8 cijfers zijn."
+            errors["kvk_number"] = _("KVK number must be exactly 8 digits.")
         elif Client.objects.filter(kvk_number=kvk).exists():
-            errors["kvk_number"] = "Dit KVK-nummer bestaat al."
+            errors["kvk_number"] = _("This KVK number already exists.")
 
         required = [
             "company_name",
@@ -620,7 +677,7 @@ class NewClientView(LoginRequiredMixin, View):
         ]
         for field in required:
             if not data.get(field, "").strip():
-                errors[field] = "Dit veld is verplicht."
+                errors[field] = _("This field is required.")
 
         if errors:
             return render(
@@ -649,7 +706,10 @@ class NewClientView(LoginRequiredMixin, View):
             postal_code=data["postal_code"].strip(),
             account_manager=request.user if not request.user.is_superuser else None,
         )
-        messages.success(request, f'Klant "{client.company_name}" aangemaakt')
+        messages.success(
+            request,
+            _('Client "%(name)s" created') % {"name": client.company_name},
+        )
         return redirect("dashboard:client_detail", pk=client.pk)
 
 
@@ -666,7 +726,7 @@ class ClientUpdateView(LoginRequiredMixin, View):
         client.email = request.POST.get('email', client.email)
         client.country = request.POST.get('country', client.country)
         client.save()
-        messages.success(request, 'Client bijgewerkt')
+        messages.success(request, _('Client updated'))
         return redirect('dashboard:client_detail', pk=pk)
 
 
@@ -692,7 +752,7 @@ class NewAuditView(LoginRequiredMixin, View):
         quoted_price = request.POST.get('quoted_price')
 
         if not all([client_id, tier, quoted_price]):
-            messages.error(request, 'Alle velden zijn verplicht')
+            messages.error(request, _('All fields are required'))
             return redirect('dashboard:audit_new')
 
         try:
@@ -703,10 +763,13 @@ class NewAuditView(LoginRequiredMixin, View):
                 status='INTAKE',
             )
         except Exception as e:
-            messages.error(request, f'Fout bij aanmaken audit: {e}')
+            messages.error(request, _('Error creating audit: %(error)s') % {"error": e})
             return redirect('dashboard:audit_new')
 
-        messages.success(request, f'Audit aangemaakt voor {audit.client.company_name}')
+        messages.success(
+            request,
+            _('Audit created for %(client)s') % {"client": audit.client.company_name},
+        )
         return redirect('dashboard:audit_detail', pk=audit.pk)
 
 
@@ -783,7 +846,7 @@ class AuditTransitionView(LoginRequiredMixin, View):
         target_status = request.POST.get('status')
 
         if target_status not in VALID_TRANSITIONS.get(audit.status, []):
-            messages.error(request, 'Ongeldige statusovergang')
+            messages.error(request, _('Invalid status transition'))
             return redirect('dashboard:audit_detail', pk=pk)
 
         audit.status = target_status
@@ -792,7 +855,10 @@ class AuditTransitionView(LoginRequiredMixin, View):
         if target_status == 'COMPLETE':
             audit.completed_at = timezone.now()
         audit.save()
-        messages.success(request, f'Status bijgewerkt naar {target_status}')
+        messages.success(
+            request,
+            _('Status updated to %(status)s') % {"status": target_status},
+        )
         return redirect('dashboard:audit_detail', pk=pk)
 
 
@@ -860,14 +926,19 @@ class DocumentDeleteView(LoginRequiredMixin, View):
         doc = get_object_or_404(ClientDocument, pk=pk)
         # Only allow delete if audit not PROCESSING
         if doc.audit.status == 'PROCESSING':
-            messages.error(request,
-                'Kan document niet verwijderen tijdens verwerking')
+            messages.error(
+                request,
+                _('Cannot delete document while processing'),
+            )
             return redirect('dashboard:audit_detail', pk=doc.audit.pk)
         audit_pk = doc.audit.pk
         filename = doc.original_filename
         doc.file.delete(save=False)
         doc.delete()
-        messages.success(request, f'Document "{filename}" verwijderd')
+        messages.success(
+            request,
+            _('Document "%(filename)s" deleted') % {"filename": filename},
+        )
         return redirect('dashboard:audit_detail', pk=audit_pk)
 
 
@@ -899,7 +970,12 @@ class DocumentReprocessView(LoginRequiredMixin, View):
                 )
 
         threading.Thread(target=_extract, args=(doc.pk,), daemon=True).start()
-        messages.success(request, f'Document "{doc.original_filename}" wordt opnieuw verwerkt')
+        messages.success(
+            request,
+            _('Document "%(filename)s" is being reprocessed') % {
+                "filename": doc.original_filename,
+            },
+        )
         return redirect('dashboard:audit_detail', pk=doc.audit.pk)
 
 

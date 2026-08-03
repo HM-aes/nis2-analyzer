@@ -1,3 +1,4 @@
+{% load i18n %}
 <form class="auth-form"
       hx-post="{% url 'login' %}"
       hx-target="this"
@@ -8,26 +9,26 @@
   {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
 
   <div class="auth-field">
-    <label for="id_login_email">Email or username</label>
+    <label for="id_login_email">{% trans "Email or username" %}</label>
     <input type="text" name="email" id="id_login_email"
            autocomplete="username" required
-           placeholder="you@organisation.eu or admin"
+           placeholder="{% trans 'you@organisation.eu or admin' %}"
            value="{{ form.email.value|default:'' }}">
   </div>
 
   <div class="auth-field">
     <div class="auth-labelrow">
-      <label for="id_login_pw">Password</label>
-      <a href="{% url 'password_reset' %}" class="auth-forgot">Forgot?</a>
+      <label for="id_login_pw">{% trans "Password" %}</label>
+      <a href="{% url 'password_reset' %}" class="auth-forgot">{% trans "Forgot?" %}</a>
     </div>
     <div class="auth-pw" x-data="{ show:false }">
       <input :type="show ? 'text' : 'password'"
              name="password" id="id_login_pw"
              autocomplete="current-password" required
-             placeholder="Your password">
+             placeholder="{% trans 'Your password' %}">
       <button type="button" class="auth-pw-toggle"
               @click="show = !show"
-              :aria-label="show ? 'Hide password' : 'Show password'"
+              :aria-label="show ? '{% trans "Hide password" %}' : '{% trans "Show password" %}'"
               :aria-pressed="show.toString()">
         <svg x-show="!show" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         <svg x-show="show" x-cloak width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
@@ -40,11 +41,11 @@
   {% endif %}
 
   <button type="submit" class="btn btn-primary auth-submit">
-    <span class="auth-submit-label">Log in</span>
+    <span class="auth-submit-label">{% trans "Log in" %}</span>
     <span class="auth-spinner" aria-hidden="true"></span>
   </button>
 
   <p class="auth-alt">
-    New to NIS2 Analyzer? <a href="{% url 'signup' %}">Create an account</a>
+    {% trans "New to NIS2 Analyzer?" %} <a href="{% url 'signup' %}">{% trans "Create an account" %}</a>
   </p>
 </form>

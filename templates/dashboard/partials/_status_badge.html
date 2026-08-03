@@ -1,0 +1,10 @@
+{# Reusable status badge — status: "ok" | "todo" | "bad" #}
+{% if status == "ok" %}
+<span class="badge ok"><span class="badge-dot" aria-hidden="true"></span>{{ label }}</span>
+{% elif status == "todo" %}
+<span class="badge todo"><span class="badge-dot" aria-hidden="true"></span>{{ label }}</span>
+{% elif status == "bad" %}
+<span class="badge bad"><span class="badge-dot" aria-hidden="true"></span>{{ label }}</span>
+{% else %}
+<span class="badge todo"><span class="badge-dot" aria-hidden="true"></span>{{ label }}</span>
+{% endif %}

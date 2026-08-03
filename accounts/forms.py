@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.utils.translation import gettext_lazy as _
 
 
 class SignupForm(forms.Form):
@@ -10,15 +11,15 @@ class SignupForm(forms.Form):
     def clean_email(self):
         email = self.cleaned_data["email"].strip().lower()
         if User.objects.filter(username=email).exists():
-            raise forms.ValidationError("An account with this email already exists.")
+            raise forms.ValidationError(_("An account with this email already exists."))
         if User.objects.filter(email__iexact=email).exists():
-            raise forms.ValidationError("An account with this email already exists.")
+            raise forms.ValidationError(_("An account with this email already exists."))
         return email
 
     def clean_password1(self):
         password = self.cleaned_data["password1"]
         if len(password) < 10:
-            raise forms.ValidationError("Password must be at least 10 characters.")
+            raise forms.ValidationError(_("Password must be at least 10 characters."))
         return password
 
     def save(self):
@@ -32,5 +33,5 @@ class SignupForm(forms.Form):
 
 
 class LoginForm(forms.Form):
-    email = forms.CharField(label="Email or username")
+    email = forms.CharField(label=_("Email or username"))
     password = forms.CharField(widget=forms.PasswordInput)

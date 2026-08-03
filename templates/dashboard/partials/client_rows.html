@@ -1,3 +1,4 @@
+{% load i18n %}
 {% for client in clients %}
 {% with latest_audit=client.audits.first %}
 <tr class="cursor-pointer" onclick="window.location='{% url 'dashboard:client_detail' client.pk %}'">
@@ -8,9 +9,9 @@
     <td><span class="mono text-slate-600">{{ client.kvk_number }}</span></td>
     <td><span class="badge" style="background:#EFF6FF;color:#1E40AF;">{{ client.sector }}</span></td>
     <td>
-        {% if client.company_size == 'SMALL' %}<span class="text-xs text-slate-500">Klein</span>
-        {% elif client.company_size == 'MEDIUM' %}<span class="text-xs text-slate-500">Middel</span>
-        {% else %}<span class="text-xs text-slate-500">Groot</span>
+        {% if client.company_size == 'SMALL' %}<span class="text-xs text-slate-500">{% trans "Small" %}</span>
+        {% elif client.company_size == 'MEDIUM' %}<span class="text-xs text-slate-500">{% trans "Medium" %}</span>
+        {% else %}<span class="text-xs text-slate-500">{% trans "Large" %}</span>
         {% endif %}
     </td>
     <td>
@@ -41,8 +42,8 @@
     </td>
     <td onclick="event.stopPropagation()">
         <div class="flex gap-1">
-            <a href="{% url 'dashboard:client_detail' client.pk %}" class="btn btn-sm btn-secondary">Bekijken</a>
-            <a href="{% url 'dashboard:audits' %}?client={{ client.pk }}" class="btn btn-sm btn-primary">Audit</a>
+            <a href="{% url 'dashboard:client_detail' client.pk %}" class="btn btn-sm btn-secondary">{% trans "View" %}</a>
+            <a href="{% url 'dashboard:audits' %}?client={{ client.pk }}" class="btn btn-sm btn-primary">{% trans "Audit" %}</a>
         </div>
     </td>
 </tr>
@@ -52,8 +53,8 @@
     <td colspan="8">
         <div class="empty-state">
             <div class="empty-state-icon">👥</div>
-            <div class="empty-state-text">Geen klanten gevonden</div>
-            <a href="{% url 'dashboard:client_new' %}" class="btn btn-primary mt-3">Eerste klant toevoegen</a>
+            <div class="empty-state-text">{% trans "No clients found" %}</div>
+            <a href="{% url 'dashboard:client_new' %}" class="btn btn-primary mt-3">{% trans "Add first client" %}</a>
         </div>
     </td>
 </tr>

@@ -1,6 +1,7 @@
 {% extends "dashboard/base.html" %}
-{% block title %}Nieuwe Audit — NIS2{% endblock %}
-{% block page_title %}Nieuwe Audit Starten{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "New Audit" %} — NIS2{% endblock %}
+{% block page_title %}{% trans "Start New Audit" %}{% endblock %}
 
 {% block content %}
 <div class="max-w-2xl" x-data="{
@@ -15,8 +16,8 @@
 }">
     <div class="card">
         <div class="mb-5" style="border-bottom:1px solid var(--border); padding-bottom:1rem;">
-            <h2 class="text-lg font-semibold" style="color:var(--foreground);">Nieuwe Audit Aanmaken</h2>
-            <p class="text-sm mt-1" style="color:var(--muted-foreground);">Selecteer de klant, kies het tier en bevestig de offerte.</p>
+            <h2 class="text-lg font-semibold" style="color:var(--foreground);">{% trans "Create New Audit" %}</h2>
+            <p class="text-sm mt-1" style="color:var(--muted-foreground);">{% trans "Select the client, choose the tier, and confirm the quote." %}</p>
         </div>
 
         <form method="post" action="{% url 'dashboard:audit_new' %}" @submit="running = true">
@@ -24,9 +25,9 @@
 
             {# Client dropdown #}
             <div class="mb-5">
-                <label class="form-label">Klant *</label>
+                <label class="form-label">{% trans "Client" %} *</label>
                 <select name="client" class="form-select" required>
-                    <option value="">Kies een klant…</option>
+                    <option value="">{% trans "Choose a client…" %}</option>
                     {% for client in clients %}
                     <option value="{{ client.pk }}"
                         {% if selected_client_id == client.pk|stringformat:"s" %}selected{% endif %}>
@@ -39,7 +40,7 @@
 
             {# Tier selection #}
             <div class="mb-5">
-                <label class="form-label">Tier *</label>
+                <label class="form-label">{% trans "Tier" %} *</label>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
 
                     <label class="cursor-pointer" @click="selectTier('T1')">
@@ -51,8 +52,8 @@
                             style="background: selectedTier === 'T1' ? '' : 'var(--secondary)'; border-color: selectedTier === 'T1' ? '#3b82f6' : 'var(--border)';">
                             <div class="text-center">
                                 <div class="text-2xl mb-1">🔍</div>
-                                <div class="font-bold text-sm" style="color:var(--foreground);">Tier 1</div>
-                                <div class="text-xs mt-1" style="color:var(--muted-foreground);">Gap Analyse</div>
+                                <div class="font-bold text-sm" style="color:var(--foreground);">{% trans "Tier 1" %}</div>
+                                <div class="text-xs mt-1" style="color:var(--muted-foreground);">{% trans "Gap Analysis" %}</div>
                                 <div class="text-lg font-bold mt-2" style="color:var(--accent-blue);">€950</div>
                             </div>
                         </div>
@@ -67,8 +68,8 @@
                             style="border-color: var(--border);">
                             <div class="text-center">
                                 <div class="text-2xl mb-1">📄</div>
-                                <div class="font-bold text-sm" style="color:var(--foreground);">Tier 2</div>
-                                <div class="text-xs mt-1" style="color:var(--muted-foreground);">Implementatiedocumenten</div>
+                                <div class="font-bold text-sm" style="color:var(--foreground);">{% trans "Tier 2" %}</div>
+                                <div class="text-xs mt-1" style="color:var(--muted-foreground);">{% trans "Implementation Documents" %}</div>
                                 <div class="text-lg font-bold mt-2" style="color:var(--accent-blue);">€2.500</div>
                             </div>
                         </div>
@@ -83,8 +84,8 @@
                             style="border-color: var(--border);">
                             <div class="text-center">
                                 <div class="text-2xl mb-1">🏆</div>
-                                <div class="font-bold text-sm" style="color:var(--foreground);">Tier 3</div>
-                                <div class="text-xs mt-1" style="color:var(--muted-foreground);">Volledig Pakket</div>
+                                <div class="font-bold text-sm" style="color:var(--foreground);">{% trans "Tier 3" %}</div>
+                                <div class="text-xs mt-1" style="color:var(--muted-foreground);">{% trans "Full Package" %}</div>
                                 <div class="text-lg font-bold mt-2" style="color:var(--accent-blue);">€5.000</div>
                             </div>
                         </div>
@@ -95,29 +96,29 @@
 
             {# Quoted price — auto-filled, editable #}
             <div class="mb-6">
-                <label class="form-label">Offertebedrag (€) *</label>
+                <label class="form-label">{% trans "Quote Amount (€)" %} *</label>
                 <input type="number" name="quoted_price" class="form-input"
                     :value="quotedPrice"
                     @input="quotedPrice = $event.target.value"
-                    placeholder="Wordt automatisch ingevuld bij tier selectie"
+                    placeholder="{% trans "Auto-filled when you select a tier" %}"
                     step="0.01" min="0" required>
-                <p class="form-hint">Wordt automatisch ingevuld op basis van tier, maar kan worden aangepast.</p>
+                <p class="form-hint">{% trans "Auto-filled based on tier, but can be adjusted." %}</p>
             </div>
 
             <div class="flex gap-3" style="border-top:1px solid var(--border); padding-top:1rem;">
                 <button type="submit" class="btn btn-primary flex items-center gap-2"
                     :disabled="running"
                     :class="running ? 'opacity-50 cursor-not-allowed' : ''">
-                    <span x-show="!running">✅ Audit Aanmaken</span>
+                    <span x-show="!running">✅ {% trans "Create Audit" %}</span>
                     <span x-show="running" class="flex items-center gap-2">
                         <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                         </svg>
-                        Aanmaken...
+                        {% trans "Creating…" %}
                     </span>
                 </button>
-                <a href="{% url 'dashboard:audits' %}" class="btn btn-secondary">Annuleren</a>
+                <a href="{% url 'dashboard:audits' %}" class="btn btn-secondary">{% trans "Cancel" %}</a>
             </div>
         </form>
     </div>

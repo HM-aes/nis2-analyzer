@@ -8,7 +8,7 @@
         <a href="{% url 'dashboard:client_detail' gap.audit.client.pk %}"
             class="text-sm font-medium hover:underline" style="color:var(--accent-blue);">{{ gap.audit.client.company_name }}</a>
         <div class="text-xs" style="color:var(--text-muted);">
-            <a href="{% url 'dashboard:audit_detail' gap.audit.pk %}" class="hover:underline">Audit →</a>
+            <a href="{% url 'dashboard:audit_detail' gap.audit.pk %}" class="hover:underline">{% trans "Audit →" %}</a>
         </div>
     </td>
     {% endif %}
@@ -21,10 +21,10 @@
             <span class="text-sm">{{ gap.risk_score }}/10</span>
         </div>
     </td>
-    <td @click="expanded=!expanded"><span class="text-sm">{{ gap.estimated_effort_hours }}u</span></td>
+    <td @click="expanded=!expanded"><span class="text-sm">{{ gap.estimated_effort_hours }}h</span></td>
     <td>
-        {% if gap.addressed %}<span class="text-green-600 text-sm font-medium">✓ Opgelost</span>
-        {% else %}<span class="text-red-500 text-sm">● Open</span>{% endif %}
+        {% if gap.addressed %}<span class="text-green-600 text-sm font-medium">✓ {% trans "Resolved" %}</span>
+        {% else %}<span class="text-red-500 text-sm">● {% trans "Open" %}</span>{% endif %}
     </td>
 </tr>
 <tr x-show="expanded" style="background:var(--secondary);">
@@ -32,11 +32,11 @@
         <div class="gap-detail">
             <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-8">
                 <div>
-                    <dt>Huidige Situatie</dt>
+                    <dt>{% trans "Current State" %}</dt>
                     <dd>{{ gap.current_state }}</dd>
                 </div>
                 <div>
-                    <dt>Aanbeveling</dt>
+                    <dt>{% trans "Recommendation" %}</dt>
                     <dd>{{ gap.recommendation }}</dd>
                 </div>
             </dl>
@@ -48,7 +48,7 @@
     <td colspan="8">
         <div class="empty-state py-16">
             <div class="empty-state-icon">🔍</div>
-            <div class="empty-state-text">Geen gaps gevonden voor deze filters</div>
+            <div class="empty-state-text">{% trans "No gaps found for these filters" %}</div>
         </div>
     </td>
 </tr>
