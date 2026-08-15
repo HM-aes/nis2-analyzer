@@ -364,6 +364,57 @@
   color: var(--muted);
 }
 
+@media (max-width: 768px) {
+  .dash-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .stat-num {
+    font-size: 1.5rem;
+  }
+
+  .onboard-card {
+    padding: 2.5rem 1.25rem;
+  }
+
+  .onboard-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .onboard-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .stat-delta {
+    font-size: 0.625rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .dash-head-sub {
+    font-size: 0.6875rem;
+    padding: 0.3rem 0.65rem;
+  }
+
+  .onboard-icon {
+    font-size: 3rem;
+  }
+
+  .onboard-title {
+    font-size: 1.25rem;
+  }
+}
+
 .bar-fill-critical { background: var(--danger); }
 .bar-fill-high     { background: color-mix(in oklab, var(--danger) 80%, var(--warning) 20%); }
 .bar-fill-medium   { background: var(--warning); }

@@ -1,6 +1,7 @@
 {% load static %}
 {% load i18n %}
-<nav class="sidebar" :aria-expanded="(!collapsed).toString()">
+<nav id="dashboard-sidebar" class="sidebar" :aria-expanded="(!collapsed).toString()"
+     @click="if ($event.target.closest('a')) mobileOpen = false">
 
     <!-- Brand -->
     <div class="sidebar-brand">

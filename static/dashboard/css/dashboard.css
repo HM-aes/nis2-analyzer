@@ -1331,9 +1331,77 @@ body::after {
 
 /* ── Responsive ────────────────────────────────────────────── */
 /* Sidebar-specific breakpoints live in sidebar.css             */
+
+.topbar-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--secondary);
+  color: var(--muted-foreground);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.topbar-menu-btn:hover {
+  color: var(--foreground);
+  border-color: var(--border-medium);
+  background: var(--surface-3, var(--secondary));
+}
+
+.topbar-menu-btn:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.topbar-start {
+  min-width: 0;
+  flex: 1;
+}
+
+.topbar-search {
+  width: 15rem;
+  max-width: 100%;
+}
+
+.card.p-0.overflow-hidden {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.card.p-0.overflow-hidden > .data-table,
+.card.p-0.overflow-hidden > table.data-table {
+  min-width: 36rem;
+}
+
 @media (max-width: 768px) {
   .app-shell {
     flex-direction: column;
+  }
+
+  .topbar-menu-btn {
+    display: inline-flex;
+  }
+
+  .topbar {
+    padding: 0.625rem 1rem;
+    height: auto;
+    min-height: 3.5rem;
+    gap: 0.5rem;
+  }
+
+  .topbar h1 {
+    font-size: 0.875rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
   }
 
   .kanban-board {
@@ -1346,6 +1414,60 @@ body::after {
 
   .page-content {
     padding: 1rem;
+  }
+
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-select,
+  .search-wrap--filter {
+    width: 100%;
+    min-width: 0;
+  }
+
+  #toast-container {
+    left: 1rem !important;
+    right: 1rem !important;
+    bottom: 1rem !important;
+    min-width: 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-content {
+    padding: 0.75rem;
+  }
+
+  .kpi-value {
+    font-size: 1.5rem;
+  }
+
+  .bar-label {
+    width: 5rem;
+    font-size: 0.6875rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .page-content {
+    padding: 0.625rem;
+  }
+
+  .topbar {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .btn {
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .topbar-menu-btn {
+    transition: none;
   }
 }
 

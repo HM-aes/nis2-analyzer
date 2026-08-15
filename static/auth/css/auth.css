@@ -97,7 +97,7 @@
 @media(max-width:860px){.auth-page{grid-template-columns:1fr}}
 
 .auth-panel{display:flex;flex-direction:column;justify-content:center;
-  padding:48px;max-width:480px;margin-left:auto;margin-right:auto;width:100%}
+  padding:clamp(24px,6vw,48px);max-width:480px;margin-left:auto;margin-right:auto;width:100%}
 .auth-brand{display:flex;align-items:center;gap:10px;font-weight:600;
   letter-spacing:-.01em;color:var(--ink);margin-bottom:36px;text-decoration:none}
 .auth-brand .glyph{width:28px;height:28px;border:1.5px solid var(--amber);border-radius:7px;
@@ -128,11 +128,11 @@
 
 /* ---- MODAL (HTMX-loaded signup on landing page) ---- */
 [x-cloak]{display:none!important}
-.modal-overlay{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;
+.modal-overlay{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:clamp(12px,4vw,20px);
   background:rgba(6,8,12,.72);backdrop-filter:blur(4px)}
 .modal-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;
-  width:100%;max-width:440px;max-height:92vh;overflow-y:auto;
-  box-shadow:0 40px 100px -30px rgba(0,0,0,.8);padding:30px 28px}
+  width:100%;max-width:440px;max-height:92vh;max-height:92dvh;overflow-y:auto;
+  box-shadow:0 40px 100px -30px rgba(0,0,0,.8);padding:clamp(20px,5vw,30px) clamp(18px,4vw,28px)}
 .modal-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px}
 .modal-title{font-family:'Fraunces',serif;font-weight:500;font-size:23px;letter-spacing:-.015em;
   color:#F4F7FB;margin-bottom:4px}
@@ -144,6 +144,18 @@
 .modal-close:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 
 .auth-modal-loading{font-size:13px;color:var(--muted);padding:8px 0}
+
+@media(max-width:480px){
+  .auth-h1{font-size:26px}
+  .auth-sub{font-size:14px;margin-bottom:24px}
+  .auth-brand{margin-bottom:28px}
+  .modal-title{font-size:21px}
+}
+@media(max-width:380px){
+  .auth-h1{font-size:24px}
+  .auth-field input{font-size:16px}
+  .auth-submit{padding:14px}
+}
 
 /* modal enter/leave (Alpine x-transition drives these via inline; these are fallbacks) */
 @media (prefers-reduced-motion:reduce){

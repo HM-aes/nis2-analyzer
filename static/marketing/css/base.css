@@ -128,4 +128,9 @@ h2.sec-title{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(28px,3
   .section-divider{padding:20px 0 28px}
   .btn{width:100%;justify-content:center}
   .btn-lg{padding:14px 20px}
+  .wrap{padding:0 clamp(12px,3.5vw,24px)}
+}
+@media(max-width:380px){
+  h2.sec-title{font-size:clamp(22px,7vw,28px)}
+  .chip{font-size:11px;padding:4px 9px}
 }

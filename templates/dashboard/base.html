@@ -10,8 +10,8 @@
   <title>{% block title %}NIS2 Dashboard{% endblock %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=7">
-  <link rel="stylesheet" href="{% static 'dashboard/css/sidebar.css' %}?v=13">
-  <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}?v=14">
+  <link rel="stylesheet" href="{% static 'dashboard/css/sidebar.css' %}?v=14">
+  <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}?v=15">
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=8">
   <link rel="stylesheet" href="{% static 'dashboard/css/dashboard-theme.css' %}?v=11">
   <script src="https://unpkg.com/htmx.org@1.9.12"
@@ -30,8 +30,15 @@
 <body x-data>
 
   <div class="app-shell"
-       x-data="{ collapsed: $persist(false).as('sidebar_collapsed') }"
-       :class="{ 'is-collapsed': collapsed }">
+       x-data="{ collapsed: $persist(false).as('sidebar_collapsed'), mobileOpen: false }"
+       :class="{ 'is-collapsed': collapsed, 'is-mobile-open': mobileOpen }"
+       @keydown.escape.window="mobileOpen = false">
+
+    <div class="sidebar-backdrop"
+         x-show="mobileOpen"
+         x-cloak
+         @click="mobileOpen = false"
+         aria-hidden="true"></div>
 
     {% include "dashboard/includes/sidebar.html" %}
 
@@ -39,12 +46,22 @@
 
       <!-- Topbar -->
       <header class="topbar">
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 topbar-start">
+          <button type="button"
+                  class="topbar-menu-btn"
+                  @click="mobileOpen = !mobileOpen"
+                  :aria-expanded="mobileOpen.toString()"
+                  aria-controls="dashboard-sidebar"
+                  aria-label="{% trans 'Open navigation menu' %}">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
           <h1>{% block page_title %}{% endblock %}</h1>
         </div>
         <div class="flex items-center gap-3">
 
-          <div class="search-wrap search-wrap--pill hidden sm:flex" style="width:15rem;">
+          <div class="search-wrap search-wrap--pill topbar-search hidden sm:flex">
             <svg class="search-icon w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />

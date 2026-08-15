@@ -258,11 +258,44 @@
 
 @media (max-width: 768px) {
     .sidebar {
-        width: 100%;
-        min-height: auto;
-        height: auto;
-        flex-direction: row;
-        position: relative;
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 200;
+        width: min(280px, 88vw) !important;
+        min-height: 100vh;
+        min-height: 100dvh;
+        height: 100vh;
+        height: 100dvh;
+        flex-direction: column;
+        transform: translateX(-100%);
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--shadow-md, 0 8px 24px rgba(0, 0, 0, 0.18));
+        border-right: 1px solid var(--border);
+    }
+
+    .app-shell.is-mobile-open .sidebar {
+        transform: translateX(0);
+    }
+
+    .app-shell.is-collapsed .sidebar {
+        width: min(280px, 88vw) !important;
+    }
+
+    .sidebar-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 199;
+        background: var(--backdrop, oklch(0% 0 0 / 20%));
+        display: none;
+    }
+
+    .app-shell.is-mobile-open .sidebar-backdrop {
+        display: block;
+    }
+
+    .sidebar-toggle {
+        display: none;
     }
 }
 
@@ -327,6 +360,12 @@
     .sidebar-toggle svg,
     .app-shell.is-collapsed .sidebar-nav a::after {
         transition: none;
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            transition: none;
+        }
     }
 }
 
