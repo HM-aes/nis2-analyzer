@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "frontend/templates/dashboard/gaps.html"
+        ],
+        "createdAt": "2026-11-07T12:50:55.604Z",
+        "reason": "agent: false positive; card uses p-0 deliberately, children (filter bar p-4, table cells) provide their own inset"
+      }
+    ]
+  }
+}

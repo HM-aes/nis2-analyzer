@@ -3,7 +3,8 @@
   "venv": "venv",
   "pythonVersion": "3.12",
   "pythonPlatform": "Darwin",
-  "extraPaths": ["venv/lib/python3.12/site-packages"],
+  "extraPaths": ["backend", "venv/lib/python3.12/site-packages"],
+  "include": ["backend"],
   "typeCheckingMode": "basic",
   "reportMissingImports": true,
   "reportMissingTypeStubs": false

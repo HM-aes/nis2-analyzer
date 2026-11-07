@@ -1,0 +1,78 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Clients" %} — NIS2{% endblock %}
+{% block page_title %}{% trans "Clients" %}{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-5">
+    <div class="filter-bar" x-data="{ sector: '', size: '' }">
+        <div class="search-wrap search-wrap--filter">
+            <svg class="search-icon w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
+            </svg>
+            <input type="text" name="q" placeholder="{% trans 'Search client, KVK…' %}" class="search-input search-input--embedded text-sm"
+                hx-get="{% url 'dashboard:htmx_client_search' %}" hx-trigger="keyup changed delay:300ms"
+                hx-target="#client-table-body" hx-include="#filter-sector,#filter-size">
+        </div>
+        <div class="filter-select-wrap">
+            <select id="filter-sector" name="sector"
+                class="filter-control filter-select filter-control--warning"
+                :class="sector && 'filter-control--active'"
+                x-model="sector"
+                hx-get="{% url 'dashboard:htmx_client_search' %}" hx-trigger="change" hx-target="#client-table-body"
+                hx-include="[name='q'],#filter-size">
+                <option value="">{% trans "All sectors" %}</option>
+                {% for val, label in sectors %}
+                <option value="{{ val }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-select-wrap">
+            <select id="filter-size" name="size"
+                class="filter-control filter-select filter-control--default"
+                :class="size && 'filter-control--active'"
+                x-model="size"
+                hx-get="{% url 'dashboard:htmx_client_search' %}" hx-trigger="change" hx-target="#client-table-body"
+                hx-include="[name='q'],#filter-sector">
+                <option value="">{% trans "All sizes" %}</option>
+                {% for val, label in sizes %}
+                <option value="{{ val }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <a href="{% url 'dashboard:client_new' %}" class="btn btn-primary btn-pill btn-cta">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        {% trans "New Client" %}
+    </a>
+</div>
+
+{% if total_clients == 0 %}
+{% trans "Start with your first client" as onboard_title %}
+{% trans "Add a client, upload their security policies, and get a scored NIS2 gap analysis with a prioritised action plan." as onboard_lead %}
+{% include "dashboard/includes/onboard_card.html" with onboard_id="clients-empty-title" %}
+{% else %}
+<div class="card p-0 overflow-hidden">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>{% trans "Company" %}</th>
+                <th>{% trans "KVK" %}</th>
+                <th>{% trans "Sector" %}</th>
+                <th>{% trans "Size" %}</th>
+                <th>{% trans "Audits" %}</th>
+                <th>{% trans "Latest Score" %}</th>
+                <th>{% trans "Contact" %}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="client-table-body">
+            {% include "dashboard/partials/client_rows.html" with clients=clients %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

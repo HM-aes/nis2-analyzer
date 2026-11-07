@@ -1,0 +1,62 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "**/dashboard/gaps.html"
+        ],
+        "createdAt": "2026-11-07T12:51:39.927Z",
+        "reason": "agent: false positive; .treemap-cell padding comes from dashboard.css, invisible to the template scan"
+      },
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "files": [
+          "**/dashboard/css/dashboard-polish.css"
+        ],
+        "createdAt": "2026-11-07T13:29:03.821Z",
+        "reason": "agent: Inter/Fraunces are the app's established typography (base.html font link, tokens, multiple stylesheets); not changed here. Not user-confirmed; flagged in summary"
+      },
+      {
+        "rule": "overused-font",
+        "value": "fraunces",
+        "files": [
+          "**/dashboard/css/dashboard-polish.css"
+        ],
+        "createdAt": "2026-11-07T13:29:03.886Z",
+        "reason": "agent: Inter/Fraunces are the app's established typography (base.html font link, tokens, multiple stylesheets); not changed here. Not user-confirmed; flagged in summary"
+      },
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "files": [
+          "**/dashboard/css/dashboard.css"
+        ],
+        "createdAt": "2026-11-07T14:05:55.559Z",
+        "reason": "agent: Inter is the app's established UI face (base.html + tokens); this edit only removes sidebar label hover pills"
+      },
+      {
+        "rule": "overused-font",
+        "value": "fraunces",
+        "files": [
+          "**/dashboard/css/home.css"
+        ],
+        "createdAt": "2026-11-07T14:12:49.009Z",
+        "reason": "agent: user asked to keep serif headings; Fraunces is the established display face"
+      },
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "files": [
+          "**/dashboard/css/home.css"
+        ],
+        "createdAt": "2026-11-07T14:12:49.042Z",
+        "reason": "agent: Inter is the established UI face; this edit adds component CSS only"
+      }
+    ]
+  }
+}

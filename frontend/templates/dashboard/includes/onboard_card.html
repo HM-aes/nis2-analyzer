@@ -1,0 +1,58 @@
+{% load i18n %}
+{% comment %}
+Empty-state onboarding card. Expects: onboard_id, onboard_title, onboard_lead.
+Styles: static/dashboard/css/onboard.css
+{% endcomment %}
+<section class="card mb-6 onboard-card" aria-labelledby="{{ onboard_id }}">
+    <h2 id="{{ onboard_id }}" class="onboard-title">{{ onboard_title }}</h2>
+    <p class="onboard-lead">{{ onboard_lead }}</p>
+    <div class="onboard-choices">
+        <a href="{% url 'dashboard:client_new' %}" class="onboard-choice onboard-choice--primary">
+            <span class="onboard-choice__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M19 8v6M22 11h-6" />
+                </svg>
+            </span>
+            <span class="onboard-choice__body">
+                <span class="onboard-choice__title">{% trans "Add your first client" %}</span>
+                <span class="onboard-choice__desc">{% trans "Start a NIS2 gap analysis in three steps." %}</span>
+            </span>
+            <svg class="onboard-choice__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+        </a>
+        <a href="{% url 'report_generator:sector_report' %}" class="onboard-choice">
+            <span class="onboard-choice__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 3v18h18" />
+                    <path d="M8 17v-5M13 17V8M18 17v-8" />
+                </svg>
+            </span>
+            <span class="onboard-choice__body">
+                <span class="onboard-choice__title">{% trans "Free sector report" %}</span>
+                <span class="onboard-choice__desc">{% trans "See how your sector scores on NIS2. No setup needed." %}</span>
+            </span>
+            <svg class="onboard-choice__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+        </a>
+    </div>
+    <div class="onboard-steps" aria-label="{% trans 'Getting started' %}">
+        <div class="onboard-step is-current">
+            <span class="onboard-step__n">1</span>
+            <span class="onboard-step__label">{% trans "Add client" %}</span>
+        </div>
+        <span class="onboard-step__line" aria-hidden="true"></span>
+        <div class="onboard-step">
+            <span class="onboard-step__n">2</span>
+            <span class="onboard-step__label">{% trans "Upload documents" %}</span>
+        </div>
+        <span class="onboard-step__line" aria-hidden="true"></span>
+        <div class="onboard-step">
+            <span class="onboard-step__n">3</span>
+            <span class="onboard-step__label">{% trans "Run AI analysis" %}</span>
+        </div>
+    </div>
+</section>

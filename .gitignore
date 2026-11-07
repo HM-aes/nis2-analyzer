@@ -58,6 +58,9 @@ logs/
 # Jupyter
 .ipynb_checkpoints/
 
+# Impeccable design-hook cache
+.impeccable/hook.cache.json
+
 # Sample/test docs (optional — remove if you want to keep)
 sample_docs/
 

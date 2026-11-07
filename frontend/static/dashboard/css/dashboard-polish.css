@@ -1,0 +1,605 @@
+/* ================================================================
+   Dashboard — Pass 3 · "Bring it to life"
+   Layered polish on top of tokens.css + dashboard.css +
+   dashboard-theme.css. Load LAST. Main content only; sidebar
+   untouched. Pure CSS, no template changes required.
+   ================================================================ */
+
+/* ── Local design vars (self-contained; scoped to main content) ── */
+.main-content {
+  --pl-accent:   oklch(0.74 0.16 58);   /* brand amber — the one accent */
+  --pl-blue:     oklch(0.70 0.12 245);
+  --pl-green:    oklch(0.74 0.15 158);
+  --pl-amber:    oklch(0.80 0.14 78);
+  --pl-red:      oklch(0.70 0.19 25);
+  --pl-tint:     var(--pl-accent);
+
+  --pl-ease:     cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Refined UI type — Inter for chrome, Fraunces for display figures */
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-feature-settings: 'cv02','cv03','cv04','cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Flat canvas — no ambient glow; layers separate by surface colour */
+.page-content::before { display: none; }
+.page-content > * { position: relative; z-index: 1; }
+
+/* ── Zinc shell: near-black canvas + dot grid, matches the sidebar ── */
+.main-content {
+  --surface:           var(--shell-card);
+  --surface-hover:     var(--shell-raised);
+  --surface-secondary: var(--shell-raised);
+  --header-strip:      var(--shell-raised);
+  --filter-bg:         var(--shell-raised);
+  --filter-bg-hover:   color-mix(in oklab, var(--shell-raised) 85%, var(--text) 8%);
+  --card-header-bg:    var(--shell-raised);
+  background: var(--shell-bg);
+}
+
+.main-content::before {
+  background-image: radial-gradient(circle, var(--shell-dot) 1px, transparent 1.2px);
+  background-size: 18px 18px;
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 20%, transparent 85%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 20%, transparent 85%);
+  opacity: 1;
+}
+
+.main-content::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--shell-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--shell-grid-line) 1px, transparent 1px);
+  background-size: 36px 36px;
+  background-position: center bottom;
+  mask-image: linear-gradient(to bottom, transparent 50%, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 50%, black 100%);
+}
+
+/* ── Sticky topbar: translucent, blurred, premium ──────────────── */
+.main-content .topbar {
+  background: color-mix(in oklab, var(--surface) 72%, transparent);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+  backdrop-filter: saturate(1.4) blur(14px);
+  border-bottom: 1px solid var(--separator);
+}
+.main-content .topbar h1 { letter-spacing: -0.015em; font-weight: 650; }
+
+/* =================================================================
+   CARDS — shared elevation + life
+   ================================================================= */
+.main-content .card:not(.stat-card),
+.main-content .scard,
+.main-content .kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: none;
+  transform: none;
+  transition: border-color 0.15s ease;
+}
+.main-content .card:not(.stat-card):hover,
+.main-content .scard:hover,
+.main-content .kpi-card:hover {
+  transform: none;
+  border-color: var(--border-strong);
+  box-shadow: none;
+}
+
+.main-content .kpi-card { border-left-color: var(--border) !important; }
+
+/* Retire the heavy filled header strips → clean hairline headers */
+.main-content .card.stat-card .stat-card-top,
+.main-content .card.panel-card .scard-head,
+.main-content .scard-head {
+  background: transparent;
+  color: var(--foreground);
+  border-bottom: 1px solid var(--separator);
+}
+.main-content .card.stat-card .stat-card-top { border-bottom: none; }
+
+/* =================================================================
+   KPI STAT CARDS — colored identity, depth, motion
+   ================================================================= */
+.main-content .card.stat-card {
+  overflow: hidden;
+  position: relative;
+  background:
+    radial-gradient(140px 90px at 100% 100%,
+      color-mix(in oklab, var(--pl-tint) 4%, transparent),
+      transparent 72%),
+    linear-gradient(180deg, var(--card-highlight), transparent 1px),
+    var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--card-inset);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .main-content .stats-row .stat-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-strong);
+    box-shadow: var(--card-inset);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .main-content .stats-row .stat-card:hover {
+    transform: none;
+    box-shadow: var(--card-inset);
+  }
+}
+.main-content .stats-row .stat-card:nth-child(1) { --pl-tint: var(--pl-accent); }
+.main-content .stats-row .stat-card:nth-child(2) { --pl-tint: var(--pl-blue); }
+.main-content .stats-row .stat-card:nth-child(3) { --pl-tint: var(--pl-green); }
+.main-content .stats-row .stat-card:nth-child(4) { --pl-tint: var(--pl-red); }
+
+.main-content .card.stat-card::after { display: none; }
+
+.main-content .card.stat-card .stat-card-top { padding: 0; margin-bottom: 0.7rem; }
+
+.main-content .card.stat-card .kpi-icon-wrap {
+  width: 2.25rem; height: 2.25rem;
+  border-radius: 8px;
+  background: color-mix(in oklab, var(--pl-tint) 12%, var(--surface));
+  border: 1px solid color-mix(in oklab, var(--pl-tint) 18%, transparent);
+  color: var(--pl-tint);
+  box-shadow: none;
+}
+.main-content .card.stat-card .kpi-icon-muted { color: inherit; }
+
+/* delta → soft pill */
+.main-content .card.stat-card .stat-delta {
+  margin-top: 0;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  background: color-mix(in oklab, var(--muted) 14%, var(--surface));
+  color: var(--muted);
+  border: 1px solid color-mix(in oklab, var(--muted) 20%, transparent);
+}
+.main-content .card.stat-card .stat-delta.delta-up {
+  background: color-mix(in oklab, var(--success) 15%, var(--surface));
+  color: var(--success-text);
+  border-color: color-mix(in oklab, var(--success) 32%, transparent);
+}
+.main-content .card.stat-card .stat-delta.delta-down {
+  background: color-mix(in oklab, var(--danger) 15%, var(--surface));
+  color: var(--danger-text);
+  border-color: color-mix(in oklab, var(--danger) 32%, transparent);
+}
+
+/* the number — Fraunces, big, tight, tabular */
+.main-content .card.stat-card .stat-num {
+  padding: 0;
+  font-family: 'Fraunces', 'Georgia', serif;
+  font-weight: 550;
+  font-size: 2.1rem;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.main-content .card.stat-card .kpi-label {
+  padding: 0;
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--text-muted);
+}
+
+/* =================================================================
+   SECTION LABELS — retire cold mono pills for refined eyebrows
+   ================================================================= */
+.main-content .tag {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  background: transparent;
+  color: var(--foreground);
+  padding: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  gap: 0.55rem;
+}
+.main-content .tag::before {
+  width: 7px; height: 7px;
+  background: var(--pl-accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--pl-accent) 22%, transparent);
+}
+
+/* panel header spacing */
+.main-content .card.panel-card .scard-head { padding: 1rem 1.35rem; }
+.main-content .card.panel-card .scard-head .st,
+.main-content .card.panel-card .card-title {
+  font-size: 0.9rem; font-weight: 600; color: var(--foreground);
+}
+
+/* top status eyebrow ("real-time overview…") */
+.main-content .dash-head-sub {
+  background: color-mix(in oklab, var(--surface) 70%, transparent);
+  border-color: var(--border);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: var(--muted);
+}
+.main-content .dash-head-sub::before { background: var(--pl-accent); }
+.main-content .status-chip-ready .status-dot { color: var(--success); }
+
+/* =================================================================
+   PRIORITY (.scard) — brighter marks, richer left rail
+   ================================================================= */
+.main-content .scard-head { padding: 0.85rem 1rem 0.85rem 1.25rem; }
+.main-content .scard-title .st { color: var(--foreground); }
+.main-content .scard-mark {
+  border-radius: 3px;
+  background: var(--pl-accent);
+  box-shadow: 0 0 8px -1px color-mix(in oklab, var(--pl-accent) 70%, transparent);
+}
+.main-content .scard.ok  .scard-mark { background: var(--success); box-shadow: 0 0 8px -1px color-mix(in oklab, var(--success) 70%, transparent); }
+.main-content .scard.todo .scard-mark { background: var(--warning); box-shadow: 0 0 8px -1px color-mix(in oklab, var(--warning) 70%, transparent); }
+.main-content .scard.bad  .scard-mark { background: var(--danger);  box-shadow: 0 0 8px -1px color-mix(in oklab, var(--danger) 70%, transparent); }
+.main-content .scard::before { width: 3px; filter: saturate(1.2); }
+
+/* =================================================================
+   KANBAN PIPELINE
+   ================================================================= */
+.main-content .kanban-col {
+  background: linear-gradient(180deg,
+    color-mix(in oklab, var(--surface) 88%, var(--background)),
+    color-mix(in oklab, var(--surface) 70%, var(--background)));
+  border: 1px solid var(--separator);
+  border-radius: 12px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.main-content .kanban-col:hover { border-color: var(--border-strong); }
+.main-content .kanban-count {
+  background: color-mix(in oklab, var(--foreground) 10%, transparent);
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+.main-content .audit-mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  position: relative;
+  transition: transform 0.18s var(--pl-ease), border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.main-content .audit-mini-card::before {
+  content: ""; position: absolute; left: 0; top: 8px; bottom: 8px;
+  width: 2px; border-radius: 2px;
+  background: var(--pl-accent); opacity: 0; transition: opacity 0.18s ease;
+}
+.main-content .audit-mini-card:hover {
+  transform: translateX(2px);
+  border-color: color-mix(in oklab, var(--pl-accent) 40%, var(--border));
+  box-shadow: 0 6px 18px -10px oklch(0 0 0 / 0.7);
+}
+.main-content .audit-mini-card:hover::before { opacity: 1; }
+
+/* =================================================================
+   ACTIVITY FEED
+   ================================================================= */
+.main-content .feed-row {
+  border-radius: 10px;
+  padding: 0.6rem 0.6rem;
+  margin: 0 -0.35rem;
+  border-bottom: 1px solid var(--separator);
+  transition: background 0.15s ease;
+}
+.main-content .feed-scroll .feed-row:last-child { border-bottom: none; }
+.main-content .feed-row:hover { background: color-mix(in oklab, var(--foreground) 5%, transparent); }
+.main-content .feed-avatar {
+  background: linear-gradient(140deg,
+    color-mix(in oklab, var(--pl-accent) 26%, var(--surface)),
+    color-mix(in oklab, var(--pl-blue) 24%, var(--surface)));
+  border: 1px solid color-mix(in oklab, var(--pl-accent) 30%, transparent);
+  color: var(--foreground);
+  box-shadow: 0 2px 8px -4px oklch(0 0 0 / 0.6);
+}
+/* keep rows to two tidy lines even in the narrow column */
+.main-content .feed-main { gap: 0.1rem; }
+.main-content .feed-name {
+  display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.main-content .feed-time { white-space: nowrap; }
+.main-content .feed-row .badge { flex-shrink: 0; }
+
+/* =================================================================
+   PROGRESS + CHARTS
+   ================================================================= */
+.main-content .progress-track {
+  height: 7px;
+  background: color-mix(in oklab, var(--foreground) 8%, transparent);
+  border-color: transparent;
+}
+.main-content .progress-fill {
+  background: linear-gradient(90deg,
+    color-mix(in oklab, var(--warning) 70%, var(--pl-accent)),
+    var(--warning));
+  box-shadow: 0 0 10px -2px color-mix(in oklab, var(--warning) 80%, transparent);
+}
+.main-content .progress-fill.is-complete {
+  background: linear-gradient(90deg,
+    color-mix(in oklab, var(--success) 75%, var(--pl-blue)), var(--success));
+  box-shadow: 0 0 10px -2px color-mix(in oklab, var(--success) 80%, transparent);
+}
+
+/* histogram — gradient columns with glow + baseline */
+.main-content .hist-chart {
+  border-bottom: 1px solid var(--separator);
+  padding-bottom: 2px;
+}
+.main-content .hist-bar-fill {
+  border-radius: 6px 6px 2px 2px;
+  box-shadow: 0 0 14px -6px currentColor;
+}
+.main-content .hist-bar-fill--danger    { background: linear-gradient(180deg, color-mix(in oklab, var(--danger) 92%, white), var(--danger)); }
+.main-content .hist-bar-fill--danger-2  { background: linear-gradient(180deg, color-mix(in oklab, var(--danger) 70%, var(--warning)), color-mix(in oklab, var(--danger) 82%, var(--warning) 18%)); }
+.main-content .hist-bar-fill--warning   { background: linear-gradient(180deg, color-mix(in oklab, var(--warning) 92%, white), var(--warning)); }
+.main-content .hist-bar-fill--warning-2 { background: linear-gradient(180deg, color-mix(in oklab, var(--warning) 74%, var(--success)), color-mix(in oklab, var(--warning) 84%, var(--success) 16%)); }
+.main-content .hist-bar-fill--success   { background: linear-gradient(180deg, color-mix(in oklab, var(--success) 92%, white), var(--success)); }
+
+/* horizontal bar chart */
+.main-content .bar-track {
+  height: 9px;
+  background: color-mix(in oklab, var(--foreground) 8%, transparent);
+  border: none;
+}
+.main-content .bar-fill-critical { background: linear-gradient(90deg, color-mix(in oklab, var(--danger) 78%, white), var(--danger)); }
+.main-content .bar-fill-high     { background: linear-gradient(90deg, color-mix(in oklab, var(--danger) 70%, var(--warning)), color-mix(in oklab, var(--warning) 60%, var(--danger))); }
+.main-content .bar-fill-medium   { background: linear-gradient(90deg, color-mix(in oklab, var(--warning) 82%, white), var(--warning)); }
+.main-content .bar-fill-low      { background: color-mix(in oklab, var(--foreground) 22%, transparent); }
+.main-content .bar-label { color: var(--muted); }
+.main-content .bar-count { color: var(--foreground); font-variant-numeric: tabular-nums; font-weight: 600; }
+.main-content .legend-swatch { border-radius: 3px; }
+
+/* revenue figures */
+.main-content .revenue-value {
+  font-family: 'Fraunces', serif; font-weight: 550; font-size: 1.75rem;
+  letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+}
+
+/* =================================================================
+   EMPTY STATES — styled, not sad
+   ================================================================= */
+.main-content .empty-state { padding: 2.5rem 1rem; }
+.main-content .empty-state-icon {
+  display: inline-grid; place-items: center;
+  width: 3.25rem; height: 3.25rem; margin: 0 auto 0.85rem;
+  font-size: 1.4rem; opacity: 1;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--foreground) 6%, transparent);
+  border: 1px solid var(--separator);
+}
+.main-content .empty-state-text { color: var(--dim); font-weight: 500; }
+.main-content .empty-state--activity .empty-state-text { color: var(--text); }
+.main-content .empty-state--activity p { color: var(--text-muted); }
+
+/* =================================================================
+   BUTTONS — one confident accent CTA
+   ================================================================= */
+.main-content .btn { border-radius: 10px; font-weight: 550; }
+.main-content .btn.btn-primary {
+  background: linear-gradient(180deg,
+    color-mix(in oklab, var(--pl-accent) 92%, white 8%),
+    var(--pl-accent));
+  color: oklch(0.2 0.03 60);
+  border: 1px solid color-mix(in oklab, var(--pl-accent) 70%, black 12%);
+  box-shadow:
+    0 1px 0 0 color-mix(in oklab, white 30%, transparent) inset,
+    0 8px 20px -10px color-mix(in oklab, var(--pl-accent) 90%, transparent);
+  transition: transform 0.18s var(--pl-ease), box-shadow 0.2s ease, filter 0.2s ease;
+}
+.main-content .btn.btn-primary:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+  box-shadow:
+    0 1px 0 0 color-mix(in oklab, white 40%, transparent) inset,
+    0 12px 26px -10px color-mix(in oklab, var(--pl-accent) 95%, transparent);
+}
+.main-content .btn.btn-primary:active { transform: translateY(0); }
+.main-content .btn.btn-secondary { border-radius: 10px; }
+.main-content .btn.btn-secondary:hover { border-color: var(--border-strong); }
+
+/* onboarding hero */
+.main-content .onboard-card { padding: 3.5rem 2rem; }
+.main-content .onboard-title {
+  font-family: 'Fraunces', serif; font-weight: 560; letter-spacing: -0.02em;
+  font-size: 1.7rem;
+}
+
+/* =================================================================
+   ENTRANCE MOTION
+   ================================================================= */
+@media (prefers-reduced-motion: no-preference) {
+  .main-content .card.panel-card,
+  .main-content .scard {
+    animation: pl-rise 0.6s var(--pl-ease) both;
+  }
+}
+@keyframes pl-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .main-content .card,
+  .main-content .scard,
+  .main-content .audit-mini-card { transition: none; animation: none; }
+}
+
+/* =================================================================
+   SELECT DROPDOWN — themed listbox that replaces every native <select>
+   (built by static/dashboard/js/select-dropdown.js; the real <select>
+   stays in the DOM, visually hidden, as the source of truth)
+   ================================================================= */
+.dd {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+.dd--field { display: block; width: 100%; }
+.dd--fixed { display: inline-block; }   /* width comes from a copied w-* class */
+
+/* Native select: keep it for forms / HTMX / x-model, hide it visually */
+.dd-native {
+  position: absolute !important;
+  inset: auto 0 0 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dd-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.45rem 0.75rem 0.45rem 0.95rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--field-background);
+  color: var(--foreground);
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.dd--filter .dd-trigger { min-width: 9rem; }
+.dd--field .dd-trigger {
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem;
+  background: var(--background);
+}
+.dd-trigger:hover {
+  background: var(--filter-bg-hover);
+  border-color: var(--border-strong);
+}
+.dd--field .dd-trigger:hover { background: var(--background); }
+.dd-trigger[aria-expanded="true"] {
+  outline: none;
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 3px var(--field-focus);
+}
+/* Keyboard focus keeps the stronger accent ring */
+.dd-trigger:focus-visible {
+  outline: none;
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 3px var(--filter-focus-ring);
+}
+.dd-trigger:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* Active filter (a non-"All" value is applied) */
+.dd.is-active .dd-trigger {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+}
+.dd.is-placeholder .dd-label { color: var(--dim); }
+
+/* Label cell also holds hidden copies of every option so the trigger keeps a
+   stable width when the selection changes */
+.dd-label-wrap { display: grid; min-width: 0; flex: 1; }
+.dd-label,
+.dd-sizer { grid-area: 1 / 1; min-width: 0; white-space: nowrap; }
+.dd-label { overflow: hidden; text-overflow: ellipsis; }
+.dd-sizer { visibility: hidden; height: 0; overflow: hidden; pointer-events: none; }
+
+.dd-chevron {
+  flex: none;
+  color: var(--muted);
+  transition: transform 0.2s ease;
+}
+.dd-trigger[aria-expanded="true"] .dd-chevron { transform: rotate(180deg); }
+
+.dd-menu {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  min-width: 100%;
+  width: max-content;
+  max-width: min(22rem, calc(100vw - 2rem));
+  max-height: 17rem;
+  overflow-y: auto;
+  padding: 0.35rem;
+  border-radius: calc(var(--radius) * 1.4);
+  border: 1px solid var(--filter-border);
+  background: var(--filter-bg);
+  box-shadow: var(--shadow-md);
+  transform-origin: top left;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+.dd-menu[hidden] { display: none; }
+.dd--up .dd-menu { top: auto; bottom: calc(100% + 0.4rem); transform-origin: bottom left; }
+.dd--right .dd-menu { left: auto; right: 0; transform-origin: top right; }
+
+.dd-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--filter-muted);
+  font: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.12s, color 0.12s;
+}
+.dd-option:hover,
+.dd-option:focus-visible {
+  outline: none;
+  background: var(--filter-bg-hover);
+  color: var(--filter-fg);
+}
+.dd-option[aria-selected="true"] {
+  background: var(--accent-soft);
+  color: var(--filter-fg);
+  font-weight: 500;
+}
+.dd-option[aria-disabled="true"] { opacity: 0.45; pointer-events: none; }
+.dd-check { flex: none; color: var(--accent); opacity: 0; }
+.dd-option[aria-selected="true"] .dd-check { opacity: 1; }
+
+/* Legacy arrow drawn by the old filter wrapper is replaced by our chevron */
+.filter-select-wrap:has(.dd)::after { display: none; }
+.filter-select-wrap { align-items: center; }
+
+/* Table cards that host a dropdown must not clip its menu: only the table scrolls */
+.dd-table-wrap {
+  overflow-x: auto;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+@media (max-width: 640px) {
+  .filter-bar .dd,
+  .filter-bar .filter-select-wrap { width: 100%; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dd-menu:not([hidden]) { animation: dd-pop 0.16s var(--pl-ease, ease-out) both; }
+}
+@keyframes dd-pop {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dd-trigger, .dd-chevron, .dd-option { transition: none; }
+}

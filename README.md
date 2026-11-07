@@ -27,6 +27,18 @@ This platform automates NIS2 compliance gap analysis using:
    - Qdrant client for NIS2 knowledge base
    - Semantic search for requirements
 
+## 📁 Project Structure
+
+```
+backend/    All Python — Django project (nis2_analyzer/) and the 8 apps,
+            manage.py, scripts/, plus runtime data (media/, logs/,
+            qdrant_local/, db.sqlite3)
+frontend/   Server-rendered UI — templates/ and static/ (HTMX + Alpine.js,
+            no build step)
+```
+
+Run every management command from the repo root: `python backend/manage.py <cmd>`.
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -53,13 +65,13 @@ cp .env.example .env
 nano .env  # Add your ANTHROPIC_API_KEY
 
 # 6. Run Django migrations
-python manage.py migrate
+python backend/manage.py migrate
 
 # 7. Create superuser
-python manage.py createsuperuser
+python backend/manage.py createsuperuser
 
 # 8. Start development server
-python manage.py runserver
+python backend/manage.py runserver
 ```
 
 ### Access the Application
@@ -201,7 +213,7 @@ results = qdrant.search(
 ### Ingest Full NIS2 Corpus
 
 ```bash
-python manage.py ingest_nis2_docs \
+python backend/manage.py ingest_nis2_docs \
   --docs-dir sample_docs/NIS2-EU-documents \
   --language en \
   --clear
@@ -259,20 +271,20 @@ NIS2 corpus tracking (what's in Qdrant)
 ### Run Tests
 
 ```bash
-python manage.py test
+python backend/manage.py test
 ```
 
 ### Create Migrations
 
 ```bash
-python manage.py makemigrations
-python manage.py migrate
+python backend/manage.py makemigrations
+python backend/manage.py migrate
 ```
 
 ### Django Shell
 
 ```bash
-python manage.py shell
+python backend/manage.py shell
 
 # Test components
 from compliance_engine.models import Client
@@ -284,8 +296,8 @@ from rag_engine.qdrant_client import NIS2QdrantClient
 
 ```bash
 # Set DEBUG=False and configure ALLOWED_HOSTS in .env
-python manage.py collectstatic
-python manage.py runserver 0.0.0.0:8000
+python backend/manage.py collectstatic
+python backend/manage.py runserver 0.0.0.0:8000
 ```
 
 ## 📝 TODO / Roadmap

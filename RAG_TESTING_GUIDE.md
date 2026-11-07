@@ -1,5 +1,10 @@
 # Deployment Readiness Guide — NIS2 Analyzer
 
+> ⚠️ **OUTDATED (2026-09-08).** This guide references paths, a management command,
+> and an Anthropic-based auditor that no longer match the code. For the current
+> local backend setup + end-to-end test steps see **`BACKEND_TESTING.md`**.
+> Kept for historical context only.
+
 > **Doel:** Wat moet er nog gedaan worden voordat de applicatie live kan? Dit document beschrijft de stappen in volgorde.
 
 ---

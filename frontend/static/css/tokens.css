@@ -1,0 +1,197 @@
+@layer base {
+  :root {
+    color-scheme: dark;
+
+    /* ── Cool slate surfaces — tweak these six first ─────────── */
+    --bg:             #0e1116;
+    --surface:        #151922;
+    --surface-hover:  #1a2029;
+    --border:         rgba(255, 255, 255, 0.07);
+    --card-highlight: rgba(255, 255, 255, 0.12);
+    --card-inset:     inset 0 1px 0 var(--card-highlight),
+                      inset 0 -12px 18px color-mix(in oklab, var(--bg) 42%, transparent);
+    --stat-blue:      oklch(0.70 0.12 245);
+    --text:           #e8eaed;
+    --text-muted:     #9aa3b2;
+
+    /* ── Near-black zinc shell (shadcn-style) ─────────────────── */
+    --shell-bg:     oklch(0.141 0.005 285.8);
+    --shell-card:   oklch(0.175 0.005 285.9);
+    --shell-raised: oklch(0.21 0.006 285.9);
+    --shell-dot:    color-mix(in oklab, var(--text) 14%, transparent);
+    --shell-grid-line: color-mix(in oklab, var(--text) 6%, transparent);
+
+    --sidebar-bg:      var(--shell-bg);
+    --sidebar-surface: var(--shell-raised);
+    --sidebar-dot:     var(--shell-dot);
+
+    /* Aliases used by the rest of the stylesheet */
+    --background:        var(--bg);
+    --foreground:        var(--text);
+    --muted:             var(--text-muted);
+    --surface-secondary: var(--surface-hover);
+    --border-strong:     rgba(255, 255, 255, 0.14);
+    --separator:         rgba(255, 255, 255, 0.06);
+    --header-strip:      var(--surface-hover);
+    --dim:               #8a93a0;
+
+    --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.30),
+                 0 2px 6px -1px oklch(0 0 0 / 0.40);
+    --shadow-md: 0 2px 4px oklch(0 0 0 / 0.35),
+                 0 12px 28px -6px oklch(0 0 0 / 0.55);
+
+    /* ── Subtle brand accent (shield orange) — use sparingly ─── */
+    --accent:        oklch(0.705 0.155 55);
+    --accent-soft:   color-mix(in oklab, var(--accent) 15%, var(--surface));
+    --accent-border: color-mix(in oklab, var(--accent) 34%, var(--surface));
+
+    /* ── Status bases (brightened for dark contrast) ─────────── */
+    --success: oklch(0.72 0.15 155);
+    --warning: oklch(0.80 0.14 75);
+    --danger:  oklch(0.68 0.19 27);
+
+    --success-soft: color-mix(in oklab, var(--success) 15%, var(--surface));
+    --success-text: color-mix(in oklab, var(--success) 88%, white);
+    --success-edge: color-mix(in oklab, var(--success) 34%, var(--surface));
+    --warning-soft: color-mix(in oklab, var(--warning) 14%, var(--surface));
+    --warning-text: color-mix(in oklab, var(--warning) 90%, white);
+    --warning-edge: color-mix(in oklab, var(--warning) 26%, var(--surface));
+    --danger-soft:  color-mix(in oklab, var(--danger) 14%, var(--surface));
+    --danger-text:  color-mix(in oklab, var(--danger) 90%, white);
+    --danger-edge:  color-mix(in oklab, var(--danger) 34%, var(--surface));
+
+    /* ── HeroUI-style interactive fills (filters, fields) ────── */
+    --default-hover:       color-mix(in oklab, var(--default) 88%, var(--foreground) 12%);
+    --warning-soft-hover:  color-mix(in oklab, var(--warning) 20%, var(--surface));
+    --danger-soft-hover:   color-mix(in oklab, var(--danger) 20%, var(--surface));
+    --field-focus:         color-mix(in oklab, var(--foreground) 10%, transparent);
+
+    --radius: 10px;
+    --radius-sm: 8px;
+    --radius-badge: 6px;
+
+    /* ── Legacy aliases (dashboard shell + sidebar bridge) ───── */
+    --surface-foreground:    var(--foreground);
+    --default:               var(--surface-secondary);
+    --default-foreground:    var(--foreground);
+    --background-inverse:            var(--foreground);
+    --background-inverse-foreground: var(--surface);
+    --link:                  var(--foreground);
+    --backdrop:              oklch(0% 0 0 / 55%);
+    --success-foreground:    var(--success-text);
+    --warning-foreground:    var(--warning-text);
+    --danger-foreground:     var(--danger-text);
+
+    --background-secondary: color-mix(in oklab, var(--background) 92%, var(--foreground) 8%);
+    --background-tertiary:  color-mix(in oklab, var(--background) 86%, var(--foreground) 14%);
+    --surface-tertiary:     color-mix(in oklab, var(--surface) 88%, var(--foreground) 12%);
+    --field-background:     var(--surface-secondary);
+    --field-border:         var(--border);
+
+    /* ── Filter chrome — KEY INVERSION ────────────────────────
+       In light mode this was var(--foreground) to paint a DARK strip on a
+       LIGHT card. In dark mode that would paint a near-WHITE strip, so it must
+       become a softly ELEVATED slate instead. ─────────────────────────────── */
+    --filter-bg:         var(--surface-hover);
+    --filter-fg:         var(--foreground);
+    --filter-muted:      var(--muted);
+    --filter-border:     var(--border-strong);
+    --filter-bg-hover:   color-mix(in oklab, var(--surface-hover) 80%, white 8%);
+    --filter-focus-ring: color-mix(in oklab, var(--accent) 40%, transparent);
+
+    /* ── Card chrome — subtle elevated header strip on dark cards ── */
+    --card-header-bg:            var(--filter-bg);
+    --card-header-fg:            var(--filter-fg);
+    --card-header-muted:         var(--filter-muted);
+    --card-header-border:        var(--filter-border);
+    --card-header-icon-bg:       color-mix(in oklab, var(--foreground) 8%, var(--filter-bg));
+    --card-header-icon-border:   color-mix(in oklab, var(--foreground) 18%, var(--filter-bg));
+    --card-header-positive:      var(--success);
+    --card-header-negative:      var(--danger);
+  }
+
+  [x-cloak] { display: none !important; }
+}
+
+/* ── OKLCH fallback (hex ONLY here) ───────────────────────────── */
+@supports not (color: oklch(0 0 0)) {
+  :root {
+    --bg:             #0e1116;
+    --surface:        #151922;
+    --surface-hover:  #1a2029;
+    --border:         rgba(255, 255, 255, 0.07);
+    --card-highlight: rgba(255, 255, 255, 0.12);
+    --card-inset:     inset 0 1px 0 rgba(255, 255, 255, 0.12),
+                      inset 0 -12px 18px rgba(14, 17, 22, 0.42);
+    --stat-blue:      #6b9ad4;
+    --text:           #e8eaed;
+    --text-muted:     #9aa3b2;
+
+    --shell-bg:     #09090b;
+    --shell-card:   #111113;
+    --shell-raised: #18181b;
+    --shell-dot:    rgba(232, 234, 237, 0.14);
+    --shell-grid-line: rgba(232, 234, 237, 0.06);
+
+    --sidebar-bg:      #09090b;
+    --sidebar-surface: #18181b;
+    --sidebar-dot:     rgba(232, 234, 237, 0.14);
+
+    --background:        #0e1116;
+    --foreground:        #e8eaed;
+    --muted:             #9aa3b2;
+    --surface-secondary: #1a2029;
+    --border-strong:     rgba(255, 255, 255, 0.14);
+    --separator:         rgba(255, 255, 255, 0.06);
+    --header-strip:      #1a2029;
+    --dim:               #8a93a0;
+
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.30), 0 2px 6px -1px rgb(0 0 0 / 0.40);
+    --shadow-md: 0 2px 4px rgb(0 0 0 / 0.35), 0 12px 28px -6px rgb(0 0 0 / 0.55);
+
+    --accent:        #f08a3c;
+    --accent-soft:   #2a2620;
+    --accent-border: #5a4632;
+
+    --success: #4ec98a;
+    --warning: #e0b23c;
+    --danger:  #f0655a;
+
+    --success-soft: #1e2a24;
+    --success-text: #b9ecd0;
+    --success-edge: #2f5a44;
+    --warning-soft: #2a2820;
+    --warning-text: #f0e0b0;
+    --warning-edge: #5a4e2c;
+    --danger-soft:  #2a2020;
+    --danger-text:  #f6c4bd;
+    --danger-edge:  #5a3630;
+
+    --default-hover:      #2a2f38;
+    --warning-soft-hover: #332f22;
+    --danger-soft-hover:  #33241f;
+    --field-focus:        rgb(238 240 244 / 0.10);
+
+    --background-secondary: #171b21;
+    --background-tertiary:  #1d222a;
+    --surface-tertiary:     #262b34;
+    --field-background:     #21262f;
+    --field-border:         #3a404b;
+
+    --filter-bg:         #1a2029;
+    --filter-fg:         #e8eaed;
+    --filter-muted:      #9aa3b2;
+    --filter-border:     rgba(255, 255, 255, 0.14);
+    --filter-bg-hover:   #222833;
+    --filter-focus-ring: rgb(240 138 60 / 0.40);
+
+    --card-header-bg:          #262b34;
+    --card-header-fg:          #eef0f4;
+    --card-header-muted:       #a3a9b5;
+    --card-header-border:      #515867;
+    --card-header-icon-bg:     #2f343d;
+    --card-header-icon-border: #444a54;
+    --card-header-positive:    #4ec98a;
+    --card-header-negative:    #f0655a;
+  }
+}

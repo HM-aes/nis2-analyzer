@@ -6,6 +6,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Django-based SaaS platform for automated NIS2 (Network and Information Security Directive) compliance gap analysis for Dutch IT companies. The system uses Claude (via Pydantic AI) to analyze uploaded client documents against NIS2 requirements stored in a Qdrant vector database.
 
+## Repository Layout
+
+```
+backend/     All Python: Django project (nis2_analyzer/) + the 8 apps, manage.py,
+             scripts/, and runtime dirs (media/, logs/, qdrant_local/, db.sqlite3)
+frontend/    Server-rendered UI assets: templates/ and static/ (HTMX + Alpine.js,
+             no build step). Referenced from settings via FRONTEND_DIR.
+```
+
+All management commands run from the repo root as `python backend/manage.py ...`.
+
+**Login gate (temporary):** `accounts/middleware.py::LoginGateMiddleware` forces
+every request to an authenticated user. Logged-out visitors only reach `/login/`,
+`/accounts/*` (allauth), `/admin/login/`, and static/media. Widen
+`PUBLIC_PREFIXES` there to reopen pages. Create credentials with
+`python backend/manage.py createsuperuser`.
+
 ## Development Commands
 
 ```bash
@@ -14,18 +31,18 @@ python3.11 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env          # then set ANTHROPIC_API_KEY and DATABASE_URL
 docker-compose up -d          # starts PostgreSQL and Qdrant
-python manage.py migrate
-python manage.py runserver
+python backend/manage.py migrate
+python backend/manage.py runserver
 
 # Tests
-python manage.py test                              # all tests
-python manage.py test compliance_engine            # single app
-python manage.py test compliance_engine.tests.TestName  # single test
+python backend/manage.py test                              # all tests
+python backend/manage.py test compliance_engine            # single app
+python backend/manage.py test compliance_engine.tests.TestName  # single test
 
 # Database
-python manage.py makemigrations
-python manage.py migrate
-python manage.py shell                             # Django REPL
+python backend/manage.py makemigrations
+python backend/manage.py migrate
+python backend/manage.py shell                             # Django REPL
 ```
 
 ## Architecture

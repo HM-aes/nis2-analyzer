@@ -1,0 +1,222 @@
+/* ================================================================
+   Onboarding card — shared by the dashboard and clients empty states
+   (templates/dashboard/includes/onboard_card.html)
+   ================================================================ */
+
+.onboard-card {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.onboard-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle,
+    color-mix(in oklab, var(--foreground) 16%, transparent) 1px,
+    transparent 1.2px);
+  background-size: 18px 18px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 28%, black 10%, transparent 72%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 28%, black 10%, transparent 72%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.onboard-card > * { position: relative; z-index: 1; }
+
+.onboard-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 0.75rem;
+}
+
+.onboard-lead {
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+/* ── Choice cards ─────────────────────────────────────────────── */
+.onboard-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 0.75rem;
+  max-width: 38rem;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.onboard-choice {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 1rem 1.1rem;
+  border-radius: 14px;
+  background: var(--surface-hover);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  text-decoration: none;
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.2s ease,
+    box-shadow 0.25s ease;
+}
+
+.onboard-choice:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-border);
+  box-shadow: 0 12px 28px -16px color-mix(in oklab, var(--accent) 70%, transparent);
+}
+
+.onboard-choice:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.onboard-choice__icon {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 10px;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.onboard-choice--primary .onboard-choice__icon {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+}
+
+.onboard-choice__icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.onboard-choice__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.onboard-choice__title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.onboard-choice__desc {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.onboard-choice__arrow {
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-left: auto;
+  color: var(--text-muted);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s ease;
+}
+
+.onboard-choice:hover .onboard-choice__arrow {
+  transform: translateX(3px);
+  color: var(--accent);
+}
+
+/* ── 3-step strip ─────────────────────────────────────────────── */
+.onboard-steps {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  max-width: 36rem;
+  margin: 1.75rem auto 0;
+  padding: 0 0.5rem;
+}
+
+.onboard-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 5.5rem;
+  flex: 1;
+}
+
+.onboard-step__n {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+}
+
+.onboard-step.is-current .onboard-step__n {
+  color: var(--bg);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.onboard-step__label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.onboard-step.is-current .onboard-step__label { color: var(--text); }
+
+.onboard-step__line {
+  flex: 0.4;
+  height: 1px;
+  background: var(--border-strong);
+  margin-top: 0.75rem;
+  min-width: 1.25rem;
+}
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .onboard-card {
+    padding: 2.5rem 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .onboard-steps { flex-wrap: wrap; }
+  .onboard-step__line { display: none; }
+}
+
+@media (max-width: 380px) {
+  .onboard-title {
+    font-size: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onboard-choice,
+  .onboard-choice__arrow {
+    transition: none;
+  }
+
+  .onboard-choice:hover,
+  .onboard-choice:hover .onboard-choice__arrow {
+    transform: none;
+  }
+}
