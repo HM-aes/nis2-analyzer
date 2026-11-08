@@ -58,8 +58,13 @@ logs/
 # Jupyter
 .ipynb_checkpoints/
 
-# Impeccable design-hook cache
+# Impeccable design tool — local install, cache and live-session data
 .impeccable/hook.cache.json
+.impeccable/live/
+.claude/
+.cursor/skills/
+.cursor/agents/
+.cursor/hooks.json
 
 # Sample/test docs (optional — remove if you want to keep)
 sample_docs/

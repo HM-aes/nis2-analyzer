@@ -385,27 +385,48 @@
    BUTTONS — one confident accent CTA
    ================================================================= */
 .main-content .btn { border-radius: 10px; font-weight: 550; }
+/* Primary = graphite "metal": zinc gradient + top highlight; amber only on the icon */
 .main-content .btn.btn-primary {
   background: linear-gradient(180deg,
-    color-mix(in oklab, var(--pl-accent) 92%, white 8%),
-    var(--pl-accent));
-  color: oklch(0.2 0.03 60);
-  border: 1px solid color-mix(in oklab, var(--pl-accent) 70%, black 12%);
+    color-mix(in oklab, var(--shell-raised) 82%, var(--text) 10%),
+    var(--shell-card));
+  color: var(--text);
+  border: 1px solid var(--border-strong);
   box-shadow:
-    0 1px 0 0 color-mix(in oklab, white 30%, transparent) inset,
-    0 8px 20px -10px color-mix(in oklab, var(--pl-accent) 90%, transparent);
-  transition: transform 0.18s var(--pl-ease), box-shadow 0.2s ease, filter 0.2s ease;
+    inset 0 1px 0 0 color-mix(in oklab, var(--text) 14%, transparent),
+    0 1px 2px 0 color-mix(in oklab, black 50%, transparent);
+  transition: transform 0.18s var(--pl-ease), box-shadow 0.2s ease, border-color 0.2s ease;
 }
-.main-content .btn.btn-primary:hover {
-  filter: brightness(1.06);
+.main-content .btn.btn-primary svg { color: var(--accent); }
+
+/* Secondary = same shape, flat surface; shares the primary's hover language */
+.main-content .btn.btn-secondary {
+  border-radius: 10px;
+  transition: transform 0.18s var(--pl-ease), box-shadow 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.main-content .btn.btn-primary:hover,
+.main-content .btn.btn-secondary:hover {
   transform: translateY(-1px);
+  color: var(--text);
+  border-color: var(--accent-border);
   box-shadow:
-    0 1px 0 0 color-mix(in oklab, white 40%, transparent) inset,
-    0 12px 26px -10px color-mix(in oklab, var(--pl-accent) 95%, transparent);
+    inset 0 1px 0 0 color-mix(in oklab, var(--text) 18%, transparent),
+    0 10px 24px -14px color-mix(in oklab, var(--accent) 70%, transparent);
 }
-.main-content .btn.btn-primary:active { transform: translateY(0); }
-.main-content .btn.btn-secondary { border-radius: 10px; }
-.main-content .btn.btn-secondary:hover { border-color: var(--border-strong); }
+.main-content .btn.btn-primary:active,
+.main-content .btn.btn-secondary:active { transform: translateY(0); }
+.main-content .btn.btn-primary:focus-visible,
+.main-content .btn.btn-secondary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .main-content .btn.btn-primary,
+  .main-content .btn.btn-primary:hover,
+  .main-content .btn.btn-secondary,
+  .main-content .btn.btn-secondary:hover { transition: none; transform: none; }
+}
 
 /* onboarding hero */
 .main-content .onboard-card { padding: 3.5rem 2rem; }

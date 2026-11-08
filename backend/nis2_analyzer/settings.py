@@ -74,6 +74,9 @@ _railway_deploy = any(
         "RAILWAY_PROJECT_ID",
     )
 )
+# Never leave DEBUG on in production unless explicitly set.
+if _railway_deploy:
+    DEBUG = config("DEBUG", default=False, cast=bool)
 
 # HTTPS / CSRF — required for Railway (TLS terminates at the edge proxy)
 CSRF_TRUSTED_ORIGINS: list[str] = _parse_csv_origins(

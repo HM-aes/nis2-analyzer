@@ -22,6 +22,7 @@ class LoginGateMiddleware:
         "/admin/login/",    # Django admin's own login form
         "/static/",
         "/media/",
+        "/favicon.ico",     # redirects to the static SVG icon
     )
 
     def __init__(self, get_response):

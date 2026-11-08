@@ -4,10 +4,14 @@ NIS2 Analyzer URL Configuration
 
 from django.contrib import admin
 from django.urls import path, include
+from django.templatetags.static import static as static_url
+from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    # Browsers and crawlers request /favicon.ico directly; point them at the SVG.
+    path("favicon.ico", RedirectView.as_view(url=static_url("favicon.svg"), permanent=True)),
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path("api/", include("compliance_engine.urls")),

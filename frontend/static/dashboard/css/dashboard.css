@@ -1271,23 +1271,49 @@ body::after {
 }
 
 .avatar-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.8125rem;
+  position: relative;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 50%;
   border: none;
   cursor: pointer;
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-  transition: opacity 0.15s;
+  background: var(--surface-hover);
+  box-shadow: 0 0 0 1px var(--border-strong), 0 0 0 3px transparent;
+  transition: box-shadow 0.2s ease;
 }
 
-.avatar-btn:hover {
-  opacity: 0.85;
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.avatar-status {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 0 2px var(--shell-bg, var(--bg));
+}
+
+.avatar-btn:hover,
+.avatar-btn[aria-expanded="true"] {
+  box-shadow: 0 0 0 1px var(--accent-border), 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent);
+}
+
+.avatar-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-btn { transition: none; }
 }
 
 .topbar-dropdown {

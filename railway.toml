@@ -1,0 +1,5 @@
+[deploy]
+releaseCommand = "python backend/manage.py migrate --noinput"
+# collectstatic must run in the serving container — files written by the
+# release/pre-deploy step are not kept, and the manifest storage 500s without them.
+startCommand = "python backend/manage.py collectstatic --noinput && gunicorn --chdir backend nis2_analyzer.wsgi --bind 0.0.0.0:$PORT --workers 2 --log-file -"

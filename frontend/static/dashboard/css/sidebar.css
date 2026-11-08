@@ -278,22 +278,77 @@
     background: var(--secondary);
 }
 
+/* ── Tooltip (rail only — see rail blocks below) ──────────────── */
+.sidebar-nav a,
+.sidebar-logout-btn {
+    position: relative;
+}
+
+.sidebar-nav a::after,
+.sidebar-logout-btn::after {
+    content: attr(data-tip);
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%) translateX(-4px);
+    padding: 0.35rem 0.7rem;
+    border-radius: var(--radius-sm);
+    background: var(--shell-raised);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-md);
+    color: var(--text);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+    z-index: 50;
+}
+
 /* ── Responsive ───────────────────────────────────────────────── */
-@media (max-width: 1024px) {
+/* Auto rail on tablet widths — mirrors the manual collapsed rail below */
+@media (min-width: 769px) and (max-width: 1024px) {
     .sidebar {
-        width: 60px;
+        width: 72px;
+        overflow: visible;
+        z-index: 30;
     }
 
-    .sidebar-nav a span:not(.nav-icon) {
-        display: none;
-    }
-
-    .sidebar-brand .brand-text {
-        display: none;
-    }
-
+    .sidebar-toggle,
+    .sidebar-brand .brand-text,
     .sidebar-section-label {
         display: none;
+    }
+
+    .sidebar-brand-row {
+        justify-content: center;
+    }
+
+    .sidebar-nav a,
+    .sidebar-logout-btn {
+        justify-content: center;
+        padding: 0.6rem;
+    }
+
+    .sidebar-nav a span,
+    .sidebar-logout-btn span {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    .sidebar-nav a:hover::after,
+    .sidebar-nav a:focus-visible::after,
+    .sidebar-logout-btn:hover::after,
+    .sidebar-logout-btn:focus-visible::after {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(-50%) translateX(0);
     }
 }
 
@@ -343,63 +398,54 @@
 /* ── Collapsed rail (user toggle, persisted client-side) ─────────
    Applies at any viewport width — the manual choice from the
    sidebar-toggle button wins over the 1024px auto-collapse above. */
-.app-shell.is-collapsed .sidebar {
-    width: 72px;
-}
+@media (min-width: 769px) {
+    .app-shell.is-collapsed .sidebar {
+        width: 72px;
+        overflow: visible;
+        z-index: 30;
+    }
 
-.app-shell.is-collapsed .sidebar-brand-row {
-    flex-direction: column;
-    gap: 0.65rem;
-}
+    .app-shell.is-collapsed .sidebar-brand-row {
+        flex-direction: column;
+        gap: 0.65rem;
+    }
 
-.app-shell.is-collapsed .sidebar-brand .brand-text,
-.app-shell.is-collapsed .sidebar-nav a span:not(.nav-icon),
-.app-shell.is-collapsed .sidebar-logout-btn span:not(.nav-icon),
-.app-shell.is-collapsed .sidebar-section-label {
-    display: none;
-}
+    .app-shell.is-collapsed .sidebar-brand .brand-text,
+    .app-shell.is-collapsed .sidebar-section-label {
+        display: none;
+    }
 
-.app-shell.is-collapsed .sidebar-nav a,
-.app-shell.is-collapsed .sidebar-logout-btn {
-    justify-content: center;
-    padding: 0.6rem;
-}
+    .app-shell.is-collapsed .sidebar-nav a,
+    .app-shell.is-collapsed .sidebar-logout-btn {
+        justify-content: center;
+        padding: 0.6rem;
+    }
 
-/* Styled tooltip on hover — the native title="" attribute already
-   gives a fallback tooltip, this is just the polished version. */
-.app-shell.is-collapsed .sidebar-nav a {
-    position: relative;
-}
+    .app-shell.is-collapsed .sidebar-nav a span,
+    .app-shell.is-collapsed .sidebar-logout-btn span {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
 
-.app-shell.is-collapsed .sidebar-nav a::after {
-    content: attr(title);
-    position: absolute;
-    left: calc(100% + 10px);
-    top: 50%;
-    transform: translateY(-50%) scale(0.92);
-    background: var(--card);
-    border: 1px solid var(--border);
-    color: var(--foreground);
-    font-size: 0.75rem;
-    font-weight: 500;
-    padding: 0.35rem 0.65rem;
-    border-radius: var(--radius-sm);
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.15s ease, transform 0.15s ease;
-    z-index: 20;
-}
-
-.app-shell.is-collapsed .sidebar-nav a:hover::after {
-    opacity: 1;
-    transform: translateY(-50%) scale(1);
+    .app-shell.is-collapsed .sidebar-nav a:hover::after,
+    .app-shell.is-collapsed .sidebar-nav a:focus-visible::after,
+    .app-shell.is-collapsed .sidebar-logout-btn:hover::after,
+    .app-shell.is-collapsed .sidebar-logout-btn:focus-visible::after {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(-50%) translateX(0);
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .sidebar,
     .sidebar-toggle svg,
-    .app-shell.is-collapsed .sidebar-nav a::after {
+    .sidebar-nav a::after,
+    .sidebar-logout-btn::after {
         transition: none;
     }
 

@@ -7,6 +7,10 @@
       novalidate>
   {% csrf_token %}
 
+  {% if form.non_field_errors %}
+    <div class="auth-alert" role="alert">{{ form.non_field_errors.0 }}</div>
+  {% endif %}
+
   <div class="auth-field">
     <label for="id_org_email">{% trans "Work email" %}</label>
     <input type="email" name="email" id="id_org_email"
@@ -52,10 +56,6 @@
       <p class="auth-err" id="err_pw">{{ form.password1.errors.0 }}</p>
     {% endif %}
   </div>
-
-  {% if form.non_field_errors %}
-    <div class="auth-alert" role="alert">{{ form.non_field_errors.0 }}</div>
-  {% endif %}
 
   <button type="submit" class="btn btn-primary auth-submit">
     <span class="auth-submit-label">{% trans "Create account & start assessment" %}</span>

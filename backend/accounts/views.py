@@ -1,5 +1,8 @@
+import logging
+
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.models import User
+from django.db import DatabaseError
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -9,7 +12,17 @@ from django.utils.translation import gettext_lazy as _
 
 from .forms import LoginForm, SignupForm
 
+logger = logging.getLogger(__name__)
+
 DASHBOARD_URL = "dashboard:home"
+AUTH_DB_UNAVAILABLE = _(
+    "Sign-in is temporarily unavailable. The account database is not ready. "
+    "Please try again shortly."
+)
+SIGNUP_DB_UNAVAILABLE = _(
+    "We couldn't create your account because the database is not ready. "
+    "Please try again shortly."
+)
 
 
 def _is_htmx(request):
@@ -44,15 +57,19 @@ def signup(request):
 
     if request.method == "POST":
         form = SignupForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            auth_login(request, user)
-            target = reverse(DASHBOARD_URL)
-            if _is_htmx(request):
-                resp = HttpResponse(status=204)
-                resp["HX-Redirect"] = target
-                return resp
-            return redirect(DASHBOARD_URL)
+        try:
+            if form.is_valid():
+                user = form.save()
+                auth_login(request, user)
+                target = reverse(DASHBOARD_URL)
+                if _is_htmx(request):
+                    resp = HttpResponse(status=204)
+                    resp["HX-Redirect"] = target
+                    return resp
+                return redirect(DASHBOARD_URL)
+        except DatabaseError:
+            logger.exception("Signup failed: account database is unavailable")
+            form.add_error(None, SIGNUP_DB_UNAVAILABLE)
         return render(request, "auth/_signup_form.html", {"form": form})
 
     form = SignupForm()
@@ -69,21 +86,25 @@ def login_view(request):
     next_url = request.GET.get("next") or request.POST.get("next") or ""
     if request.method == "POST":
         form = LoginForm(request.POST)
-        if form.is_valid():
-            user = _authenticate_login(
-                request,
-                form.cleaned_data["email"],
-                form.cleaned_data["password"],
-            )
-            if user is not None:
-                auth_login(request, user)
-                target = next_url or reverse(DASHBOARD_URL)
-                if _is_htmx(request):
-                    resp = HttpResponse(status=204)
-                    resp["HX-Redirect"] = target
-                    return resp
-                return redirect(target)
-            form.add_error(None, _("Email or password is incorrect."))
+        try:
+            if form.is_valid():
+                user = _authenticate_login(
+                    request,
+                    form.cleaned_data["email"],
+                    form.cleaned_data["password"],
+                )
+                if user is not None:
+                    auth_login(request, user)
+                    target = next_url or reverse(DASHBOARD_URL)
+                    if _is_htmx(request):
+                        resp = HttpResponse(status=204)
+                        resp["HX-Redirect"] = target
+                        return resp
+                    return redirect(target)
+                form.add_error(None, _("Email or password is incorrect."))
+        except DatabaseError:
+            logger.exception("Login failed: account database is unavailable")
+            form.add_error(None, AUTH_DB_UNAVAILABLE)
         return render(
             request, "auth/_login_form.html", {"form": form, "next": next_url}
         )

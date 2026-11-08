@@ -8,6 +8,10 @@
   {% csrf_token %}
   {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
 
+  {% if form.non_field_errors %}
+    <div class="auth-alert" role="alert">{{ form.non_field_errors.0 }}</div>
+  {% endif %}
+
   <div class="auth-field">
     <label for="id_login_email">{% trans "Email or username" %}</label>
     <input type="text" name="email" id="id_login_email"
@@ -35,10 +39,6 @@
       </button>
     </div>
   </div>
-
-  {% if form.non_field_errors %}
-    <div class="auth-alert" role="alert">{{ form.non_field_errors.0 }}</div>
-  {% endif %}
 
   <button type="submit" class="btn btn-primary auth-submit">
     <span class="auth-submit-label">{% trans "Log in" %}</span>
