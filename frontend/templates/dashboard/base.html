@@ -13,9 +13,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,560&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=14">
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=15">
   <link rel="stylesheet" href="{% static 'dashboard/css/sidebar.css' %}?v=19">
-  <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}?v=19">
+  <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}?v=20">
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=8">
   <link rel="stylesheet" href="{% static 'dashboard/css/dashboard-theme.css' %}?v=17">
   <link rel="stylesheet" href="{% static 'dashboard/css/onboard.css' %}?v=1">
@@ -86,23 +86,26 @@
           </button>
 
           <!-- Avatar dropdown (Alpine.js) -->
-          <div x-data="{ open: false }" class="relative">
-            <button type="button" @click="open = !open" class="avatar-btn"
-                    :aria-expanded="open.toString()" aria-haspopup="menu"
+          <div x-data="{ open: false }" class="relative"
+               @keydown.escape.window="if (open) { open = false; $refs.avatarBtn.focus() }">
+            <button type="button" @click="open = !open" class="avatar-btn" x-ref="avatarBtn"
+                    :aria-expanded="open.toString()" aria-haspopup="menu" aria-controls="account-menu"
                     aria-label="{% trans 'Account menu' %}">
               <img class="avatar-img"
                    src="{% if user_avatar_url %}{{ user_avatar_url }}{% else %}{% static 'dashboard/img/avatar-default.jpg' %}{% endif %}"
                    alt="" width="32" height="32" referrerpolicy="no-referrer">
               <span class="avatar-status" aria-hidden="true"></span>
             </button>
-            <div x-show="open" @click.away="open = false" x-transition class="topbar-dropdown">
+            <div id="account-menu" role="menu" x-cloak x-show="open" @click.outside="open = false"
+                 x-transition:enter="dropdown-enter" x-transition:enter-start="dropdown-from" x-transition:enter-end="dropdown-to"
+                 x-transition:leave="dropdown-leave" x-transition:leave-start="dropdown-to" x-transition:leave-end="dropdown-from"
+                 class="topbar-dropdown">
               <div class="topbar-dropdown-header">
-                <div class="topbar-dropdown-name">{{ request.user.get_full_name|default:request.user.username }}</div>
-                <div class="topbar-dropdown-role">{% if request.user.is_superuser %}{% trans "Administrator" %}{% else %}{% trans "Consultant" %}{% endif %}</div>
+                <div class="topbar-dropdown-name" title="{{ request.user.get_full_name|default:request.user.username }}">{{ request.user.get_full_name|default:request.user.username }}</div>
               </div>
               <form method="post" action="{% url 'dashboard:logout' %}">
                 {% csrf_token %}
-                <button type="submit" class="topbar-dropdown-logout">{% trans "Log out" %}</button>
+                <button type="submit" role="menuitem" class="topbar-dropdown-logout">{% trans "Log out" %}</button>
               </form>
             </div>
           </div>

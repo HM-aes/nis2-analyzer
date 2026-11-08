@@ -1316,51 +1316,75 @@ body::after {
   .avatar-btn { transition: none; }
 }
 
+/* Anchored to the avatar's bottom-right corner, 8px gap, grows down-left. */
 .topbar-dropdown {
   position: absolute;
+  top: calc(100% + 8px);
   right: 0;
-  top: 2.5rem;
-  border-radius: var(--radius-lg);
-  padding: 0.25rem 0;
-  width: 200px;
   z-index: 50;
+  min-width: 220px;
+  max-width: calc(100vw - 1.5rem);
+  padding: 4px;
+  border-radius: var(--radius);
   background: var(--popover);
-  border: 1px solid var(--border);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--popover-edge);
+  box-shadow: var(--popover-shadow);
+  transform-origin: top right;
 }
 
 .topbar-dropdown-header {
-  padding: 0.6rem 0.875rem;
-  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 0.625rem 0.625rem;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border-strong);
 }
 
 .topbar-dropdown-name {
   font-size: 0.875rem;
   font-weight: 600;
+  line-height: 1.3;
   color: var(--foreground);
-}
-
-.topbar-dropdown-role {
-  font-size: 0.7rem;
-  margin-top: 2px;
-  color: var(--muted-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .topbar-dropdown-logout {
-  display: block;
+  display: flex;
+  align-items: center;
   width: 100%;
-  text-align: left;
-  padding: 0.55rem 0.875rem;
-  font-size: 0.875rem;
-  color: var(--accent-red);
-  background: none;
+  min-height: 34px;
+  padding: 0 0.625rem;
   border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  font-size: 0.875rem;
+  text-align: left;
+  color: var(--danger);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background-color 0.12s ease;
 }
 
-.topbar-dropdown-logout:hover {
-  background: rgba(239, 68, 68, 0.06);
+.topbar-dropdown-logout:hover,
+.topbar-dropdown-logout:focus-visible {
+  background: var(--danger-soft);
+  outline: none;
+}
+
+.topbar-dropdown-logout:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--danger-edge);
+}
+
+.dropdown-enter,
+.dropdown-leave { transition: opacity 0.14s ease-out, transform 0.14s ease-out; }
+.dropdown-leave { transition-duration: 0.1s; transition-timing-function: ease-in; }
+.dropdown-from  { opacity: 0; transform: translateY(-4px) scale(0.98); }
+.dropdown-to    { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dropdown-enter,
+  .dropdown-leave { transition: opacity 0.1s linear; }
+  .dropdown-from  { transform: none; }
+  .topbar-dropdown-logout { transition: none; }
 }
 
 /* ── Responsive ────────────────────────────────────────────── */

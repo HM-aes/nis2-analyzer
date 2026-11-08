@@ -40,6 +40,12 @@
     --shadow-md: 0 2px 4px oklch(0 0 0 / 0.35),
                  0 12px 28px -6px oklch(0 0 0 / 0.55);
 
+    /* ── Popover / dropdown menus ─────────────────────────────── */
+    --popover:        var(--shell-bg);
+    --popover-edge:   color-mix(in oklab, var(--text) 78%, transparent);
+    --popover-shadow: 0 4px 8px -2px oklch(0 0 0 / 0.45),
+                      0 16px 36px -8px oklch(0 0 0 / 0.65);
+
     /* ── Subtle brand accent (shield orange) — use sparingly ─── */
     --accent:        oklch(0.705 0.155 55);
     --accent-soft:   color-mix(in oklab, var(--accent) 15%, var(--surface));
@@ -148,6 +154,10 @@
 
     --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.30), 0 2px 6px -1px rgb(0 0 0 / 0.40);
     --shadow-md: 0 2px 4px rgb(0 0 0 / 0.35), 0 12px 28px -6px rgb(0 0 0 / 0.55);
+
+    --popover:        #09090b;
+    --popover-edge:   rgba(232, 234, 237, 0.78);
+    --popover-shadow: 0 4px 8px -2px rgb(0 0 0 / 0.45), 0 16px 36px -8px rgb(0 0 0 / 0.65);
 
     --accent:        #f08a3c;
     --accent-soft:   #2a2620;
